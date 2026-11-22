@@ -2275,6 +2275,25 @@ const CUSTOM_SITE_CONFIG = {
   ]
 };
 
+    // 大頭貼優先載入：設定一讀進來就預載＋直接開始下載，不用等其他初始化；其他圖片稍後才載
+    (function preloadAvatarFirst() {
+      try {
+        const u = String(((CUSTOM_SITE_CONFIG.images || {}).avatar) || SITE_IMAGES.avatar || '').trim();
+        if (!u) return;
+        const fast = optimizeImageUrl(u);
+        const l = document.createElement('link');
+        l.rel = 'preload'; l.as = 'image'; l.href = fast;
+        l.setAttribute('fetchpriority', 'high');
+        document.head.appendChild(l);
+        const img = document.getElementById('img-avatar');
+        if (img && img.getAttribute('src') !== fast) {
+          img.setAttribute('fetchpriority', 'high');
+          img.onerror = () => { if (fast !== u) { img.onerror = null; img.src = u; } };
+          img.src = fast;
+        }
+      } catch (e) { /* 失敗就照原本流程載入 */ }
+    })();
+
     let siteConfig = JSON.parse(JSON.stringify(DEFAULT_SITE_CONFIG));
     let isEditMode = false;
     let activeWeekKey = 'this';
@@ -2464,6 +2483,7 @@ const CUSTOM_SITE_CONFIG = {
           if (decorEl) decorEl.classList.remove('hidden');
         };
         if (imgEl.getAttribute('src') !== fast) imgEl.src = fast;
+        else if (imgEl.complete && !imgEl.naturalWidth && imgEl.onerror) imgEl.onerror();   // 提早載入時錯過的失敗事件
       } else {
         imgEl.src = fallbackUri;
         if (imgId === 'img-main-channel-banner') {
@@ -4349,7 +4369,16 @@ const CUSTOM_SITE_CONFIG = {
       initLiveStatus();
       loadSavedConfig();
       applySiteImages();
-      createMagicParticles();
+      (function () {
+        const av = document.getElementById('img-avatar');
+        let started = false;
+        const go = () => { if (started) return; started = true; createMagicParticles(); };
+        if (av && !(av.complete && av.naturalWidth)) {
+          av.addEventListener('load', go, { once: true });
+          av.addEventListener('error', go, { once: true });
+          setTimeout(go, 2500);
+        } else go();
+      })();
       renderAll();
       renderAnnouncements();
       bindEvents();
@@ -4360,7 +4389,13 @@ const CUSTOM_SITE_CONFIG = {
     // 設定套用完成後才顯示頁面（排在原本的 DOMContentLoaded 之後執行）；4 秒保險，避免意外一直空白
     (function () {
       function reveal() { var e = document.getElementById('preload-hide'); if (e) e.remove(); }
-      window.addEventListener('DOMContentLoaded', reveal);
+      window.addEventListener('DOMContentLoaded', function () {
+        var av = document.getElementById('img-avatar');
+        if (!av || (av.complete && av.naturalWidth)) return reveal();
+        av.addEventListener('load', reveal, { once: true });
+        av.addEventListener('error', reveal, { once: true });
+        setTimeout(reveal, 1800);      // 大頭貼太慢就不再等，先顯示頁面
+      });
       setTimeout(reveal, 4000);
     })();
   </script>
