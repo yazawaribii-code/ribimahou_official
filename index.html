@@ -21,7 +21,7 @@
 
 
   <!-- 自訂義粉紅魔法星星 Favicon（可於下方 SITE_IMAGES.favicon 替換） -->
-  <link id="dynamic-favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='starGrad' x1='0%25' y1='0%25' x2='100%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%23FFC4D4'/%3E%3Cstop offset='100%25' stop-color='%23E85A7F'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='30' fill='%23FFF9FB' stroke='%23FFA8BE' stroke-width='4'/%3E%3Cpath d='M32 10 L38.6 23.4 L53.4 25.5 L42.7 35.9 L45.2 50.7 L32 43.8 L18.8 50.7 L21.3 35.9 L10.6 25.5 L25.4 23.4 Z' fill='url(%23starGrad)' stroke='%23E85A7F' stroke-width='2' stroke-linejoin='round'/%3E%3Ccircle cx='32' cy='31' r='4' fill='%23FFF9FB'/%3E%3Cpath d='M50 11 L52 15.5 L56.5 17.5 L52 19.5 L50 24 L48 19.5 L43.5 17.5 L48 15.5 Z' fill='%23FFD166'/%3E%3C/svg%3E">
+  <link id="dynamic-favicon" rel="icon" type="image/png" href="https://cdn.jsdelivr.net/gh/yazawaribii-code/RibiPortfolio@main/portfolio/Favicon.png">
 
   <!-- Google Fonts: Zen Maru Gothic & Noto Sans TC -->
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
@@ -1261,9 +1261,9 @@
       <p data-editable-field="contactDesc" class="mt-5 text-sm sm:text-base leading-loose text-cocoa font-medium" contenteditable="true" spellcheck="false">繪圖/工商合作 等合作邀約</p>
       <div class="mt-7 flex items-center gap-3 pb-4 border-b border-sakura/50 text-cocoa font-black text-sm sm:text-base">
         <i class="fa-regular fa-envelope text-sm" aria-hidden="true"></i>
-        <span id="contact-email" data-editable-field="contactEmail" contenteditable="true" spellcheck="false"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="661f071c071107140f040f0f26010b070f0a4805090b">[email&#160;protected]</a></span>
+        <span id="contact-email" data-editable-field="contactEmail" contenteditable="true" spellcheck="false">yazawaribii@gmail.com</span>
       </div>
-      <a id="contact-mail-btn" href="/cdn-cgi/l/email-protection#59203823382e382b303b3030193e34383035773a3634" class="mt-7 inline-flex items-center gap-2 bg-sakura-deep text-white font-black text-sm sm:text-base px-7 py-3.5 rounded-full shadow-kawaii hover:opacity-95 hover:-translate-y-0.5 transition">
+      <a id="contact-mail-btn" href="mailto:yazawaribii@gmail.com" class="mt-7 inline-flex items-center gap-2 bg-sakura-deep text-white font-black text-sm sm:text-base px-7 py-3.5 rounded-full shadow-kawaii hover:opacity-95 hover:-translate-y-0.5 transition">
         <span data-editable-field="contactBtn" contenteditable="true" spellcheck="false">合作詢問</span><span aria-hidden="true">→</span>
       </a>
      </div>
@@ -1403,7 +1403,7 @@
     </div>
   </div>
 
-  <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  <script>
     // =========================================================================
     // ★ 全站圖片集中設定表（SITE_IMAGES） ★
     // 填入網址或相對路徑（例如 "./avatar.png"、"https://..."）即可替換；
@@ -1796,7 +1796,7 @@ const CUSTOM_SITE_CONFIG = {
     "footerHint": "Made with Strawberry Magic 🍓 • 點擊右下角「✨ 排版與內容編輯模式」可移動卡片、刪除小區塊與編輯文字"
   },
   "images": {
-    "favicon": "",
+    "favicon": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Favicon.png?raw=true",
     "logo": "https://github.com/yazawaribii-code/RibiMahou-Official-Link/blob/main/logo.png?raw=true",
     "chibi": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/RibiQ.webp?raw=true",
     "contactChibi": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/stickers/Walk_NEW01%20(1).gif?raw=true",
@@ -2743,8 +2743,9 @@ const CUSTOM_SITE_CONFIG = {
       const faviconEl = document.getElementById('dynamic-favicon');
       const favUrl = getImageUrl('favicon').trim();
       if (faviconEl && favUrl) {
-        faviconEl.href = favUrl;
-        if (favUrl.toLowerCase().endsWith('.png')) faviconEl.type = 'image/png';
+        faviconEl.onerror = () => { faviconEl.onerror = null; faviconEl.href = favUrl; };
+        faviconEl.href = optimizeImageUrl(favUrl);
+        if (favUrl.toLowerCase().split('?')[0].endsWith('.png')) faviconEl.type = 'image/png';
         else if (favUrl.toLowerCase().endsWith('.ico')) faviconEl.type = 'image/x-icon';
       }
 
