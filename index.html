@@ -154,8 +154,8 @@
     body:not(.edit-mode-active) #block-channels [data-item-field]:empty { display: none; }
     body.edit-mode-active #block-channels [data-item-field]:empty { display: inline-block; min-width: 4rem; min-height: 1.2em; }
     body.edit-mode-active #block-channels [data-item-field]:empty::before { content: '（空白，點此輸入）'; opacity: .45; font-weight: 400; font-size: 11px; }
-    /* 「關於莉比醬」標題與內文：2px 圓角白色外框 + 白色光暈 */
-    #notes-heading, #sheet-notes-container {
+    /* 「關於莉比醬」標題與內文、週表下方備註：2px 圓角白色外框 + 白色光暈 */
+    #notes-heading, #sheet-notes-container, [data-editable-field="scheduleDisclaimer"] {
       /* 用一圈圈白色陰影疊出 2px 的圓角外框（text-stroke 的轉角是尖的，所以不用它） */
       text-shadow:
         2.00px 0.00px 0 #fff,
@@ -1221,7 +1221,7 @@
           </div>
         </div>
 
-        <p data-editable-field="scheduleDisclaimer" class="text-xs text-cocoa-light pl-1" contenteditable="true" spellcheck="false">※ 行程若有臨時變動，以魔法少女莉比醬的 X (Twitter) 與 Discord 公告為準喔！</p>
+        <p data-editable-field="scheduleDisclaimer" class="text-xs text-cocoa-light pl-1" contenteditable="true" spellcheck="false">※ 行程若有臨時變動，以莉比醬的推特與DC公告為準喔！</p>
       </div>
     </section><section id="block-videos" class="modular-block" data-block-id="videos" data-block-name="YouTube 主打影片">
       <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
@@ -1583,7 +1583,7 @@
         scheduleTimezoneNote: '台灣時間 UTC+8 • 00:00 為隔日午夜 • 每週六固定「無莉日」休息 💤',
         scheduleMascotBubble: '本週也請多指教！',
         scheduleMascotKaomoji: '٩(*\' \' *)✨',
-        scheduleDisclaimer: '※ 行程若有臨時變動，以魔法少女莉比醬的 X (Twitter) 與 Discord 公告為準喔！',
+        scheduleDisclaimer: '※ 行程若有臨時變動，以莉比醬的推特與DC公告為準喔！',
         videosEyebrow: 'FEATURED COVERS & CLIPS',
         videosTitle: 'YouTube 主打影片精選',
         videosSubscribeText: '訂閱莉比醬的 YouTube 頻道',
@@ -1867,7 +1867,7 @@ const CUSTOM_SITE_CONFIG = {
     "scheduleTimezoneNote": "台灣時間 UTC+8 • 00:00 為隔日午夜 • 每週六固定「無莉日」休息 ",
     "scheduleMascotBubble": "這週也要加油\n欸欸喔—！٩(*' ' *)✨",
     "scheduleMascotKaomoji": "",
-    "scheduleDisclaimer": "※ 行程若有臨時變動，以魔法少女莉比醬的 X (Twitter) 與 Discord 公告為準喔！",
+    "scheduleDisclaimer": "※ 行程若有臨時變動，以莉比醬的推特與DC公告為準喔！",
     "videosEyebrow": "FEATURED COVERS & CLIPS",
     "videosTitle": "YouTube 主打影片精選",
     "videosSubscribeText": "訂閱莉比醬的 YouTube 頻道",
