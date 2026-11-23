@@ -450,7 +450,8 @@
 <style id="cw-css">
     /* ===== 🎀 合作實績小牆（放在「歡迎合作邀約」卡片左欄；正在合作中的顯示 NOW ♡） ===== */
     body:not(.edit-mode-active) #block-collab.cw-none { display: none !important; }
-    .cw-area { max-width: 42rem; margin: 1.5rem auto 3.5rem; padding: 0 .5rem; }
+    #blocks-container > .cw-area { max-width: 42rem; margin-left: auto; margin-right: auto; padding: 2rem .5rem .5rem; }
+    body.edit-mode-active #blocks-container > .cw-area { padding-top: 5rem; }   /* 編輯模式：留位置給上方的積木控制列，不擋到標題 */
     .cw-headrow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
     .cw-heading { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .1rem .45rem; font-weight: 900; color: #E85A7F; }
     .cw-heading .cw-eb { font-size: 11px; letter-spacing: .18em; }
@@ -480,7 +481,7 @@
       color: #E85A7F; font-weight: 900; font-size: .8rem; background: rgba(255,255,255,.7); line-height: 1.6; }
     .cw-placeholder span { font-weight: 700; font-size: 11px; opacity: .75; }
     @media (max-width: 639px) {
-      .cw-area { margin: 1rem auto 2.75rem; padding: 0 .75rem; }
+      #blocks-container > .cw-area { padding: 2.5rem .75rem 0; }
       .cw-viewport { padding: 3px; border-radius: 14px; }
       .cw-window { border-radius: 10px; }
       .cw-arrow { display: none; }
@@ -1500,29 +1501,36 @@
         </div>
       </div>
     </section>
+
+    <!-- 🎀 合作實績（可在 ?edit 編輯模式用 ⬆️⬇️ 移到任何位置；預設在最下面、合作詢問卡片的正上方） -->
+    <section id="block-collab" class="modular-block cw-area cw-none" data-block-id="collab" data-block-name="合作實績">
+      <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
+        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：合作實績</span>
+        <button type="button" data-cw-open="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">🎀 編輯</button>
+        <button type="button" data-move-block="collab" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
+        <button type="button" data-move-block="collab" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
+        <button type="button" data-toggle-block="collab" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
+      </div>
+      <div class="cw-headrow">
+        <div class="cw-heading">
+          <span class="cw-eb" data-editable-field="adsEyebrow">♡ COLLABORATIONS</span>
+          <span class="cw-tt" data-editable-field="adsTitle">合作實績</span>
+        </div>
+        <button type="button" data-cw-open="1" class="cw-edit-btn">🎀 編輯合作實績</button>
+      </div>
+      <div class="cw-frame" role="region" aria-roledescription="carousel" aria-label="合作實績">
+        <div id="cw-viewport" class="cw-viewport">
+          <div class="cw-window"><div id="cw-track" class="cw-track"></div></div>
+          <button id="cw-prev" type="button" class="cw-arrow cw-prev" aria-label="上一則">‹</button>
+          <button id="cw-next" type="button" class="cw-arrow cw-next" aria-label="下一則">›</button>
+        </div>
+        <div id="cw-dots" class="cw-dots"></div>
+      </div>
+    </section>
     </main>
 
   <!-- 合作詢問區塊（文字可在 ?edit 編輯模式直接修改；按鈕會自動使用下方 email） -->
   <section id="contact" class="relative z-10 max-w-6xl mx-auto px-4 pt-4 pb-10">
-      <!-- 🎀 合作實績小牆（在合作卡片上方，不加框）：?edit 編輯模式按「🎀 編輯合作實績」放圖片＋網址；勾「正在合作中」會顯示 NOW ♡。沒有內容時一般訪客看不到 -->
-      <div id="block-collab" class="cw-area cw-none">
-        <div class="cw-headrow">
-          <div class="cw-heading">
-            <span class="cw-eb" data-editable-field="adsEyebrow">♡ COLLABORATIONS</span>
-            <span class="cw-tt" data-editable-field="adsTitle">合作實績</span>
-          </div>
-          <button type="button" data-cw-open="1" class="cw-edit-btn">🎀 編輯合作實績</button>
-        </div>
-        <div class="cw-frame" role="region" aria-roledescription="carousel" aria-label="合作實績">
-          <div id="cw-viewport" class="cw-viewport">
-            <div class="cw-window"><div id="cw-track" class="cw-track"></div></div>
-            <button id="cw-prev" type="button" class="cw-arrow cw-prev" aria-label="上一則">‹</button>
-            <button id="cw-next" type="button" class="cw-arrow cw-next" aria-label="下一則">›</button>
-          </div>
-          <div id="cw-dots" class="cw-dots"></div>
-        </div>
-      </div>
-
     <div class="kawaii-card shadow-kawaii max-w-2xl mx-auto p-7 sm:p-10 !rounded-[2rem] flex items-end justify-between gap-3 sm:gap-6">
      <div class="min-w-0 flex-1">
       <div data-editable-field="contactEyebrow" class="text-xs sm:text-sm font-black tracking-[.25em] text-sakura-deep uppercase" contenteditable="true" spellcheck="false">BUSINESS CONTACT</div>
@@ -1762,7 +1770,8 @@
         { id: 'sheet', visible: true },
         { id: 'hashtags', visible: true },
         { id: 'schedule', visible: true },
-        { id: 'videos', visible: true }
+        { id: 'videos', visible: true },
+        { id: 'collab', visible: true }   // 🎀 合作實績（沒有內容時一般訪客看不到）
       ],
       deletedItemIds: [],
       ads: [],                                  // 🎀 工商廣告：[{ id, image: '圖片網址', url: '點擊前往網址', title: '廣告名稱' }]
@@ -2008,6 +2017,10 @@ const CUSTOM_SITE_CONFIG = {
       "visible": true
     },
     {
+      "id": "collab",
+      "visible": true
+    },
+    {
       "id": "schedule",
       "visible": true
     },
@@ -2074,12 +2087,14 @@ const CUSTOM_SITE_CONFIG = {
     "schedule": 100,
     "sheet": 100,
     "channels": 50,
-    "hashtags": 100,
-    "profile": 100
+    "hashtags": 55,
+    "profile": 100,
+    "collab": 100
   },
   "blockBorderOpacity": {
     "hashtags": 0,
-    "profile": 0
+    "profile": 0,
+    "collab": 0
   },
   "borderOpacity": 0,
   "texts": {
@@ -3435,7 +3450,7 @@ const CUSTOM_SITE_CONFIG = {
       const base = JSON.parse(JSON.stringify(DEFAULT_SITE_CONFIG));
       if (!raw || typeof raw !== 'object') return base;
       return {
-        layout: ensureLayoutBlocks((Array.isArray(raw.layout) && raw.layout.length > 0 ? raw.layout : base.layout).filter(x => !(x && (x.id === 'ads' || x.id === 'collab'))), base.layout),   // 合作實績已移進合作詢問卡片，不再是可移動的積木
+        layout: ensureLayoutBlocks((Array.isArray(raw.layout) && raw.layout.length > 0 ? raw.layout : base.layout).map(x => (x && x.id === 'ads') ? Object.assign({}, x, { id: 'collab' }) : x), base.layout),
         ads: Array.isArray(raw.ads) ? raw.ads : base.ads,
         adsSettings: Object.assign({}, base.adsSettings, (raw.adsSettings && typeof raw.adsSettings === 'object') ? raw.adsSettings : {}),
         deletedItemIds: Array.isArray(raw.deletedItemIds) ? raw.deletedItemIds : [],
