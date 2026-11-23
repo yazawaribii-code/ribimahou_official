@@ -450,7 +450,7 @@
 <style id="cw-css">
     /* ===== 🎀 合作實績小牆（放在「歡迎合作邀約」卡片左欄；正在合作中的顯示 NOW ♡） ===== */
     body:not(.edit-mode-active) #block-collab.cw-none { display: none !important; }
-    #blocks-container > .cw-area { max-width: 42rem; margin-left: auto; margin-right: auto; padding: 2rem .5rem .5rem; }
+    #blocks-container > .cw-area { max-width: 42rem; margin-left: auto; margin-right: auto; padding: 0 .5rem; }   /* 上下間距跟其他區塊一樣 */
     body.edit-mode-active #blocks-container > .cw-area { padding-top: 5rem; }   /* 編輯模式：留位置給上方的積木控制列，不擋到標題 */
     .cw-headrow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
     .cw-heading { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: .1rem .45rem; font-weight: 900; color: #E85A7F; }
@@ -481,7 +481,7 @@
       color: #E85A7F; font-weight: 900; font-size: .8rem; background: rgba(255,255,255,.7); line-height: 1.6; }
     .cw-placeholder span { font-weight: 700; font-size: 11px; opacity: .75; }
     @media (max-width: 639px) {
-      #blocks-container > .cw-area { padding: 2.5rem .75rem 0; }
+      #blocks-container > .cw-area { padding: 0 .75rem; }
       .cw-viewport { padding: 3px; border-radius: 14px; }
       .cw-window { border-radius: 10px; }
       .cw-arrow { display: none; }
@@ -2017,11 +2017,11 @@ const CUSTOM_SITE_CONFIG = {
       "visible": true
     },
     {
-      "id": "collab",
+      "id": "schedule",
       "visible": true
     },
     {
-      "id": "schedule",
+      "id": "collab",
       "visible": true
     },
     {
