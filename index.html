@@ -65,6 +65,11 @@
     @media (prefers-reduced-motion: reduce) { #announce-text { transition: none; } }
     /* LOGO 大小：由 siteConfig.logoSize（px，電腦版高度）控制，手機版自動縮成 70% */
     #img-logo { height: calc(var(--logo-size, 72) * .7px); width: auto; max-width: 70vw; }
+    /* LOGO 載入前先保留高度，避免版面跳動 */
+    #logo-wrap { min-height: calc(var(--logo-size, 72) * .7px); }
+    @media (min-width: 640px) { #logo-wrap { min-height: calc(var(--logo-size, 72) * 1px); } }
+    /* LOGO 防下載：停用右鍵選單、拖曳、手機長按儲存與選取 */
+    #logo-wrap, #img-logo { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; -webkit-user-drag: none; }
     @media (min-width: 640px) { #img-logo { height: calc(var(--logo-size, 72) * 1px); max-width: 480px; } }
     /* 編輯模式：空白欄位也看得到、點得到 */
     body.edit-mode-active [data-editable-field]:empty { display: inline-block; min-width: 4rem; min-height: 1.2em; }
@@ -466,12 +471,9 @@
   <header class="relative z-20 pt-5 pb-2 px-4">
     <nav class="max-w-6xl mx-auto px-1 sm:px-2 py-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <a href="#" class="flex items-center gap-3 group">
-        <!-- LOGO 區：在 SITE_IMAGES.logo 填網址，或在 ?edit 編輯模式對 LOGO 按「換圖」；沒設定時顯示魔法棒小圖示 -->
-        <div id="logo-wrap" class="relative shrink-0 flex items-center">
-          <div id="logo-fallback" class="w-10 h-10 rounded-full bg-gradient-to-br from-sakura-light to-sakura flex items-center justify-center border-2 border-sakura-deep/30 shadow-sm group-hover:rotate-12 transition-transform">
-            <span class="text-xl">🪄</span>
-          </div>
-          <img id="img-logo" alt="網站 LOGO" decoding="async" class="hidden object-contain">
+        <!-- LOGO 區：在 SITE_IMAGES.logo 填網址，或在 ?edit 編輯模式對 LOGO 按「換圖」；載入前只會保留空位，不顯示任何替代圖示 -->
+        <div id="logo-wrap" class="relative shrink-0 flex items-center" oncontextmenu="return false;">
+          <img id="img-logo" alt="網站 LOGO" decoding="async" draggable="false" oncontextmenu="return false;" ondragstart="return false;" class="hidden object-contain">
         </div>
       </a>
 
@@ -1817,7 +1819,7 @@ const CUSTOM_SITE_CONFIG = {
       "url": "#block-schedule"
     }
   ],
-  "logoSize": 94,
+  "logoSize": 86,
   "chibiSize": 128,
   "contactChibiSize": 150,
   "bgOpacity": 100,
@@ -1881,7 +1883,7 @@ const CUSTOM_SITE_CONFIG = {
   },
   "images": {
     "favicon": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Favicon.png?raw=true",
-    "logo": "https://github.com/yazawaribii-code/RibiMahou-Official-Link/blob/main/logo.png?raw=true",
+    "logo": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Ribi-logo.gif?raw=true",
     "chibi": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/RibiQ.webp?raw=true",
     "contactChibi": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/stickers/Walk_NEW01%20(1).gif?raw=true",
     "avatar": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/3rd%20avatar.webp?raw=true",
@@ -2600,13 +2602,11 @@ const CUSTOM_SITE_CONFIG = {
     function applyLogo() {
       applyLogoSize();
       const img = document.getElementById('img-logo');
-      const fallback = document.getElementById('logo-fallback');
-      if (!img || !fallback) return;
+      if (!img) return;
       const url = getImageUrl('logo').trim();
       if (!url) {
         img.classList.add('hidden');
         img.removeAttribute('src');
-        fallback.classList.remove('hidden');
         return;
       }
       const fast = optimizeImageUrl(url);
@@ -2615,11 +2615,10 @@ const CUSTOM_SITE_CONFIG = {
         if (!retried && fast !== url) { retried = true; img.src = url; return; }
         img.onerror = null;
         img.classList.add('hidden');
-        fallback.classList.remove('hidden');
       };
-      img.onload = () => { img.classList.remove('hidden'); fallback.classList.add('hidden'); };
+      img.onload = () => { img.classList.remove('hidden'); };
       if (img.getAttribute('src') !== fast) img.src = fast;
-      else if (img.complete && img.naturalWidth) { img.classList.remove('hidden'); fallback.classList.add('hidden'); }
+      else if (img.complete && img.naturalWidth) { img.classList.remove('hidden'); }
     }
 
     // 大頭貼：電腦版用 imageAdjust.avatar；手機版用 imageAdjust.avatarMobile（沒設定時沿用電腦版）
