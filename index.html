@@ -446,6 +446,75 @@
 /* 主打實況台徽章（🩷每週六固定「無莉日」休息）：去掉半透明底框，改成淡白色發光的外光暈 */
 [data-editable-field="mainStreamBadge"]{background-color:transparent;box-shadow:none;text-shadow:0 0 3px #fff,0 0 6px #fff,0 0 10px rgba(255,255,255,.95),0 0 16px rgba(255,255,255,.9),0 0 26px rgba(255,255,255,.75)}
 </style>
+<style id="ads-wall-css">
+    /* ===== 🎀 工商廣告牆（粉色縫線框＋自動輪播） ===== */
+    body:not(.edit-mode-active) #block-ads.ads-empty { display: none !important; }
+    .adw-frame {
+      position: relative; margin: 0; padding: 20px; border-radius: 30px;
+      background:
+        radial-gradient(circle, rgba(255,255,255,.95) 0 1.6px, transparent 2.4px) 0 0 / 26px 26px,
+        linear-gradient(180deg, rgba(255,240,246,calc(.96*var(--bgo,1))) 0%, rgba(255,226,238,calc(.96*var(--bgo,1))) 100%);
+      box-shadow: 0 14px 34px -12px rgba(255,140,190,.55), inset 0 0 0 2px rgba(255,255,255,.95);
+    }
+    /* 內側縫線 */
+    .adw-frame::before { content: ''; position: absolute; inset: 8px; border-radius: 23px; border: 2px dashed rgba(255,150,190,.75); pointer-events: none; }
+    /* 角落閃閃 */
+    .adw-spark { position: absolute; z-index: 4; pointer-events: none; font-size: 16px; line-height: 1; color: #FFB3D1; text-shadow: 0 0 6px #fff, 0 0 10px rgba(255,179,209,.9); animation: adwTwinkle 2.4s ease-in-out infinite; }
+    .adw-spark.s1 { top: -9px; left: -7px; }
+    .adw-spark.s2 { top: -9px; right: -7px; color: #FF85A4; animation-delay: .6s; }
+    .adw-spark.s3 { bottom: -9px; left: -7px; color: #FF85A4; animation-delay: 1.2s; }
+    .adw-spark.s4 { bottom: -9px; right: -7px; color: #FFB3D1; animation-delay: 1.8s; }
+    @keyframes adwTwinkle { 0%,100% { opacity: .45; transform: scale(.8) rotate(0); } 50% { opacity: 1; transform: scale(1.2) rotate(20deg); } }
+    /* 輪播本體 */
+    .adw-viewport { position: relative; overflow: hidden; border-radius: 20px; border: 3px solid #fff; background: #FFF6FA; aspect-ratio: 3 / 1;
+      box-shadow: 0 6px 18px -6px rgba(232,90,127,.4); touch-action: pan-y; z-index: 2; }
+    .adw-track { display: flex; height: 100%; transition: transform .65s cubic-bezier(.22,.8,.28,1); will-change: transform; }
+    .adw-slide { flex: 0 0 100%; height: 100%; display: block; position: relative; overflow: hidden; }
+    .adw-slide img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; -webkit-user-drag: none; transition: transform .5s ease; }
+    a.adw-slide:hover img { transform: scale(1.025); }
+    .adw-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 3; width: 36px; height: 36px; border-radius: 999px;
+      display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,.9); color: #E85A7F; font-size: 20px; font-weight: 900; line-height: 1;
+      border: 2px solid #FFD6E0; box-shadow: 0 4px 10px -2px rgba(232,90,127,.35); cursor: pointer; transition: opacity .25s, transform .2s; }
+    .adw-arrow:hover { transform: translateY(-50%) scale(1.1); }
+    .adw-prev { left: 10px; } .adw-next { right: 10px; }
+    @media (hover: hover) { .adw-arrow { opacity: 0; } .adw-viewport:hover .adw-arrow, .adw-arrow:focus-visible { opacity: 1; } }
+    .adw-dots { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); z-index: 3; display: flex; justify-content: center; gap: 4px; padding: 3px 8px; border-radius: 999px; background: rgba(255,255,255,.78); box-shadow: 0 2px 8px -2px rgba(232,90,127,.3); }
+    .adw-dots:empty { display: none; }
+    .adw-dot { background: none; border: 0; padding: 1px 3px; font-size: 13px; line-height: 1; color: #FFC9DA; cursor: pointer; transition: transform .25s, color .25s; }
+    .adw-dot:hover { color: #FF85A4; }
+    .adw-dot[aria-current="true"] { color: #E85A7F; transform: scale(1.4); }
+    .adw-empty { height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; text-align: center; cursor: pointer;
+      color: #E85A7F; font-weight: 900; font-size: .85rem; border: 2px dashed #FFA8BE; border-radius: 16px; background: rgba(255,255,255,.7); }
+    @media (max-width: 639px) {
+      .adw-frame { margin: 0; padding: 13px; border-radius: 24px; }
+      .adw-frame::before { inset: 6px; border-radius: 19px; }
+      .adw-arrow { width: 28px; height: 28px; font-size: 16px; }
+      .adw-prev { left: 6px; } .adw-next { right: 6px; }
+      .adw-viewport { border-radius: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .adw-track { transition: none; } .adw-spark { animation: none; } }
+    /* 編輯廣告視窗 */
+    .adm-row { border: 1px solid rgba(255,168,190,.6); background: rgba(255,255,255,.85); border-radius: 1rem; padding: .75rem; display: grid; grid-template-columns: 110px minmax(0,1fr); gap: .6rem .75rem; }
+    .adm-thumb { width: 110px; aspect-ratio: 3 / 1; border-radius: 10px; object-fit: cover; background: #FFF0F4; border: 1px solid #FFD6E0; display: block; }
+    .adm-fields { display: flex; flex-direction: column; gap: .45rem; min-width: 0; }
+    .adm-side { display: flex; flex-direction: column; align-items: center; gap: .4rem; }
+    .adm-btns { display: flex; gap: .25rem; }
+    .adm-label { font-size: 11px; font-weight: 900; color: #E85A7F; }
+    @media (max-width: 520px) { .adm-row { grid-template-columns: minmax(0,1fr); } .adm-side { flex-direction: row; justify-content: space-between; } }
+
+    /* 📱 手機版：YouTube 主打影片卡片改成「自動往左捲動的一排」（可用手指滑；點了會切換上方影片） */
+    @media (max-width: 767px) {
+      #video-cards-container.vid-marquee {
+        display: flex; gap: .75rem; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none;
+        padding: 4px 2px 6px; margin: 0 -2px;
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent);
+                mask-image: linear-gradient(90deg, transparent 0, #000 16px, #000 calc(100% - 16px), transparent);
+      }
+      #video-cards-container.vid-marquee::-webkit-scrollbar { display: none; }
+      #video-cards-container.vid-marquee > [data-video-card-id] { flex: 0 0 62%; max-width: 240px; padding: .6rem; }
+      #video-cards-container.vid-marquee > [data-video-card-id] > .aspect-video { margin-bottom: .5rem; }
+    }
+  </style>
 </head>
 <body class="min-h-screen relative selection:bg-sakura selection:text-white">
 
@@ -554,6 +623,9 @@
         </button>
         <button id="btn-particles" type="button" class="bg-white/20 hover:bg-white/30 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-full transition flex items-center gap-1.5 cursor-pointer">
           🎈 設定漂浮物圖片
+        </button>
+        <button id="btn-ads" type="button" data-ads-open="1" class="bg-white/20 hover:bg-white/30 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-full transition flex items-center gap-1.5 cursor-pointer">
+          🎀 編輯廣告牆
         </button>
         <button id="btn-export-layout" type="button" class="bg-white/20 hover:bg-white/30 text-white text-xs sm:text-sm font-bold px-3.5 py-2 rounded-full transition flex items-center gap-1.5 cursor-pointer">
           <i class="fa-solid fa-code"></i> 匯出完整設定碼
@@ -1431,6 +1503,41 @@
           </div>
         </div>
       </div>
+    </section>
+
+    <!-- 7. 🎀 工商廣告牆（可在 ?edit 編輯模式用 ⬆️⬇️ 移到任何位置；按「🎀 編輯廣告」放圖片＋網址） -->
+    <section id="block-ads" class="modular-block ads-empty" data-block-id="ads" data-block-name="工商廣告牆">
+      <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
+        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：工商廣告牆</span>
+        <button type="button" data-ads-open="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">🎀 編輯廣告</button>
+        <button type="button" data-move-block="ads" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
+        <button type="button" data-move-block="ads" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
+        <button type="button" data-toggle-block="ads" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
+      </div>
+
+      <div class="space-y-4">
+      <div class="flex flex-wrap items-end justify-between gap-2 px-1">
+        <div>
+          <div data-editable-field="adsEyebrow" class="text-xs font-black tracking-widest text-sakura-deep uppercase">SPONSORED</div>
+          <h2 class="text-2xl sm:text-3xl font-black text-cocoa flex items-center gap-2">
+            <span data-editable-field="adsTitle">魔法合作夥伴</span>
+          </h2>
+        </div>
+      </div>
+
+      <div class="adw-frame" role="region" aria-roledescription="carousel" aria-label="工商廣告">
+        <span class="adw-spark s1" aria-hidden="true">✦</span>
+        <span class="adw-spark s2" aria-hidden="true">✦</span>
+        <span class="adw-spark s3" aria-hidden="true">✦</span>
+        <span class="adw-spark s4" aria-hidden="true">✦</span>
+        <div id="ads-viewport" class="adw-viewport">
+          <div id="ads-track" class="adw-track"></div>
+          <button id="ads-prev" type="button" class="adw-arrow adw-prev" aria-label="上一則廣告">‹</button>
+          <button id="ads-next" type="button" class="adw-arrow adw-next" aria-label="下一則廣告">›</button>
+          <div id="ads-dots" class="adw-dots"></div>
+        </div>
+      </div>
+      </div>
     </section></main>
 
   <!-- 合作詢問區塊（文字可在 ?edit 編輯模式直接修改；按鈕會自動使用下方 email） -->
@@ -1579,6 +1686,48 @@
     </div>
   </div>
 
+  <!-- 🎀 編輯工商廣告牆 Modal -->
+  <div id="ads-modal" role="dialog" aria-modal="true" aria-labelledby="ads-modal-title" class="hidden fixed inset-0 z-50 bg-cocoa/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div id="ads-panel" class="bg-cream border-2 border-sakura rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col p-5 sm:p-6 shadow-2xl gap-4">
+      <div class="flex items-center justify-between">
+        <h3 id="ads-modal-title" class="text-lg font-black text-sakura-deep">🎀 編輯工商廣告牆</h3>
+        <button id="btn-close-ads" type="button" aria-label="關閉" class="w-8 h-8 rounded-full bg-sakura-light text-sakura-deep font-black cursor-pointer">✕</button>
+      </div>
+      <p class="text-xs text-cocoa-light leading-relaxed">
+        每則廣告 = 一張橫幅圖片＋點擊後前往的網址。會依順序自動輪播（滑鼠移上去會暫停、手機可左右滑）。
+        圖片建議用 GitHub 圖片網址，尺寸照下方「橫幅比例」做最漂亮（3:1 → 例如 1500×500）。
+      </p>
+      <div class="flex flex-wrap gap-2 text-xs font-bold text-cocoa">
+        <label class="flex items-center gap-2 bg-white border border-sakura/70 rounded-full px-3 py-1.5">📐 橫幅比例
+          <select id="ads-aspect" class="bg-transparent focus:outline-none">
+            <option value="3/1">3 : 1（標準橫幅）</option>
+            <option value="4/1">4 : 1（細長橫條）</option>
+            <option value="5/1">5 : 1（超細長）</option>
+            <option value="2/1">2 : 1（比較高）</option>
+            <option value="16/9">16 : 9（影片比例）</option>
+          </select>
+        </label>
+        <label class="flex items-center gap-2 bg-white border border-sakura/70 rounded-full px-3 py-1.5">⏱️ 每則停留
+          <select id="ads-interval" class="bg-transparent focus:outline-none">
+            <option value="3000">3 秒</option>
+            <option value="4500">4.5 秒</option>
+            <option value="6000">6 秒</option>
+            <option value="8000">8 秒</option>
+          </select>
+        </label>
+      </div>
+      <div id="ads-list" class="space-y-3 overflow-y-auto pr-1 min-h-[80px]"></div>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <button id="btn-add-ad" type="button" class="bg-white text-sakura-deep border border-sakura text-xs font-black px-4 py-2.5 rounded-full shadow-sm hover:opacity-90 transition cursor-pointer">➕ 新增一則廣告</button>
+        <div class="flex gap-2">
+          <button id="btn-cancel-ads" type="button" class="bg-white text-sakura-deep border border-sakura text-xs font-black px-4 py-2.5 rounded-full shadow-sm hover:opacity-90 transition cursor-pointer">取消</button>
+          <button id="btn-save-ads" type="button" class="bg-sakura-deep text-white text-xs font-black px-4 py-2.5 rounded-full shadow-md hover:opacity-90 transition cursor-pointer">✅ 套用廣告</button>
+        </div>
+      </div>
+      <p class="text-[11px] text-cocoa-light leading-relaxed">💡 套用後記得到「匯出完整設定碼」下載 HTML，所有訪客才會看到。全部刪除 ＝ 一般訪客看不到廣告牆。想換位置：用廣告牆右上角的 ⬆️⬇️。</p>
+    </div>
+  </div>
+
   <!-- 提示氣泡 Toast -->
   <div id="toast-notification" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 opacity-0 translate-y-4">
     <div class="bg-cocoa text-white px-5 py-2.5 rounded-full shadow-xl border border-sakura text-xs sm:text-sm font-bold flex items-center gap-2">
@@ -1633,12 +1782,15 @@
       layout: [
         { id: 'profile', visible: true },
         { id: 'channels', visible: true },
+        { id: 'ads', visible: true },          // 🎀 工商廣告牆（沒放任何廣告時，一般訪客看不到）
         { id: 'sheet', visible: true },
         { id: 'hashtags', visible: true },
         { id: 'schedule', visible: true },
         { id: 'videos', visible: true }
       ],
       deletedItemIds: [],
+      ads: [],                                  // 🎀 工商廣告：[{ id, image: '圖片網址', url: '點擊前往網址', title: '廣告名稱' }]
+      adsSettings: { aspect: '3/1', interval: 4500 },   // 橫幅比例、每則停留毫秒數
       bgOpacity: 100,           // 區塊內白底透明度 0~100（全站）；在 ?edit 工具列「⬜ 白底透明度」調整
       blockBgOpacity: {},       // 各區塊個別的白底透明度，例如 { profile: 60 }；沒設定的區塊跟隨全站
       blockBorderOpacity: {},   // 各區塊個別的邊框透明度，例如 { profile: 40, videos: 0 }；沒設定的區塊跟隨全站設定
@@ -1691,6 +1843,8 @@
         videosTitle: 'YouTube 主打影片精選',
         videosSubscribeText: '訂閱莉比醬的 YouTube 頻道',
         videosWatchBtn: '前往 YouTube 觀看完整版',
+        adsEyebrow: 'SPONSORED',
+        adsTitle: '魔法合作夥伴',
         footerFanartPrefix: '🎨 同人二創與應援歡迎標註專屬繪圖標籤：',
         footerCopyright: '© 2023–2026 魔法少女莉比醬 / 莉比Ribi. All Rights Reserved. ٩(*\' \' *)✨',
         footerHint: 'Made with Strawberry Magic 🍓 • 點擊右下角「✨ 排版與內容編輯模式」可移動卡片、刪除小區塊與編輯文字'
@@ -1882,10 +2036,32 @@ const CUSTOM_SITE_CONFIG = {
       "visible": true
     },
     {
+      "id": "ads",
+      "visible": true
+    },
+    {
       "id": "videos",
       "visible": true
     }
   ],
+  "ads": [
+    {
+      "id": "ad-mwt53xc80x",
+      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/AD/Vwake.jpg?raw=true",
+      "url": "https://vwake.app/",
+      "title": "Vwake聲音鬧鐘 用莉比醬的元氣喚醒你！"
+    },
+    {
+      "id": "ad-mwt87s2o1g",
+      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/AD/pudding.jpg?raw=true",
+      "url": "https://kukulcansnake.zite.so/order",
+      "title": "訂購推薦者選「魔法少女莉比醬」，滿千送Q版布丁模板頭貼，買就送電子感謝卡 🍮"
+    }
+  ],
+  "adsSettings": {
+    "aspect": "3/1",
+    "interval": 4500
+  },
   "deletedItemIds": [
     "attr-game",
     "attr-sing",
@@ -1927,11 +2103,13 @@ const CUSTOM_SITE_CONFIG = {
     "sheet": 100,
     "channels": 50,
     "hashtags": 100,
-    "profile": 100
+    "profile": 100,
+    "ads": 60
   },
   "blockBorderOpacity": {
     "hashtags": 0,
-    "profile": 0
+    "profile": 0,
+    "ads": 0
   },
   "borderOpacity": 0,
   "texts": {
@@ -1975,6 +2153,8 @@ const CUSTOM_SITE_CONFIG = {
     "videosTitle": "YouTube 主打影片精選",
     "videosSubscribeText": "訂閱莉比醬的 YouTube 頻道",
     "videosWatchBtn": "前往 YouTube 觀看完整版",
+    "adsEyebrow": "SPONSORED",
+    "adsTitle": "工商時間",
     "footerFanartPrefix": "莉比的自發文會使用",
     "footerCopyright": "©2026 魔法少女莉比醬 VTuber/Illustrator",
     "footerHint": "Made with Strawberry Magic 🍓 • 點擊右下角「✨ 排版與內容編輯模式」可移動卡片、刪除小區塊與編輯文字"
@@ -3263,11 +3443,24 @@ const CUSTOM_SITE_CONFIG = {
     // =========================================================================
     // 狀態儲存與還原
     // =========================================================================
+    // 舊設定碼裡沒有的新區塊（例如工商廣告牆），自動插到預設的位置（跟在前一個區塊後面）
+    function ensureLayoutBlocks(layout, baseLayout) {
+      const out = layout.map(x => Object.assign({}, x));
+      baseLayout.forEach((b, i) => {
+        if (out.some(x => x.id === b.id)) return;
+        const prev = i > 0 ? out.findIndex(x => x.id === baseLayout[i - 1].id) : -1;
+        out.splice(prev + 1, 0, Object.assign({}, b));
+      });
+      return out;
+    }
+
     function mergeWithDefault(raw) {
       const base = JSON.parse(JSON.stringify(DEFAULT_SITE_CONFIG));
       if (!raw || typeof raw !== 'object') return base;
       return {
-        layout: Array.isArray(raw.layout) && raw.layout.length > 0 ? raw.layout : base.layout,
+        layout: ensureLayoutBlocks(Array.isArray(raw.layout) && raw.layout.length > 0 ? raw.layout : base.layout, base.layout),
+        ads: Array.isArray(raw.ads) ? raw.ads : base.ads,
+        adsSettings: Object.assign({}, base.adsSettings, (raw.adsSettings && typeof raw.adsSettings === 'object') ? raw.adsSettings : {}),
         deletedItemIds: Array.isArray(raw.deletedItemIds) ? raw.deletedItemIds : [],
         announcements: Array.isArray(raw.announcements) ? raw.announcements : base.announcements,
         logoSize: Number(raw.logoSize) > 0 ? Number(raw.logoSize) : base.logoSize,
@@ -3870,6 +4063,67 @@ const CUSTOM_SITE_CONFIG = {
         `;
       }).join('');
       renderFeaturedVideoPreview();
+      setupVideoMarquee();
+    }
+
+    // ---- 📱 手機版影片卡片：一直往左慢慢捲動（無縫循環）；手指按住會暫停、放開 2.5 秒後繼續 ----
+    const VID_MQ = window.matchMedia('(max-width: 767px)');
+    const vidMarquee = { raf: null, pos: 0, last: 0, holdUntil: 0, visible: true, inited: false, speed: 28 };   // speed＝每秒移動 px
+    function setupVideoMarquee() {
+      const c = document.getElementById('video-cards-container');
+      if (!c) return;
+      if (!vidMarquee.inited) {
+        vidMarquee.inited = true;
+        const hold = (ms) => { vidMarquee.holdUntil = ms === Infinity ? Infinity : Date.now() + ms; };
+        c.addEventListener('touchstart', () => hold(Infinity), { passive: true });
+        c.addEventListener('touchend', () => hold(2500), { passive: true });
+        c.addEventListener('touchcancel', () => hold(2500), { passive: true });
+        c.addEventListener('mousedown', () => hold(Infinity));
+        c.addEventListener('mouseup', () => hold(2500));
+        c.addEventListener('wheel', () => hold(2500), { passive: true });
+        c.addEventListener('click', () => hold(3000));
+        if ('IntersectionObserver' in window) {
+          new IntersectionObserver((es) => { vidMarquee.visible = es[0].isIntersecting; }).observe(c);
+        }
+        const onChange = () => renderVideoCards();
+        if (VID_MQ.addEventListener) VID_MQ.addEventListener('change', onChange); else VID_MQ.addListener(onChange);
+      }
+      c.querySelectorAll('.vid-clone').forEach(el => el.remove());
+      const cards = Array.from(c.querySelectorAll('[data-video-card-id]'));
+      const on = VID_MQ.matches && !isEditMode && cards.length > 1;
+      const was = c.classList.contains('vid-marquee');
+      c.classList.toggle('vid-marquee', on);
+      if (!on) { if (was) c.scrollLeft = 0; return; }
+      // 後面接一份「分身」卡片，捲完第一輪就無縫接回開頭
+      cards.forEach(card => {
+        const k = card.cloneNode(true);
+        k.classList.add('vid-clone');
+        k.setAttribute('aria-hidden', 'true');
+        k.querySelectorAll('img').forEach(im => im.setAttribute('loading', 'eager'));
+        c.appendChild(k);
+      });
+      vidMarquee.pos = c.scrollLeft;
+      vidMarquee.last = 0;
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduce && !vidMarquee.raf) vidMarquee.raf = requestAnimationFrame(vidMarqueeStep);
+    }
+    function vidMarqueeStep(t) {
+      const c = document.getElementById('video-cards-container');
+      if (!c || !c.classList.contains('vid-marquee')) { vidMarquee.raf = null; return; }
+      const dt = vidMarquee.last ? Math.min(64, t - vidMarquee.last) : 0;
+      vidMarquee.last = t;
+      const first = c.querySelector('[data-video-card-id]:not(.vid-clone)');
+      const firstClone = c.querySelector('.vid-clone');
+      const loopW = (first && firstClone) ? firstClone.offsetLeft - first.offsetLeft : 0;
+      if (Date.now() < vidMarquee.holdUntil) {
+        vidMarquee.pos = c.scrollLeft;                 // 手指在滑：交給手指，不搶
+      } else if (!document.hidden && vidMarquee.visible && loopW > 0) {
+        vidMarquee.pos += vidMarquee.speed * dt / 1000;
+        if (vidMarquee.pos >= loopW) vidMarquee.pos -= loopW;
+        if (vidMarquee.pos < 0) vidMarquee.pos += loopW;
+        c.scrollLeft = vidMarquee.pos;
+      }
+      vidMarquee.raf = requestAnimationFrame(vidMarqueeStep);
     }
 
     function renderSubcards() {
@@ -3887,6 +4141,7 @@ const CUSTOM_SITE_CONFIG = {
       renderMainBlocksOrder();
       syncEditableFieldsMode();
       renderSubcards();
+      renderAds();
     }
 
     // =========================================================================
@@ -4243,7 +4498,302 @@ const CUSTOM_SITE_CONFIG = {
       showToast(list.length ? `📢 已更新 ${list.length} 則公告（記得匯出才會讓所有訪客看到）` : '📢 已清空公告，公告列會隱藏');
     }
 
+    // =========================================================================
+    // 🎀 工商廣告牆：自動輪播（滑鼠移上去暫停、分頁在背景暫停、手機可左右滑、減少動態時不自動輪播）
+    // =========================================================================
+    const adsState = { idx: 0, pos: 0, timer: null, paused: false, drag: null, dragged: false };
+
+    function getAds() {
+      return (siteConfig.ads || []).filter(a => a && safeImageUrl(a.image));
+    }
+    function getAdsAspect() {
+      const v = String((siteConfig.adsSettings || {}).aspect || '3/1');
+      return /^\d+(\.\d+)?\/\d+(\.\d+)?$/.test(v) ? v : '3/1';
+    }
+    function getAdsInterval() {
+      return Math.min(20000, Math.max(2000, Number((siteConfig.adsSettings || {}).interval) || 4500));
+    }
+    function adsImgFallback(img) {
+      const orig = img.dataset.orig || '';
+      if (!img.dataset.retried && orig && img.src !== orig) { img.dataset.retried = '1'; img.src = orig; return; }
+      img.onerror = null;
+      const slide = img.closest('.adw-slide');
+      if (slide) slide.style.background = 'linear-gradient(135deg,#FFE2EF,#FFF0F6)';
+      img.style.visibility = 'hidden';
+    }
+    function stopAdsTimer() {
+      if (adsState.timer) { clearInterval(adsState.timer); adsState.timer = null; }
+    }
+    function setAdsTrack(pos, animate) {
+      const track = document.getElementById('ads-track');
+      if (!track) return;
+      adsState.pos = pos;
+      track.style.transition = animate ? '' : 'none';
+      track.style.transform = `translateX(${-pos * 100}%)`;
+      if (!animate) void track.offsetWidth;   // 讓「瞬間換位」立刻生效，下一次滑動才有動畫
+    }
+    function goToAd(i, animate = true) {
+      const track = document.getElementById('ads-track');
+      const n = getAds().length;
+      if (!track || !n) return;
+      if (adsState.pos === n) setAdsTrack(0, false);          // 還停在分身上 → 先換回真正的第一張
+      const cur = adsState.idx;
+      if (n > 1 && animate && i >= n && cur === n - 1) {       // 最後一張 → 繼續往後滑到第一張的分身
+        adsState.idx = 0;
+        setAdsTrack(n, true);
+      } else if (n > 1 && animate && i < 0 && cur === 0) {     // 第一張再往前 → 從分身位置滑回最後一張
+        adsState.idx = n - 1;
+        setAdsTrack(n, false);
+        setAdsTrack(n - 1, true);
+      } else {
+        adsState.idx = ((i % n) + n) % n;
+        setAdsTrack(adsState.idx, animate);
+      }
+      track.querySelectorAll('.adw-slide:not(.adw-clone)').forEach((s, k) => {
+        const on = k === adsState.idx;
+        s.setAttribute('aria-hidden', on ? 'false' : 'true');
+        s.tabIndex = on ? 0 : -1;
+      });
+      document.querySelectorAll('#ads-dots .adw-dot').forEach((d, k) => d.setAttribute('aria-current', k === adsState.idx ? 'true' : 'false'));
+    }
+    function startAdsTimer() {
+      stopAdsTimer();
+      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce || getAds().length < 2) return;
+      adsState.timer = setInterval(() => {
+        if (adsState.paused || adsState.drag || document.hidden) return;
+        goToAd(adsState.idx + 1);
+      }, getAdsInterval());
+    }
+    function renderAds() {
+      const sec = document.getElementById('block-ads');
+      const track = document.getElementById('ads-track');
+      const dots = document.getElementById('ads-dots');
+      const viewport = document.getElementById('ads-viewport');
+      if (!sec || !track || !dots || !viewport) return;
+      stopAdsTimer();
+      const ads = getAds();
+      sec.classList.toggle('ads-empty', !ads.length);
+      viewport.style.aspectRatio = getAdsAspect().replace('/', ' / ');
+      const showArrows = ads.length > 1;
+      document.getElementById('ads-prev').style.display = showArrows ? '' : 'none';
+      document.getElementById('ads-next').style.display = showArrows ? '' : 'none';
+      if (!ads.length) {
+        track.innerHTML = isEditMode
+          ? '<div class="adw-slide"><div class="adw-empty" data-ads-open="1"><span style="font-size:1.6rem">🎀</span>還沒有廣告～點這裡新增圖片＋網址<span style="font-weight:700;font-size:11px;opacity:.75">（沒有廣告時，一般訪客看不到這個區塊）</span></div></div>'
+          : '';
+        dots.innerHTML = '';
+        track.style.transform = '';
+        return;
+      }
+      track.innerHTML = ads.map((a, i) => {
+        const src = safeImageUrl(a.image);
+        const title = String(a.title || '').trim();
+        const href = safeUrl(a.url);
+        const img = `<img src="${escapeAttr(optimizeImageUrl(src))}" data-orig="${escapeAttr(src)}" alt="${escapeAttr(title || '工商廣告 ' + (i + 1))}" ${i ? 'loading="lazy"' : ''} decoding="async" draggable="false" onerror="adsImgFallback(this)">`;
+        const label = ` aria-roledescription="slide" aria-label="${i + 1} / ${ads.length}${title ? '：' + escapeAttr(title) : ''}"`;
+        if (!href) return `<div class="adw-slide"${label}>${img}</div>`;
+        const ext = !href.startsWith('#');
+        return `<a class="adw-slide" href="${escapeAttr(href)}"${ext ? ' target="_blank" rel="noopener noreferrer sponsored"' : ''}${title ? ` title="${escapeAttr(title)}"` : ''}${label}>${img}</a>`;
+      }).join('');
+      // 無限往後輪播：在最後面多放一張「第一張的分身」，播完最後一張會繼續往後滑到它，再瞬間換回真正的第一張
+      if (ads.length > 1) {
+        const clone = track.firstElementChild.cloneNode(true);
+        clone.classList.add('adw-clone');
+        clone.removeAttribute('aria-roledescription'); clone.removeAttribute('aria-label');
+        clone.setAttribute('aria-hidden', 'true'); clone.tabIndex = -1;
+        track.appendChild(clone);
+      }
+      adsState.pos = 0;
+      dots.innerHTML = ads.length > 1
+        ? ads.map((a, i) => `<button type="button" class="adw-dot" data-ad-dot="${i}" aria-label="第 ${i + 1} 則廣告">♥</button>`).join('')
+        : '';
+      goToAd(Math.min(adsState.idx, ads.length - 1), false);
+      startAdsTimer();
+    }
+
+    // ---- 廣告編輯器 ----
+    let adsDraft = [];
+    function renderAdsList() {
+      const list = document.getElementById('ads-list');
+      if (!adsDraft.length) {
+        list.innerHTML = '<div class="text-xs text-cocoa-light text-center py-6">目前沒有廣告，按下方「➕ 新增一則廣告」開始吧！</div>';
+        return;
+      }
+      const btn = 'w-8 h-8 rounded-full bg-sakura-light text-sakura-deep text-xs font-black hover:bg-sakura hover:text-white cursor-pointer transition';
+      const aspect = (document.getElementById('ads-aspect').value || '3/1').replace('/', ' / ');
+      list.innerHTML = adsDraft.map((a, i) => {
+        const prev = safeImageUrl(a.image);
+        return `
+          <div class="adm-row" data-ad-idx="${i}">
+            <div class="adm-side">
+              <img class="adm-thumb" alt="" style="aspect-ratio:${aspect}" ${prev ? `src="${escapeAttr(optimizeImageUrl(prev))}"` : ''} onerror="this.removeAttribute('src')">
+              <div class="adm-btns">
+                <span class="text-[11px] font-black text-sakura-deep" style="align-self:center;margin-right:.25rem">#${i + 1}</span>
+                <button type="button" data-ad-act="up" title="上移" class="${btn}">⬆️</button>
+                <button type="button" data-ad-act="down" title="下移" class="${btn}">⬇️</button>
+                <button type="button" data-ad-act="del" title="刪除" class="${btn} hover:!bg-red-500">🗑️</button>
+              </div>
+            </div>
+            <div class="adm-fields">
+              <span class="adm-label">🖼️ 橫幅圖片網址</span>
+              <input data-ad-field="image" type="text" inputmode="url" value="${escapeAttr(a.image)}" placeholder="https://github.com/…/banner.webp?raw=true" class="${ROW_FIELD}">
+              <span class="adm-label">🔗 點擊後前往的網址（可留空）</span>
+              <input data-ad-field="url" type="text" inputmode="url" value="${escapeAttr(a.url)}" placeholder="https://example.com/ （也可以填 #block-schedule 跳到網站區塊）" class="${ROW_FIELD}">
+              <span class="adm-label">🏷️ 廣告名稱（滑鼠移上去會顯示，可留空）</span>
+              <input data-ad-field="title" type="text" value="${escapeAttr(a.title)}" placeholder="例如：○○ 品牌聯名活動" class="${ROW_FIELD}">
+            </div>
+          </div>`;
+      }).join('');
+    }
+    function openAdsModal() {
+      adsDraft = (siteConfig.ads || []).map(a => ({ id: a.id, image: a.image || '', url: a.url || '', title: a.title || '' }));
+      if (!adsDraft.length) adsDraft.push({ id: '', image: '', url: '', title: '' });
+      const asp = document.getElementById('ads-aspect'), itv = document.getElementById('ads-interval');
+      asp.value = getAdsAspect(); if (!asp.value) asp.value = '3/1';
+      itv.value = String(getAdsInterval()); if (!itv.value) itv.value = '4500';
+      renderAdsList();
+      document.getElementById('ads-modal').classList.remove('hidden');
+    }
+    function closeAdsModal() {
+      document.getElementById('ads-modal').classList.add('hidden');
+    }
+    function saveAdsModal() {
+      const list = [];
+      for (let i = 0; i < adsDraft.length; i++) {
+        const a = adsDraft[i];
+        const rawImg = String(a.image || '').trim(), rawUrl = String(a.url || '').trim();
+        if (!rawImg && !rawUrl && !String(a.title || '').trim()) continue;   // 整列空白就略過
+        const image = safeImageUrl(rawImg);
+        if (!image) { showToast(`⚠️ 第 ${i + 1} 則廣告：請填有效的圖片網址（https:// 開頭）`); return; }
+        let url = '';
+        if (rawUrl) {
+          url = rawUrl.startsWith('#') ? rawUrl : normalizeWebUrl(rawUrl);
+          if (!url) { showToast(`⚠️ 第 ${i + 1} 則廣告：連結網址格式不對喔`); return; }
+        }
+        const id = a.id || `ad-${Date.now().toString(36)}${i}${Math.floor(Math.random() * 36).toString(36)}`;
+        list.push({ id, image, url, title: String(a.title || '').trim() });
+      }
+      siteConfig.ads = list;
+      siteConfig.adsSettings = {
+        aspect: document.getElementById('ads-aspect').value || '3/1',
+        interval: Number(document.getElementById('ads-interval').value) || 4500
+      };
+      adsState.idx = 0;
+      persistConfig(false);
+      renderAds();
+      closeAdsModal();
+      showToast(list.length ? `🎀 已更新 ${list.length} 則廣告（記得匯出才會讓所有訪客看到）` : '🎀 已清空廣告，一般訪客看不到廣告牆');
+    }
+
+    function bindAdsEvents() {
+      // 開啟編輯器（工具列、區塊按鈕、空白佔位）
+      document.addEventListener('click', (e) => {
+        const opener = e.target.closest && e.target.closest('[data-ads-open]');
+        if (!opener) return;
+        e.preventDefault(); e.stopPropagation();
+        openAdsModal();
+      }, true);
+
+      const viewport = document.getElementById('ads-viewport');
+      const frame = viewport.closest('.adw-frame');
+      document.getElementById('ads-prev').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); goToAd(adsState.idx - 1); startAdsTimer(); });
+      document.getElementById('ads-next').addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); goToAd(adsState.idx + 1); startAdsTimer(); });
+      document.getElementById('ads-dots').addEventListener('click', (e) => {
+        const d = e.target.closest('[data-ad-dot]'); if (!d) return;
+        e.stopPropagation();
+        goToAd(Number(d.dataset.adDot)); startAdsTimer();
+      });
+      frame.addEventListener('mouseenter', () => { adsState.paused = true; });
+      frame.addEventListener('mouseleave', () => { adsState.paused = false; });
+      frame.addEventListener('focusin', () => { adsState.paused = true; });
+      frame.addEventListener('focusout', () => { adsState.paused = false; });
+
+      // 手機／滑鼠左右滑動切換
+      viewport.addEventListener('pointerdown', (e) => {
+        if (e.target.closest('.adw-arrow, .adw-dots') || getAds().length < 2) return;
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        adsState.drag = { x: e.clientX, y: e.clientY, dx: 0, w: viewport.clientWidth, id: e.pointerId, active: false };
+        adsState.dragged = false;
+      });
+      viewport.addEventListener('pointermove', (e) => {
+        const d = adsState.drag; if (!d || d.id !== e.pointerId) return;
+        d.dx = e.clientX - d.x;
+        if (!d.active) {
+          if (Math.abs(d.dx) < 6) return;
+          if (Math.abs(e.clientY - d.y) > Math.abs(d.dx)) { adsState.drag = null; return; }   // 直向滑動交給頁面捲動
+          d.active = true;
+          try { viewport.setPointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
+        }
+        const track = document.getElementById('ads-track');
+        track.style.transition = 'none';
+        track.style.transform = `translateX(calc(${-adsState.idx * 100}% + ${d.dx}px))`;
+      });
+      const endDrag = () => {
+        const d = adsState.drag; adsState.drag = null;
+        if (!d || !d.active) return;
+        adsState.dragged = Math.abs(d.dx) > 6;
+        const th = Math.min(80, d.w * 0.18);
+        goToAd(adsState.idx + (d.dx < -th ? 1 : d.dx > th ? -1 : 0));
+        startAdsTimer();
+      };
+      viewport.addEventListener('pointerup', endDrag);
+      viewport.addEventListener('pointercancel', endDrag);
+      viewport.addEventListener('click', (e) => {
+        if (adsState.dragged) { e.preventDefault(); e.stopPropagation(); adsState.dragged = false; return; }
+        if (isEditMode && !e.target.closest('.adw-arrow, .adw-dots')) { e.preventDefault(); e.stopPropagation(); openAdsModal(); }
+      }, true);
+      viewport.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') { goToAd(adsState.idx - 1); startAdsTimer(); }
+        else if (e.key === 'ArrowRight') { goToAd(adsState.idx + 1); startAdsTimer(); }
+      });
+
+      // 編輯器
+      const list = document.getElementById('ads-list');
+      list.addEventListener('input', (e) => {
+        const row = e.target.closest('.adm-row'); if (!row) return;
+        const a = adsDraft[Number(row.dataset.adIdx)]; if (!a) return;
+        const f = e.target.dataset.adField; if (!f) return;
+        a[f] = e.target.value;
+        if (f === 'image') {
+          const th = row.querySelector('.adm-thumb'), u = safeImageUrl(e.target.value);
+          if (u) th.src = optimizeImageUrl(u); else th.removeAttribute('src');
+        }
+      });
+      list.addEventListener('click', (e) => {
+        const b = e.target.closest('[data-ad-act]'); if (!b) return;
+        const i = Number(b.closest('.adm-row').dataset.adIdx);
+        const act = b.dataset.adAct;
+        if (act === 'del') adsDraft.splice(i, 1);
+        else {
+          const j = i + (act === 'up' ? -1 : 1);
+          if (j < 0 || j >= adsDraft.length) return;
+          [adsDraft[i], adsDraft[j]] = [adsDraft[j], adsDraft[i]];
+        }
+        renderAdsList();
+      });
+      document.getElementById('ads-aspect').addEventListener('change', renderAdsList);
+      document.getElementById('btn-add-ad').addEventListener('click', () => {
+        adsDraft.push({ id: '', image: '', url: '', title: '' });
+        renderAdsList();
+        const last = document.querySelector('#ads-list .adm-row:last-child [data-ad-field="image"]');
+        if (last) { last.focus(); last.scrollIntoView({ block: 'nearest' }); }
+      });
+      document.getElementById('btn-save-ads').addEventListener('click', saveAdsModal);
+      document.getElementById('btn-cancel-ads').addEventListener('click', closeAdsModal);
+      document.getElementById('btn-close-ads').addEventListener('click', closeAdsModal);
+      document.getElementById('ads-modal').addEventListener('click', closeAdsModal);
+      document.getElementById('ads-panel').addEventListener('click', (e) => e.stopPropagation());
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeAdsModal(); });
+      window.addEventListener('resize', () => goToAd(adsState.idx, false));
+      // 滑到「第一張的分身」後，瞬間換回真正的第一張（看起來就是一直往後跑）
+      document.getElementById('ads-track').addEventListener('transitionend', (e) => {
+        if (e.target.id === 'ads-track' && adsState.pos === getAds().length) setAdsTrack(0, false);
+      });
+    }
+
     function bindEvents() {
+      bindAdsEvents();
       // 手機版 ☰ 選單
       (function () {
         const header = document.querySelector('header');
