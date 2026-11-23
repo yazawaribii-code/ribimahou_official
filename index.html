@@ -505,7 +505,8 @@
     .cw-prev { left: 26px; } .cw-next { right: 12px; }
     .cw-dots { display: none; }
     /* 📖 封面頁：手寫體大字 */
-    .cw-cover { cursor: pointer; }
+    .cw-cover, .cw-slide { cursor: pointer; }
+    a.cw-pic { cursor: pointer; } a.cw-pic:hover img { filter: brightness(1.04); }
     .cw-cover-in { height: 100%; min-height: 150px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4rem; text-align: center; padding: 10px 0 18px; }
     .cw-cover-eb { font-size: 11px; font-weight: 900; letter-spacing: .3em; color: #E85A7F; }
     .cw-cover-title { font-family: 'Xiaolai SC', 'Xiaolai Mono SC', cursive; font-weight: 400; font-size: clamp(34px, 9vw, 52px); line-height: 1.25; color: #5A3E46;
@@ -4653,8 +4654,8 @@ const CUSTOM_SITE_CONFIG = {
       sec.classList.toggle('cw-none', !ads.length);
       const picAspect = getAdsAspect().replace('/', ' / ');
       const many = ads.length > 1;
-      document.getElementById('cw-prev').style.display = ads.length ? '' : 'none';   // 有封面，所以 1 則也能翻
-      document.getElementById('cw-next').style.display = ads.length ? '' : 'none';
+      document.getElementById('cw-prev').style.display = 'none';   // 不用左右箭頭：點紙張翻頁
+      document.getElementById('cw-next').style.display = 'none';
       if (!ads.length) {
         track.innerHTML = isEditMode
           ? '<div class="cw-slide is-current"><div class="cw-placeholder" data-cw-open="1" style="min-height:140px;display:flex;flex-direction:column;justify-content:center;border-radius:6px">🎀 還沒有合作實績～點這裡新增<span>（沒有內容時，一般訪客看不到這一區）</span></div></div>'
@@ -4667,13 +4668,15 @@ const CUSTOM_SITE_CONFIG = {
         const title = String(a.title || '').trim();
         const href = safeUrl(a.url);
         const cap = String(a.desc || '').trim();
-        const img = `<span class="cw-pic"><img src="${escapeAttr(optimizeImageUrl(src))}" data-orig="${escapeAttr(src)}" alt="${escapeAttr(title || '合作實績 ' + (i + 1))}" decoding="async" draggable="false" onerror="adsImgFallback(this)">` +
-          (a.now ? '<span class="cw-now">NOW ♡</span>' : '') + '</span>' +
-          `<span class="cw-cap">${escapeHtml(cap)}</span>`;
+        // 只有「圖片」是連結；點白色紙張的地方＝翻頁，不會誤觸連結
+        const ext = href && !href.startsWith('#');
+        const picInner = `<img src="${escapeAttr(optimizeImageUrl(src))}" data-orig="${escapeAttr(src)}" alt="${escapeAttr(title || '合作實績 ' + (i + 1))}" decoding="async" draggable="false" onerror="adsImgFallback(this)">` +
+          (a.now ? '<span class="cw-now">NOW ♡</span>' : '');
+        const pic = href
+          ? `<a class="cw-pic" draggable="false" href="${escapeAttr(href)}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${title ? ` title="${escapeAttr(title)}"` : ''}>${picInner}</a>`
+          : `<span class="cw-pic">${picInner}</span>`;
         const label = ` aria-roledescription="slide" aria-label="${i + 1} / ${ads.length}${title ? '：' + escapeAttr(title) : ''}"`;
-        if (!href) return `<div class="cw-slide"${label}>${img}</div>`;
-        const ext = !href.startsWith('#');
-        return `<a class="cw-slide" draggable="false" href="${escapeAttr(href)}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${title ? ` title="${escapeAttr(title)}"` : ''}${label}>${img}</a>`;
+        return `<div class="cw-slide"${label}>${pic}<span class="cw-cap">${escapeHtml(cap)}</span></div>`;
       }).join('');
       // 第一頁：封面（手寫體大字）
       const tx = siteConfig.texts || {};
@@ -4821,7 +4824,8 @@ const CUSTOM_SITE_CONFIG = {
       viewport.addEventListener('click', (e) => {
         if (adsState.dragged) { e.preventDefault(); e.stopPropagation(); adsState.dragged = false; return; }
         if (isEditMode && !e.target.closest('.cw-arrow')) { e.preventDefault(); e.stopPropagation(); openAdsModal(); return; }
-        if (e.target.closest('[data-cw-cover]')) { goToAd(adsState.idx + 1, true, 1); }   // 點封面＝翻開
+        if (e.target.closest('a.cw-pic')) return;                        // 點圖片＝前往連結
+        if (e.target.closest('.cw-slide')) { e.preventDefault(); goToAd(adsState.idx + 1, true, 1); }   // 點白色紙張（含封面）＝翻到下一頁
       }, true);
       window.addEventListener('resize', () => goToAd(adsState.idx, false));
 
