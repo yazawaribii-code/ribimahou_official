@@ -1687,8 +1687,11 @@
   </div>
 
   <!-- 🎀 編輯工商廣告牆 Modal -->
-  <div id="ads-modal" role="dialog" aria-modal="true" aria-labelledby="ads-modal-title" class="hidden fixed inset-0 z-50 bg-cocoa/60 backdrop-blur-sm flex items-center justify-center p-4">
-    <div id="ads-panel" class="bg-cream border-2 border-sakura rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col p-5 sm:p-6 shadow-2xl gap-4">
+  <!-- 背景遮罩與白色面板分成兩層（避免部分瀏覽器把面板一起糊掉、只剩模糊背景） -->
+  <div id="ads-modal" role="dialog" aria-modal="true" aria-labelledby="ads-modal-title" class="hidden" style="position:fixed;inset:0;z-index:2147483000">
+    <div id="ads-modal-backdrop" aria-hidden="true" style="position:absolute;inset:0;background:rgba(90,62,70,.6)"></div>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:1rem;pointer-events:none">
+    <div id="ads-panel" class="bg-cream border-2 border-sakura rounded-3xl max-w-2xl w-full max-h-[90vh] flex flex-col p-5 sm:p-6 shadow-2xl gap-4" style="position:relative;pointer-events:auto;background-color:#FFF9FB">
       <div class="flex items-center justify-between">
         <h3 id="ads-modal-title" class="text-lg font-black text-sakura-deep">🎀 編輯工商廣告牆</h3>
         <button id="btn-close-ads" type="button" aria-label="關閉" class="w-8 h-8 rounded-full bg-sakura-light text-sakura-deep font-black cursor-pointer">✕</button>
@@ -1725,6 +1728,7 @@
         </div>
       </div>
       <p class="text-[11px] text-cocoa-light leading-relaxed">💡 套用後記得到「匯出完整設定碼」下載 HTML，所有訪客才會看到。全部刪除 ＝ 一般訪客看不到廣告牆。想換位置：用廣告牆右上角的 ⬆️⬇️。</p>
+    </div>
     </div>
   </div>
 
@@ -2053,7 +2057,7 @@ const CUSTOM_SITE_CONFIG = {
     },
     {
       "id": "ad-mwt87s2o1g",
-      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/AD/pudding.jpg?raw=true",
+      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/AD/pudding-.jpg?raw=true",
       "url": "https://kukulcansnake.zite.so/order",
       "title": "訂購推薦者選「魔法少女莉比醬」，滿千送Q版布丁模板頭貼，買就送電子感謝卡 🍮"
     }
@@ -4653,10 +4657,14 @@ const CUSTOM_SITE_CONFIG = {
       asp.value = getAdsAspect(); if (!asp.value) asp.value = '3/1';
       itv.value = String(getAdsInterval()); if (!itv.value) itv.value = '4500';
       renderAdsList();
+      stopAdsTimer();                     // 編輯時先暫停輪播動畫
       document.getElementById('ads-modal').classList.remove('hidden');
     }
     function closeAdsModal() {
-      document.getElementById('ads-modal').classList.add('hidden');
+      const m = document.getElementById('ads-modal');
+      if (m.classList.contains('hidden')) return;
+      m.classList.add('hidden');
+      startAdsTimer();
     }
     function saveAdsModal() {
       const list = [];
