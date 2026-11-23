@@ -154,6 +154,13 @@
     body:not(.edit-mode-active) #block-channels [data-item-field]:empty { display: none; }
     body.edit-mode-active #block-channels [data-item-field]:empty { display: inline-block; min-width: 4rem; min-height: 1.2em; }
     body.edit-mode-active #block-channels [data-item-field]:empty::before { content: '（空白，點此輸入）'; opacity: .45; font-weight: 400; font-size: 11px; }
+    /* 「關於莉比醬」標題與內文：3px 白色外框 + 白色光暈 */
+    #notes-heading, #sheet-notes-container {
+      -webkit-text-stroke: 6px #fff;         /* 6px 的線，一半被字蓋住，外側露出 3px */
+      paint-order: stroke fill;
+      text-shadow: 0 0 6px #fff, 0 0 12px rgba(255, 255, 255, .95), 0 0 20px rgba(255, 255, 255, .8);
+      stroke-linejoin: round;
+    }
     /* 邊框透明度：--bo = 0~1（由 siteConfig.borderOpacity 控制；0 即隱藏）。編輯工具列與彈窗不受影響 */
     #edit-toolbar, [role="dialog"], #toggle-edit-btn { --bo: 1; --bgo: 1; }
     /* 區塊白底透明度：--bgo = 0~1，套用在區塊內的白色底（--bgo-all 為全站值，各區塊可個別覆蓋） */
