@@ -297,6 +297,71 @@
     #main-video-player .fv-text { pointer-events: none; }
     body.edit-mode-active #main-video-player .fv-text { pointer-events: auto; }
 
+    /* 手機版大頭貼框比例：由 siteConfig.avatarMobileAspect 控制（1/1、4/3、16/9…），橫式時框會自動放寬 */
+    @media (max-width: 1023px) {
+      #avatar-card { aspect-ratio: var(--av-m-aspect, 1 / 1); max-width: var(--av-m-maxw, 210px); }
+    }
+
+    /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
+    @keyframes chibiBob {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    #chibi-wrap:not(.chibi-empty) { animation: chibiBob 3.4s ease-in-out infinite; }
+    .chibi-sparkles {
+      position: absolute; pointer-events: none; z-index: 2;
+      left: calc(50% + var(--cx, 0) * 1% - var(--cz, 1) * 50%);
+      top: calc(50% + var(--cy, 0) * 1% - var(--cz, 1) * 50%);
+      width: calc(var(--cz, 1) * 100%); height: calc(var(--cz, 1) * 100%);
+    }
+    #chibi-wrap.chibi-empty .chibi-sparkles { display: none; }
+    .chibi-sparkle {
+      position: absolute; width: var(--s, 12px); height: var(--s, 12px);
+      margin: calc(var(--s, 12px) / -2) 0 0 calc(var(--s, 12px) / -2);
+      opacity: 0; transform: scale(0);
+      animation: chibiTwinkle var(--d, 3s) ease-in-out var(--dl, 0s) infinite;
+    }
+    .chibi-sparkle::before {
+      content: ''; position: absolute; inset: 0; background: var(--c, #FF8FB1);
+      clip-path: polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%);
+      filter: drop-shadow(0 0 3px rgba(255, 255, 255, .95)) drop-shadow(0 0 5px var(--c, #FF8FB1));
+    }
+    .chibi-sparkle.is-star::before { clip-path: polygon(50% 0%, 62% 35%, 98% 35%, 69% 57%, 79% 91%, 50% 70%, 21% 91%, 31% 57%, 2% 35%, 38% 35%); }
+    .chibi-sparkle.is-dot::before { clip-path: circle(32% at 50% 50%); }
+    @keyframes chibiTwinkle {
+      0%   { opacity: 0; transform: translateY(6px) scale(0) rotate(0deg); }
+      25%  { opacity: 1; transform: translateY(0) scale(1) rotate(45deg); }
+      55%  { opacity: .85; transform: translateY(-8px) scale(.75) rotate(110deg); }
+      80%  { opacity: 1; transform: translateY(-14px) scale(.95) rotate(160deg); }
+      100% { opacity: 0; transform: translateY(-22px) scale(0) rotate(220deg); }
+    }
+
+    /* 回到最上方按鈕：簡約扁平款，跟網站的白色小藥丸按鈕同風格 */
+    #back-to-top {
+      position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 45;
+      width: 2.75rem; height: 2.75rem; border-radius: 999px; cursor: pointer;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px;
+      color: #E85A7F; font-family: inherit; font-weight: 800; font-size: .55rem; letter-spacing: .06em; line-height: 1;
+      background: rgba(255, 255, 255, .92);
+      border: 1.5px solid #FFC2D4;
+      box-shadow: 0 4px 12px -4px rgba(232, 90, 127, .25);
+      opacity: 0; visibility: hidden; transform: translateY(10px);
+      transition: opacity .3s, transform .3s ease, visibility .3s, background-color .2s, color .2s, border-color .2s;
+    }
+    #back-to-top.is-show { opacity: 1; visibility: visible; transform: translateY(0); }
+    #back-to-top:hover { background: #FF8FB1; border-color: #FF8FB1; color: #fff; transform: translateY(-2px); }
+    #back-to-top:active { transform: translateY(0); }
+    #back-to-top:focus-visible { outline: 2px dashed #E85A7F; outline-offset: 3px; }
+    #back-to-top .btt-arrow { width: .95rem; height: .95rem; }
+    body.edit-mode-active #back-to-top { bottom: 5.25rem; }
+    @media (max-width: 639px) { #back-to-top { right: .9rem; bottom: .9rem; width: 2.5rem; height: 2.5rem; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      #chibi-wrap:not(.chibi-empty), .chibi-sparkle { animation: none; }
+      .chibi-sparkle { opacity: .8; transform: scale(.8); }
+      #back-to-top { transition: opacity .2s, visibility .2s; }
+    }
+
     @keyframes floatSparkle {
       0%, 100% {
         transform: translateY(0px) rotate(0deg) scale(1);
@@ -836,7 +901,7 @@
 
           <!-- 右側單一大頭貼卡片 -->
           <div class="lg:col-span-5 flex flex-col items-center max-lg:order-4">
-            <div class="relative w-full max-w-[210px] aspect-square lg:max-w-[360px] lg:aspect-[3/4] rounded-[28px] bg-gradient-to-b from-white/85 via-sakura-light/65 to-sakura/30 border-2 border-white shadow-kawaii flex flex-col items-center justify-center p-2 lg:p-4 overflow-hidden animate-float">
+            <div id="avatar-card" class="relative w-full max-w-[210px] aspect-square lg:max-w-[360px] lg:aspect-[3/4] rounded-[28px] bg-gradient-to-b from-white/85 via-sakura-light/65 to-sakura/30 border-2 border-white shadow-kawaii flex flex-col items-center justify-center p-2 lg:p-4 overflow-hidden animate-float">
 
               <div class="w-full h-full flex flex-col items-center justify-center text-center">
                 <img id="img-avatar" fetchpriority="high" decoding="async" src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20320%20420%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22avBg%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23FFF7FA%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23FFE2EC%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22420%22%20rx%3D%2226%22%20fill%3D%22url(%23avBg)%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22160%22%20cy%3D%22136%22%20r%3D%2264%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M92%20132%20C92%2072%2C%20228%2072%2C%20228%20132%20C204%20106%2C%20180%20112%2C%20160%20126%20C140%20112%2C%20116%20106%2C%2092%20132%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M96%20125%20C50%20156%2C%2044%20252%2C%2072%20315%22%20fill%3D%22none%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M224%20125%20C270%20156%2C%20276%20252%2C%20248%20315%22%20fill%3D%22none%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M116%20202%20L204%20202%20L218%20268%20L102%20268%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M98%20268%20L222%20268%20L244%20358%20Q160%20378%2076%20358%20Z%22%20fill%3D%22%23FFF9FB%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22138%22%20cy%3D%22144%22%20r%3D%226.5%22%20fill%3D%22%235A3E46%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22182%22%20cy%3D%22144%22%20r%3D%226.5%22%20fill%3D%22%235A3E46%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M150%20160%20Q160%20170%20170%20160%22%20fill%3D%22none%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223.5%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22160%22%20y%3D%22396%22%20text-anchor%3D%22middle%22%20font-size%3D%2215%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3ERIBI%20AVATAR%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="魔法少女莉比醬大頭貼" class="w-full h-full object-contain drop-shadow-md rounded-2xl">
@@ -1092,6 +1157,7 @@
                         <!-- Q版立繪：直接放在文字白框內，不加外框。在 SITE_IMAGES.chibi 填網址，或 ?edit 編輯模式按「換圖」 -->
             <div id="chibi-wrap" class="chibi-empty relative self-end col-start-2 row-start-2">
               <img id="img-chibi" alt="莉比醬 Q版立繪" decoding="async" class="hidden w-full h-auto object-contain select-none pointer-events-none">
+              <div id="chibi-sparkles" class="chibi-sparkles" aria-hidden="true"></div>
               <div class="chibi-placeholder aspect-[3/4] w-full rounded-2xl border-2 border-dashed border-sakura/70 text-sakura-deep/70 text-[11px] font-bold flex items-center justify-center text-center p-2 leading-snug">🖼️ Q版立繪<br>按「換圖」放入</div>
             </div>
             <div id="sheet-notes-container" class="col-start-1 row-start-2 min-w-0 space-y-3 text-xs sm:text-sm text-cocoa leading-relaxed">
@@ -1611,6 +1677,11 @@
   </footer>
 
   <!-- 右下角懸浮按鈕：排版與內容編輯模式 -->
+  <!-- 回到最上方按鈕 -->
+  <button id="back-to-top" type="button" aria-label="回到最上方" title="回到最上方">
+    <svg class="btt-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 14l7-7 7 7"/><path d="M12 7v12"/></svg>
+    <span class="btt-text">TOP</span>
+  </button>
   <button id="toggle-edit-btn" type="button" style="display:none" class="fixed bottom-5 right-5 z-50 bg-gradient-to-r from-sakura-deep via-sakura-medium to-sakura-deep text-white font-black text-xs sm:text-sm px-5 py-3.5 rounded-full shadow-xl border-2 border-white hover:scale-105 active:scale-95 transition flex items-center gap-2 cursor-pointer">
     <span id="edit-btn-icon">✨</span>
     <span id="edit-btn-text">排版與內容編輯模式</span>
@@ -1712,6 +1783,16 @@
             <option value="">預設</option>
             <option value="cover">填滿（會裁切）</option>
             <option value="contain">完整顯示</option>
+          </select>
+        </label>
+        <label id="adj-aspect-wrap" class="hidden flex items-center gap-2">
+          框的比例
+          <select id="adj-aspect" class="rounded-full border border-sakura bg-white px-3 py-1.5 text-xs">
+            <option value="1/1">正方形 1:1</option>
+            <option value="4/3">橫式 4:3</option>
+            <option value="3/2">橫式 3:2</option>
+            <option value="16/9">橫式 16:9</option>
+            <option value="3/4">直式 3:4</option>
           </select>
         </label>
       </div>
@@ -1837,6 +1918,7 @@
       blockBorderOpacity: {},   // 各區塊個別的邊框透明度，例如 { profile: 40, videos: 0 }；沒設定的區塊跟隨全站設定
       borderOpacity: 100,   // 邊框透明度 0~100（0 = 隱藏邊框）；在 ?edit 編輯模式用工具列的「🔲 邊框透明度」滑桿調整
       contactChibiSize: 150,   // 合作詢問角色寬度（px）；在 ?edit 工具列「💌 合作立繪大小」調整
+      avatarMobileAspect: '1/1',   // 手機版大頭貼框比例（1/1、4/3、3/2、16/9、3/4）；在 ?edit 大頭貼「📱 手機版」裁切視窗選
       chibiSize: 120,   // Q版立繪寬度（px）；在 ?edit 編輯模式用工具列的「🧸 立繪大小」滑桿調整
       logoSize: 72,   // LOGO 高度（px）；在 ?edit 編輯模式用工具列的「🔍 LOGO 大小」滑桿調整
       announcements: [
@@ -2101,6 +2183,13 @@ const CUSTOM_SITE_CONFIG = {
       "url": "https://kukulcansnake.zite.so/order",
       "title": "訂購推薦者選「魔法少女莉比醬」，滿千送Q版布丁模板頭貼",
       "desc": "訂購推薦者選「魔法少女莉比醬」，\n滿千就送Q版布丁模板頭貼！"
+    },
+    {
+      "id": "cw-mwu7uu6927",
+      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/AD/gank.jpg?raw=true",
+      "url": "https://www.youtube.com/shorts/-Pu0YCXT0BA",
+      "title": "帶大家一分鐘了解讓創作者變現的平台 — gank",
+      "desc": "讓莉比醬帶大家一分鐘了解，\n讓創作者成功變現的平台 — gank"
     }
   ],
   "adsSettings": {
@@ -2140,6 +2229,7 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "logoSize": 86,
   "chibiSize": 128,
+  "avatarMobileAspect": "4/3",
   "contactChibiSize": 150,
   "bgOpacity": 100,
   "blockBgOpacity": {
@@ -2172,7 +2262,7 @@ const CUSTOM_SITE_CONFIG = {
     "channelsEyebrow": "MAIN CHANNELS & LINKS",
     "channelsTitle": "主要頻道與傳送門",
     "mainStreamBadge": "",
-    "mainStreamTitle": "Twitch 魔法實況主台",
+    "mainStreamTitle": "Twitch魔法主台",
     "contactEyebrow": "BUSINESS CONTACT",
     "contactTitle": "歡迎合作邀約",
     "contactDesc": "繪圖/工商合作 等合作邀約",
@@ -2312,7 +2402,7 @@ const CUSTOM_SITE_CONFIG = {
     },
     {
       "id": "ch-youtube-copy-mwr9m2nqy",
-      "title": "副頻道-莉比醬の魔法紀錄♡",
+      "title": "莉比醬の魔法紀錄♡",
       "desc": "圖奇下播後的補檔專區會上傳至此～",
       "url": "https://www.youtube.com/@ribiribiri_VOD",
       "badgeText": "YOUTUBE",
@@ -2321,8 +2411,8 @@ const CUSTOM_SITE_CONFIG = {
     },
     {
       "id": "ch-commission",
-      "title": "莉比Ribi 繪圖委託作品集／排單資訊",
-      "desc": "歡迎進來參觀！",
+      "title": "繪圖委託作品集／排單資訊",
+      "desc": "歡迎參考作品集，委託詢問可透過DC、Gmail",
       "url": "https://illustration.ribimahou.com/",
       "badgeText": "ARTWORK",
       "iconClass": "fa-solid fa-palette",
@@ -2958,6 +3048,15 @@ const CUSTOM_SITE_CONFIG = {
       };
       set('d', adj.avatar);
       set('m', adj.avatarMobile || adj.avatar);
+      const r = parseAspect(siteConfig.avatarMobileAspect) || 1;
+      root.style.setProperty('--av-m-aspect', String(r));
+      root.style.setProperty('--av-m-maxw', r > 1 ? Math.round(Math.min(320, 210 * Math.sqrt(r) * 1.15)) + 'px' : '210px');
+    }
+    // 「4/3」→ 1.333…；格式不對回傳 0
+    function parseAspect(v) {
+      const m = String(v || '').replace(/\s/g, '').match(/^(\d+(?:\.\d+)?)\/(\d+(?:\.\d+)?)$/);
+      if (!m || !Number(m[1]) || !Number(m[2])) return 0;
+      return Number(m[1]) / Number(m[2]);
     }
 
     // 「關於莉比醬」Q版立繪：有設定圖片才顯示（編輯模式會顯示虛線佔位方便你放圖）
@@ -3107,8 +3206,39 @@ const CUSTOM_SITE_CONFIG = {
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleChibiFlow);
     document.addEventListener('input', (e) => { if (e.target.closest('#notes-card')) scheduleChibiFlow(); });
 
+    // Q版立繪周圍的魔法星星粒子：粒子層對齊「縮放／位移後」的立繪範圍
+    function syncChibiSparkles() {
+      const layer = document.getElementById('chibi-sparkles');
+      if (!layer) return;
+      const a = normalizeAdjust((siteConfig.imageAdjust || {}).chibi);
+      layer.style.setProperty('--cz', String(a.z));
+      layer.style.setProperty('--cx', String(a.x));
+      layer.style.setProperty('--cy', String(a.y));
+      if (layer.childElementCount) return;
+      const colors = ['#FF8FB1', '#FFD45C', '#FFFFFF', '#FF6F9C', '#FFB8D0', '#C9A8FF'];
+      const N = 14;
+      for (let i = 0; i < N; i++) {
+        const el = document.createElement('span');
+        const kind = i % 4 === 1 ? ' is-star' : (i % 5 === 3 ? ' is-dot' : '');
+        el.className = 'chibi-sparkle' + kind;
+        // 繞著立繪排一圈（橢圓），稍微隨機一點比較自然
+        const ang = (i / N) * Math.PI * 2 + (Math.random() - .5) * .5;
+        const rad = .36 + Math.random() * .16;
+        const x = 50 + Math.cos(ang) * rad * 100 * .9;
+        const y = 52 + Math.sin(ang) * rad * 100;
+        el.style.left = x.toFixed(1) + '%';
+        el.style.top = y.toFixed(1) + '%';
+        el.style.setProperty('--s', (kind === ' is-dot' ? 6 + Math.random() * 4 : 9 + Math.random() * 9).toFixed(1) + 'px');
+        el.style.setProperty('--c', colors[i % colors.length]);
+        el.style.setProperty('--d', (2.4 + Math.random() * 1.6).toFixed(2) + 's');
+        el.style.setProperty('--dl', (-Math.random() * 4).toFixed(2) + 's');
+        layer.appendChild(el);
+      }
+    }
+
     function applyChibi() {
       applyChibiSize();
+      syncChibiSparkles();
       const img = document.getElementById('img-chibi');
       const wrap = document.getElementById('chibi-wrap');
       const card = document.getElementById('notes-card');
@@ -3393,10 +3523,13 @@ const CUSTOM_SITE_CONFIG = {
       const cur = normalizeAdjust(getAdjust(key, videoId) || (key === 'avatarMobile' ? getAdjust('avatar') : null));
       const w = img.offsetWidth, h = img.offsetHeight;
       let aspect = (w && h) ? w / h : (key === 'scheduleMascot' ? 1 : 16 / 9);
-      if (key === 'avatarMobile') aspect = 1;                                       // 手機版是正方形
+      let aspectStr = '';
+      if (key === 'avatarMobile') {                                                 // 手機版：比例可在視窗內切換（正方形／橫式…）
+        aspectStr = parseAspect(siteConfig.avatarMobileAspect) ? String(siteConfig.avatarMobileAspect) : '1/1';
+        aspect = parseAspect(aspectStr);
+      }
       else if (key === 'avatar' && window.innerWidth < 1024) aspect = 328 / 448;    // 在手機畫面調電腦版時，用電腦版比例預覽
-      const fw = Math.min(Math.min(560, window.innerWidth - 80), 320 * aspect);
-      const fh = fw / aspect;
+      const { fw, fh } = adjFrameSize(aspect);
 
       const prevFit = img.style.getPropertyValue('object-fit');
       img.style.setProperty('object-fit', '');
@@ -3404,7 +3537,16 @@ const CUSTOM_SITE_CONFIG = {
       if (slotKey === 'avatar') defFit = 'contain';
       img.style.setProperty('object-fit', prevFit);
 
-      adjState = { key, videoId, z: cur.z, tx: cur.x, ty: cur.y, fit: cur.fit, defFit, fw, fh };
+      adjState = { key, videoId, z: cur.z, tx: cur.x, ty: cur.y, fit: cur.fit, defFit, fw, fh, aspectStr };
+      const aspWrap = document.getElementById('adj-aspect-wrap');
+      if (aspWrap) {
+        aspWrap.classList.toggle('hidden', key !== 'avatarMobile');
+        const sel = document.getElementById('adj-aspect');
+        if (sel && aspectStr) {
+          if (![...sel.options].some(o => o.value === aspectStr)) sel.add(new Option(aspectStr.replace('/', ':'), aspectStr));
+          sel.value = aspectStr;
+        }
+      }
       const frame = document.getElementById('adj-frame');
       frame.style.width = fw + 'px';
       frame.style.height = fh + 'px';
@@ -3413,6 +3555,28 @@ const CUSTOM_SITE_CONFIG = {
       renderAdjustPreview();
       document.getElementById('img-adjust-modal').classList.remove('hidden');
     }
+
+    function adjFrameSize(aspect) {
+      const fw = Math.min(Math.min(560, window.innerWidth - 80), 320 * aspect);
+      return { fw, fh: fw / aspect };
+    }
+
+    // 回到最上方按鈕：往下捲一段才出現，點了平滑捲回頂端
+    (function setupBackToTop() {
+      const init = () => {
+        const btn = document.getElementById('back-to-top');
+        if (!btn) return;
+        let ticking = false;
+        const update = () => { ticking = false; btn.classList.toggle('is-show', window.scrollY > 400); };
+        window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+        btn.addEventListener('click', () => {
+          const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        });
+        update();
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+    })();
 
     function closeImageAdjust() {
       adjState = null;
@@ -3433,6 +3597,7 @@ const CUSTOM_SITE_CONFIG = {
       } else {
         if (!siteConfig.imageAdjust) siteConfig.imageAdjust = {};
         if (isDefault) delete siteConfig.imageAdjust[key]; else siteConfig.imageAdjust[key] = adj;
+        if (key === 'avatarMobile' && adjState.aspectStr) siteConfig.avatarMobileAspect = adjState.aspectStr;
       }
       persistConfig(false);
       applySiteImages();
@@ -3472,6 +3637,17 @@ const CUSTOM_SITE_CONFIG = {
       document.getElementById('adj-fit').addEventListener('change', (e) => {
         if (!adjState) return;
         adjState.fit = e.target.value;
+        renderAdjustPreview();
+      });
+      document.getElementById('adj-aspect').addEventListener('change', (e) => {
+        if (!adjState || adjState.key !== 'avatarMobile') return;
+        const r = parseAspect(e.target.value);
+        if (!r) return;
+        adjState.aspectStr = e.target.value;
+        const { fw, fh } = adjFrameSize(r);
+        adjState.fw = fw; adjState.fh = fh;
+        frame.style.width = fw + 'px';
+        frame.style.height = fh + 'px';
         renderAdjustPreview();
       });
       document.getElementById('adj-reset').addEventListener('click', () => {
@@ -3519,6 +3695,7 @@ const CUSTOM_SITE_CONFIG = {
         announcements: Array.isArray(raw.announcements) ? raw.announcements : base.announcements,
         logoSize: Number(raw.logoSize) > 0 ? Number(raw.logoSize) : base.logoSize,
         chibiSize: Number(raw.chibiSize) > 0 ? Number(raw.chibiSize) : base.chibiSize,
+        avatarMobileAspect: parseAspect(raw.avatarMobileAspect) ? String(raw.avatarMobileAspect).replace(/\s/g, '') : base.avatarMobileAspect,
         contactChibiSize: Number(raw.contactChibiSize) > 0 ? Number(raw.contactChibiSize) : base.contactChibiSize,
         bgOpacity: (raw.bgOpacity !== undefined && raw.bgOpacity !== '' && isFinite(Number(raw.bgOpacity))) ? Math.min(100, Math.max(0, Number(raw.bgOpacity))) : base.bgOpacity,
         blockBgOpacity: (raw.blockBgOpacity && typeof raw.blockBgOpacity === 'object' && !Array.isArray(raw.blockBgOpacity)) ? raw.blockBgOpacity : {},
