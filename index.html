@@ -623,6 +623,77 @@
       #video-cards-container.vid-marquee > [data-video-card-id] { flex: 0 0 62%; max-width: 240px; padding: .6rem; }
       #video-cards-container.vid-marquee > [data-video-card-id] > .aspect-video { margin-bottom: .5rem; }
     }
+  
+    /* ===== 合作實績＋Hashtags 同一排（電腦版左右並排，手機版上下堆疊） ===== */
+    .tagrow { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; align-items: center; }
+    .tagrow > .tagrow-tags { order: -1; }                                     /* 手機／平板：Hashtags 先、筆記本後 */
+    .tagrow > #block-collab { max-width: 34rem; width: 100%; margin: 0 auto; padding: 0 .25rem; }
+    .tagrow > #block-collab .cw-frame { max-width: none; }
+    .tagrow .modular-block [data-move-block] { display: none; }               /* 合作實績跟著 Hashtags 一起移動 */
+    body.edit-mode-active .tagrow > #block-collab { padding-top: 3.25rem; }
+    /* 合作實績的標題兩格都空白時，不留標題列的空位（不然筆記本上方會多出一段空白，間距看起來不一致） */
+    body:not(.edit-mode-active) .tagrow .cw-headrow:not(:has(.cw-eb:not(:empty))):not(:has(.cw-tt:not(:empty))) { display: none; }
+    /* 筆記本後面疊的紙張陰影會往下凸 6px，補回來讓「筆記本 → 下一個區塊」的距離跟其他區塊一樣 */
+    .tagrow > #block-collab { padding-bottom: 6px; }
+    @media (min-width: 1024px) {
+      .tagrow { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 2.5rem; }
+      .tagrow > .tagrow-tags { order: 0; }
+      .tagrow > #block-collab { max-width: none; margin: 0; padding: 0; }
+    }
+    /* 合作實績沒有內容／被隱藏時，Hashtags 自己置中 */
+    body:not(.edit-mode-active) .tagrow:has(> #block-collab.cw-none),
+    body:not(.edit-mode-active) .tagrow:has(> #block-collab.block-hidden-in-edit) { grid-template-columns: minmax(0, 1fr); }
+    body:not(.edit-mode-active) .tagrow:has(> #block-collab.cw-none) > .tagrow-tags,
+    body:not(.edit-mode-active) .tagrow:has(> #block-collab.block-hidden-in-edit) > .tagrow-tags { width: 100%; max-width: 34rem; margin: 0 auto; }
+
+    .tagrow-tags { width: 100%; max-width: 34rem; margin: 0 auto; padding: 1.75rem 1.5rem 1.6rem; border-radius: 28px; text-align: center; }
+    @media (min-width: 1024px) { .tagrow-tags { max-width: none; padding: 2.1rem 2rem 2rem; } }
+    .tag-eyebrow { font-size: .72rem; font-weight: 900; letter-spacing: .22em; color: #E85A7F; text-transform: uppercase; }
+    .tag-title { margin-top: .35rem; display: flex; align-items: center; justify-content: center; gap: .55rem;
+      font-size: 1.6rem; line-height: 1.2; font-weight: 900; color: #5A3E46; }
+    .tag-title-deco { color: #FF8FB1; font-size: 1.05rem; }
+    .tag-hint { margin-top: .4rem; font-size: .75rem; font-weight: 700; color: #A9838F; }
+    body:not(.edit-mode-active) .tag-hint:empty::before { content: '點一下就能複製標籤 ✨'; }
+    @media (min-width: 640px) { .tag-title { font-size: 1.85rem; } }
+
+    #hashtags-container.tag-list { display: flex; flex-direction: column; gap: .7rem; margin-top: 1.25rem; overflow: visible; padding: 0; }
+    .tag-pill { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      min-height: 3rem; padding: .7rem 1.25rem; border-radius: 999px; cursor: pointer; text-align: center;
+      background: rgba(255, 255, 255, .95); border: 1.5px solid #F7BFD0; color: #5A3E46;
+      transition: background-color .2s, border-color .2s, transform .2s, box-shadow .2s;
+      -webkit-user-select: none; user-select: none; }
+    .tag-pill-line { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: .1rem .45rem; line-height: 1.35; }
+    .tag-pill-tag { font-weight: 800; font-size: .98rem; color: #5A3E46; overflow-wrap: anywhere; }
+    .tag-pill-sep { color: #F4A6BF; font-weight: 900; }
+    .tag-pill-cat { font-weight: 600; font-size: .86rem; color: #A9838F; }
+    body:not(.edit-mode-active) .tag-pill-cat:empty { display: none; }
+    body:not(.edit-mode-active) .tag-pill-line:has(.tag-pill-cat:empty) .tag-pill-sep { display: none; }
+    .tag-pill-desc { display: none; }
+    .tag-pill.is-featured { border-color: #E85A7F; }
+    .tag-pill.is-featured .tag-pill-tag { color: #E85A7F; }
+    @media (hover: hover) {
+      .tag-pill:hover { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgba(232, 90, 127, .55); }
+      .tag-pill:hover .tag-pill-tag { color: #E85A7F; }
+    }
+    .tag-pill:active { transform: scale(.98); }
+    .tag-pill:focus-visible { outline: 2px dashed #E85A7F; outline-offset: 3px; }
+    /* 複製成功：整顆膠囊變粉色並顯示「已複製」 */
+    .tag-pill::after { content: '✓ 已複製！'; position: absolute; inset: -1.5px; border-radius: inherit; display: flex; align-items: center; justify-content: center;
+      background: #FF8FB1; color: #fff; font-weight: 900; font-size: .92rem; letter-spacing: .08em; opacity: 0; pointer-events: none; transition: opacity .2s; }
+    .tag-pill.is-copied::after { opacity: 1; }
+    /* 編輯模式：膠囊改成圓角卡片，說明文字也拿出來編輯 */
+    body.edit-mode-active .tag-pill { border-radius: 18px; cursor: default; -webkit-user-select: text; user-select: text; padding-top: .9rem; }
+    body.edit-mode-active .tag-pill::after { display: none; }
+    body.edit-mode-active .tag-pill-desc { display: block; margin-top: .35rem; font-size: .75rem; color: #8A6A73; white-space: pre-line; }
+    @media (max-width: 639px) {
+      .tagrow { gap: 1.5rem; }
+      .tagrow-tags { padding: 1.5rem 1.1rem 1.25rem; border-radius: 24px; }
+      .tag-title { font-size: 1.45rem; }
+      #hashtags-container.tag-list { gap: .6rem; margin-top: 1.05rem; }
+      .tag-pill { min-height: 2.9rem; padding: .65rem 1rem; }
+      .tag-pill-tag { font-size: .95rem; }
+      .tag-pill-cat { font-size: .82rem; }
+    }
   </style>
 </head>
 <body class="min-h-screen relative selection:bg-sakura selection:text-white">
@@ -761,7 +832,6 @@
       <div id="nav-menu" class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-0 sm:gap-2 text-xs sm:text-sm font-bold">
         <a href="#block-channels" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">魔法傳送門</a>
         <a href="#block-sheet" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">關於莉比醬</a>
-        <a href="#block-hashtags" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">專屬標籤</a>
         <a href="#block-schedule" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">本週行程</a>
         <a href="#block-videos" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">主打影片</a>
         <a href="#contact" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">合作詢問</a>
@@ -1200,89 +1270,49 @@
           </div>
         </div>
       </div>
-    </section><section id="block-hashtags" class="modular-block" data-block-id="hashtags" data-block-name="專屬 Hashtags">
+    </section><section id="block-hashtags" class="modular-block" data-block-id="hashtags" data-block-name="合作實績＋Hashtags">
       <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
-        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：Hashtags</span>
+        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：合作實績＋Hashtags</span>
         <button type="button" data-move-block="hashtags" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
         <button type="button" data-move-block="hashtags" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
         <button type="button" data-toggle-block="hashtags" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
       </div>
 
-      <div class="space-y-4">
-        <div class="flex flex-wrap items-end justify-between gap-2 px-1">
-          <div>
-            <div data-editable-field="hashtagsEyebrow" class="text-xs font-black tracking-widest text-sakura-deep uppercase" contenteditable="true" spellcheck="false">OFFICIAL HASHTAGS</div>
-            <h2 class="text-2xl sm:text-3xl font-black text-cocoa flex items-center gap-2">
-              <span data-editable-field="hashtagsTitle" contenteditable="true" spellcheck="false">專屬魔法標籤牆</span>
-            </h2>
-          </div>
-          <span data-editable-field="hashtagsHint" class="text-xs font-bold text-cocoa-light" contenteditable="true" spellcheck="false">點擊任一標籤卡片即可一鍵複製！</span>
+      <!-- 電腦版：左＝合作實績筆記本、右＝Hashtags 直式清單；手機版：Hashtags 在上、筆記本在下 -->
+      <div class="tagrow">
+      <!-- 🎀 合作實績：放在 Hashtags 左邊（跟 Hashtags 一起移動；👁️ 可單獨隱藏） -->
+      <section id="block-collab" class="modular-block cw-area cw-none" data-block-id="collab" data-block-name="合作實績">
+        <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
+          <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：合作實績</span>
+          <button type="button" data-cw-open="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">🎀 編輯</button>
+          <button type="button" data-move-block="collab" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
+          <button type="button" data-move-block="collab" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
+          <button type="button" data-toggle-block="collab" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
         </div>
+        <div class="cw-headrow">
+          <div class="cw-heading">
+            <span class="cw-eb" data-editable-field="adsEyebrow">♡ COLLABORATIONS</span>
+            <span class="cw-tt" data-editable-field="adsTitle">合作實績</span>
+          </div>
+          <button type="button" data-cw-open="1" class="cw-edit-btn">🎀 編輯合作實績</button>
+        </div>
+        <div class="cw-frame" role="region" aria-roledescription="carousel" aria-label="合作實績">
+          <div id="cw-viewport" class="cw-viewport">
+            <span class="cw-rings" aria-hidden="true"></span>
+            <div class="cw-window"><div id="cw-track" class="cw-track"></div></div>
+            <button id="cw-prev" type="button" class="cw-arrow cw-prev" aria-label="上一則">‹</button>
+            <button id="cw-next" type="button" class="cw-arrow cw-next" aria-label="下一則">›</button>
+          </div>
+          <div id="cw-dots" class="cw-dots"></div>
+        </div>
+      </section>
 
-        <div id="hashtags-container" class="flex overflow-x-auto snap-x snap-mandatory gap-2.5 pt-3 pb-2 -mx-1 px-1 sm:mx-0 sm:px-0 sm:pt-0 sm:pb-0 sm:grid sm:overflow-visible sm:grid-cols-2 lg:grid-cols-4 sm:gap-4">
-          <div class="subcard-item kawaii-card p-5 text-left shadow-kawaii hover:shadow-kawaii-hover hover:-translate-y-1 transition group " data-copy-tag="#魔法少女莉比醬">
-            
-        <div class="subcard-controls absolute -top-2.5 right-2 z-30 bg-sakura-deep text-white rounded-full shadow-md px-1.5 py-0.5 items-center gap-1 text-[11px] font-bold">
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-main" data-dir="-1" title="上移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬆️</button>
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-main" data-dir="1" title="下移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬇️</button>
-          <button type="button" data-subcard-delete="tag-main" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
-        </div>
-      
-            <div class="flex items-center justify-between mb-2">
-              <span contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-main" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">🌟 綜合總標籤</span>
-              <i class="fa-regular fa-copy text-sakura-medium group-hover:text-sakura-deep cursor-pointer"></i>
-            </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-main" data-item-field="tag" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">#魔法少女莉比醬</div>
-            <p contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-main" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">日常感想、實況心得、周邊開箱分享都用這個！</p>
-          </div>
-        
-          <div class="subcard-item kawaii-card p-5 text-left shadow-kawaii hover:shadow-kawaii-hover hover:-translate-y-1 transition group border-sakura" data-copy-tag="#莉筆">
-            
-        <div class="subcard-controls absolute -top-2.5 right-2 z-30 bg-sakura-deep text-white rounded-full shadow-md px-1.5 py-0.5 items-center gap-1 text-[11px] font-bold">
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-art" data-dir="-1" title="上移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬆️</button>
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-art" data-dir="1" title="下移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬇️</button>
-          <button type="button" data-subcard-delete="tag-art" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
-        </div>
-      
-            <div class="flex items-center justify-between mb-2">
-              <span contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-art" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">🎨 繪圖／二創專區</span>
-              <i class="fa-regular fa-copy text-sakura-medium group-hover:text-sakura-deep cursor-pointer"></i>
-            </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-art" data-item-field="tag" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">#莉筆</div>
-            <p contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-art" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">同人插畫、Q版塗鴉、手作創作，歡迎分享給莉比！</p>
-          </div>
-        
-          <div class="subcard-item kawaii-card p-5 text-left shadow-kawaii hover:shadow-kawaii-hover hover:-translate-y-1 transition group " data-copy-tag="#莉息">
-            
-        <div class="subcard-controls absolute -top-2.5 right-2 z-30 bg-sakura-deep text-white rounded-full shadow-md px-1.5 py-0.5 items-center gap-1 text-[11px] font-bold">
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-fans" data-dir="-1" title="上移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬆️</button>
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-fans" data-dir="1" title="下移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬇️</button>
-          <button type="button" data-subcard-delete="tag-fans" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
-        </div>
-      
-            <div class="flex items-center justify-between mb-2">
-              <span contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-fans" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">💖 粉絲互動交流</span>
-              <i class="fa-regular fa-copy text-sakura-medium group-hover:text-sakura-deep cursor-pointer"></i>
-            </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-fans" data-item-field="tag" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">#莉息</div>
-            <p contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-fans" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">莉息們的日常報到、美食分享與許願池互動。</p>
-          </div>
-        
-          <div class="subcard-item kawaii-card p-5 text-left shadow-kawaii hover:shadow-kawaii-hover hover:-translate-y-1 transition group " data-copy-tag="#莉比歌回">
-            
-        <div class="subcard-controls absolute -top-2.5 right-2 z-30 bg-sakura-deep text-white rounded-full shadow-md px-1.5 py-0.5 items-center gap-1 text-[11px] font-bold">
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-sing" data-dir="-1" title="上移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬆️</button>
-          <button type="button" data-subcard-move="hashtags" data-item-id="tag-sing" data-dir="1" title="下移小卡片" class="hover:bg-white/25 px-1.5 py-0.5 rounded-full cursor-pointer">⬇️</button>
-          <button type="button" data-subcard-delete="tag-sing" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
-        </div>
-      
-            <div class="flex items-center justify-between mb-2">
-              <span contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-sing" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">🎤 歌回／精華剪輯</span>
-              <i class="fa-regular fa-copy text-sakura-medium group-hover:text-sakura-deep cursor-pointer"></i>
-            </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-sing" data-item-field="tag" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">#莉比歌回</div>
-            <p contenteditable="true" spellcheck="false" data-item-list="hashtags" data-item-id="tag-sing" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">歌回點歌許願、翻唱感想與爆笑精華片段剪輯！</p>
-          </div>
+        <!-- Hashtags：直式膠囊清單，點整顆就能複製（不顯示複製圖示） -->
+        <div class="tagrow-tags kawaii-card shadow-kawaii">
+          <div data-editable-field="hashtagsEyebrow" class="tag-eyebrow">OFFICIAL HASHTAGS</div>
+          <h2 class="tag-title"><span data-editable-field="hashtagsTitle">TAG一覽</span></h2>
+          <p data-editable-field="hashtagsHint" class="tag-hint"></p>
+          <div id="hashtags-container" class="tag-list" role="list"></div>
         </div>
       </div>
     </section><section id="block-schedule" class="modular-block" data-block-id="schedule" data-block-name="本週魔法行程週表">
@@ -1615,32 +1645,7 @@
       </div>
     </section>
 
-    <!-- 🎀 合作實績（可在 ?edit 編輯模式用 ⬆️⬇️ 移到任何位置；預設在最下面、合作詢問卡片的正上方） -->
-    <section id="block-collab" class="modular-block cw-area cw-none" data-block-id="collab" data-block-name="合作實績">
-      <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
-        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：合作實績</span>
-        <button type="button" data-cw-open="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">🎀 編輯</button>
-        <button type="button" data-move-block="collab" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
-        <button type="button" data-move-block="collab" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
-        <button type="button" data-toggle-block="collab" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
-      </div>
-      <div class="cw-headrow">
-        <div class="cw-heading">
-          <span class="cw-eb" data-editable-field="adsEyebrow">♡ COLLABORATIONS</span>
-          <span class="cw-tt" data-editable-field="adsTitle">合作實績</span>
-        </div>
-        <button type="button" data-cw-open="1" class="cw-edit-btn">🎀 編輯合作實績</button>
-      </div>
-      <div class="cw-frame" role="region" aria-roledescription="carousel" aria-label="合作實績">
-        <div id="cw-viewport" class="cw-viewport">
-          <span class="cw-rings" aria-hidden="true"></span>
-          <div class="cw-window"><div id="cw-track" class="cw-track"></div></div>
-          <button id="cw-prev" type="button" class="cw-arrow cw-prev" aria-label="上一則">‹</button>
-          <button id="cw-next" type="button" class="cw-arrow cw-next" aria-label="下一則">›</button>
-        </div>
-        <div id="cw-dots" class="cw-dots"></div>
-      </div>
-    </section>
+
     </main>
 
   <!-- 合作詢問區塊（文字可在 ?edit 編輯模式直接修改；按鈕會自動使用下方 email） -->
@@ -2271,13 +2276,13 @@ const CUSTOM_SITE_CONFIG = {
     "mainStreamDesc": "繪圖工作台 • 休閒遊戲 • 雜談",
     "mainStreamScheduleNote": "🩷每週六固定無莉日",
     "mainStreamCta": "前往頻道",
-    "sheetEyebrow": "CHARACTER REFERENCE SHEET",
-    "sheetTitle": "角色設定＆三視圖",
+    "sheetEyebrow": "ABOUT RIBI",
+    "sheetTitle": "關於莉比醬",
     "sheetCaptionLeft": "莉比醬的三視圖",
-    "sheetNotesHeading": "｜關於莉比醬的小檔案(๑' '๑)",
+    "sheetNotesHeading": "｜莉比醬的小檔案(๑' '๑)",
     "hashtagsEyebrow": "OFFICIAL HASHTAGS",
     "hashtagsTitle": "TAG一覽",
-    "hashtagsHint": "",
+    "hashtagsHint": " ",
     "scheduleBadge": "✨ 直播與活動預告",
     "scheduleTitle": "莉比醬本週行程",
     "scheduleTimezoneNote": "台灣時間 UTC+8 • 00:00 為隔日午夜 • 每週六固定「無莉日」休息 ",
@@ -2519,7 +2524,7 @@ const CUSTOM_SITE_CONFIG = {
     },
     {
       "id": "tag-fans",
-      "category": "粉絲互動交流",
+      "category": "周邊‧活動分享",
       "tag": "#莉息增重中",
       "desc": "莉息們的各種分享～\n周邊、宣傳活動都可以使用！",
       "featured": false
@@ -2529,6 +2534,13 @@ const CUSTOM_SITE_CONFIG = {
       "category": "自發文",
       "tag": "#莉筆",
       "desc": "莉比自發文會使用這個tag~",
+      "featured": false
+    },
+    {
+      "id": "tag-fans-copy-mwua2mqtn",
+      "category": "應援符號",
+      "tag": "🩷🌟",
+      "desc": "",
       "featured": false
     },
     {
@@ -3851,7 +3863,11 @@ const CUSTOM_SITE_CONFIG = {
     function moveMainBlock(blockId, direction) {
       const idx = siteConfig.layout.findIndex(item => item.id === blockId);
       if (idx === -1) return;
-      const targetIdx = idx + direction;
+      // 跳過被放在別的積木裡面的區塊（例如合作實績在 Hashtags 裡），這樣按一次就會真的移動一格
+      const container = document.getElementById('blocks-container');
+      const isNested = (id) => { const el = container.querySelector(`.modular-block[data-block-id="${id}"]`); return !el || el.parentElement !== container; };
+      let targetIdx = idx + direction;
+      while (targetIdx >= 0 && targetIdx < siteConfig.layout.length && isNested(siteConfig.layout[targetIdx].id)) targetIdx += direction;
       if (targetIdx < 0 || targetIdx >= siteConfig.layout.length) {
         showToast(direction < 0 ? '🎀 已經在最頂端囉！' : '🎀 已經在最底部囉！');
         return;
@@ -3878,7 +3894,7 @@ const CUSTOM_SITE_CONFIG = {
       siteConfig.layout.forEach(item => {
         const blockEl = container.querySelector(`.modular-block[data-block-id="${item.id}"]`);
         if (!blockEl) return;
-        container.appendChild(blockEl);
+        if (blockEl.parentElement === container) container.appendChild(blockEl);   // 合作實績放在 Hashtags 裡面，不單獨搬動
         if (item.visible) blockEl.classList.remove('block-hidden-in-edit');
         else blockEl.classList.add('block-hidden-in-edit');
       });
@@ -4132,19 +4148,21 @@ const CUSTOM_SITE_CONFIG = {
     function renderHashtags() {
       const container = document.getElementById('hashtags-container');
       const items = siteConfig.hashtags.filter(item => !isItemDeleted(item.id));
+      // 直式膠囊：「#標籤 · 分類」一行；說明文字平常當滑鼠提示，編輯模式才顯示出來編輯
       container.innerHTML = items.map(item => {
-        const cardBorder = item.featured ? 'border-sakura' : '';
-        const badgeClass = item.featured ? 'bg-sakura-deep text-white' : 'bg-sakura-light text-sakura-deep';
-        const tagClass = item.featured ? 'text-sakura-deep' : 'text-cocoa group-hover:text-sakura-deep';
+        const tag = String(item.tag || '').trim();
+        const cat = String(item.category || '').trim();
+        const desc = String(item.desc || '').trim();
+        const a11y = isEditMode ? '' : ` role="button" tabindex="0" aria-label="複製 ${escapeAttr(tag)}"`;
         return `
-          <div class="subcard-item kawaii-card p-3 sm:p-5 text-left shadow-kawaii hover:shadow-kawaii-hover sm:hover:-translate-y-1 transition group w-[158px] shrink-0 snap-start sm:w-auto sm:shrink ${cardBorder}" data-copy-tag="${escapeAttr(item.tag)}">
+          <div class="subcard-item tag-pill${item.featured ? ' is-featured' : ''}" role="listitem" data-copy-tag="${escapeAttr(tag)}"${desc && !isEditMode ? ` title="${escapeAttr(desc)}"` : ''}${a11y}>
             ${createSubcardControlsHtml('hashtags', item.id)}
-            <div class="flex items-center justify-between gap-1 mb-1.5 sm:mb-2">
-              <span${editableAttr('hashtags', item.id, 'category')} class="text-[11px] sm:text-xs font-black ${badgeClass} px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full">${escapeHtml(item.category)}</span>
-              <i class="fa-regular fa-copy text-sakura-medium group-hover:text-sakura-deep cursor-pointer"></i>
-            </div>
-            <div${editableAttr('hashtags', item.id, 'tag')} class="text-sm sm:text-lg font-black ${tagClass} transition cursor-pointer">${escapeHtml(item.tag)}</div>
-            <p${editableAttr('hashtags', item.id, 'desc')} class="text-[11px] sm:text-xs text-cocoa-light mt-1 sm:mt-1.5 leading-snug">${escapeHtml(item.desc)}</p>
+            <span class="tag-pill-line">
+              <span${editableAttr('hashtags', item.id, 'tag')} class="tag-pill-tag">${escapeHtml(tag)}</span>
+              <span class="tag-pill-sep" aria-hidden="true">·</span>
+              <span${editableAttr('hashtags', item.id, 'category')} class="tag-pill-cat">${escapeHtml(cat)}</span>
+            </span>
+            <span${editableAttr('hashtags', item.id, 'desc')} class="tag-pill-desc">${escapeHtml(desc)}</span>
           </div>
         `;
       }).join('');
@@ -4463,8 +4481,13 @@ const CUSTOM_SITE_CONFIG = {
       document.getElementById('lightbox-modal').classList.add('hidden');
     }
 
-    async function copyHashtag(tag) {
+    async function copyHashtag(tag, pill) {
       const ok = await copyText(tag);
+      if (ok && pill) {
+        pill.classList.remove('is-copied'); void pill.offsetWidth; pill.classList.add('is-copied');
+        clearTimeout(pill._copiedTimer);
+        pill._copiedTimer = setTimeout(() => pill.classList.remove('is-copied'), 1300);
+      }
       showToast(ok ? `已複製 ${tag} 到剪貼簿 ✨` : '⚠️ 複製失敗，請手動選取文字複製');
     }
 
@@ -5234,8 +5257,16 @@ const CUSTOM_SITE_CONFIG = {
 
         const tagCard = e.target.closest('[data-copy-tag]');
         if (tagCard && !isEditMode) {
-          copyHashtag(tagCard.dataset.copyTag);
+          copyHashtag(tagCard.dataset.copyTag, tagCard);
         }
+      });
+      // 鍵盤也能複製：Tab 移到標籤上按 Enter／空白鍵
+      document.getElementById('blocks-container').addEventListener('keydown', (e) => {
+        if (isEditMode || (e.key !== 'Enter' && e.key !== ' ')) return;
+        const pill = e.target.closest && e.target.closest('.tag-pill[data-copy-tag]');
+        if (!pill || e.target !== pill) return;
+        e.preventDefault();
+        copyHashtag(pill.dataset.copyTag, pill);
       });
 
       // 編輯模式中阻止連結預設跳轉，方便點擊文字編輯
