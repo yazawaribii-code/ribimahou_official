@@ -307,7 +307,7 @@
       0%, 100% { transform: translateY(0); }
       50% { transform: translateY(-8px); }
     }
-    #chibi-wrap:not(.chibi-empty) { animation: chibiBob 3.4s ease-in-out infinite; }
+    #chibi-wrap:not(.chibi-empty) { animation: chibiBob 3.4s ease-in-out infinite; will-change: transform; }
     .chibi-sparkles {
       position: absolute; pointer-events: none; z-index: 2;
       left: calc(50% + var(--cx, 0) * 1% - var(--cz, 1) * 50%);
@@ -3167,10 +3167,11 @@ const CUSTOM_SITE_CONFIG = {
       const left = wrap.dataset.side === 'left';
       wrap.style.float = left ? 'left' : 'right';
       // 先量「沒有立繪時」的文字高度
-      const prevDisplay = wrap.style.display;
-      wrap.style.display = 'none';
+      // 用 position:absolute 暫時抽離排版（不能用 display:none：那會讓漂浮動畫和星星粒子從頭重播，看起來像掉幀）
+      const prevPosition = wrap.style.position;
+      wrap.style.position = 'absolute';
       const textH = box.offsetHeight;
-      wrap.style.display = prevDisplay;
+      wrap.style.position = prevPosition;
       const w = wrap.getBoundingClientRect(), v = img.getBoundingClientRect();
       if (!w.width) return;
       const spillTop = Math.max(0, w.top - v.top);
@@ -3201,7 +3202,13 @@ const CUSTOM_SITE_CONFIG = {
       clearTimeout(chibiFlowTimer);
       chibiFlowTimer = setTimeout(layoutChibiFlow, 60);
     }
-    window.addEventListener('resize', scheduleChibiFlow);
+    // 手機滑動時網址列會收合／展開，瀏覽器會一直發出 resize（只有高度在變）；排版只跟寬度有關，所以寬度沒變就不重算
+    let chibiFlowLastW = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === chibiFlowLastW) return;
+      chibiFlowLastW = window.innerWidth;
+      scheduleChibiFlow();
+    });
     window.addEventListener('load', scheduleChibiFlow);
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleChibiFlow);
     document.addEventListener('input', (e) => { if (e.target.closest('#notes-card')) scheduleChibiFlow(); });
