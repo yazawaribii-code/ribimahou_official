@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW"><head>
   <meta charset="UTF-8">
-  <!-- 📱 App 內建瀏覽器（IG／FB／Threads／LINE）效能比較弱 → 加上 .inapp，自動切換成省電模式 -->
+  <!-- App 內建瀏覽器（IG／FB／Threads／LINE）效能比較弱 → 加上 .inapp，自動切換成省電模式 -->
   <script>(function(){try{if(/Instagram|FBAN|FBAV|FB_IAB|Barcelona|Threads|\bLine\//i.test(navigator.userAgent))document.documentElement.classList.add('inapp');}catch(e){}})();</script>
   <style>
     /* 省電模式：關掉毛玻璃模糊（App 內建瀏覽器畫這個很吃力），其他外觀不變 */
@@ -533,6 +533,7 @@
       background: linear-gradient(135deg, #ff85a4, #e85a7f); padding: 2px 8px; border-radius: 999px;
       box-shadow: 0 2px 6px rgba(232,90,127,.35);
     }
+    .sch-bubble-card .sch-time-row { color: #fff !important; text-shadow: 0 1px 3px rgba(214, 69, 112, .55); }   /* 重點日的時間改白字 */
     .sch-bubble-card [data-item-field="tag"] { background: #fff !important; box-shadow: 0 1px 4px rgba(232,90,127,.2); }
     @keyframes schBubbleUp {
       0%   { transform: translateY(0) translateX(0) rotate(-10deg) scale(.7); opacity: 0; }
