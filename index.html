@@ -2315,7 +2315,7 @@ const CUSTOM_SITE_CONFIG = {
       "chibiSize": 120,
       "caption": "",
       "heading": "｜莉息的小檔案(๑' '๑)",
-      "body": "\n\n\n名字｜莉息\n身高｜一個手掌大小\n喜歡｜陪伴在莉比醬身邊歡笑嬉鬧\n創作靈感｜錢包、麻糬糰子\n\n\n\n"
+      "body": "\n名字｜莉息\n身高｜一個手掌大小\n喜歡｜陪伴在莉比醬身邊歡笑嬉鬧\n創作靈感｜錢包、麻糬糰子\n\n\n\n"
     }
   ],
   "announcements": [
@@ -5754,6 +5754,13 @@ const CUSTOM_SITE_CONFIG = {
       #xp-extra-slides .xp-notes .xp-body { grid-column: 2; grid-row: 2; }
       #xp-extra-slides .xp-notes .xp-chibi { grid-column: 3; grid-row: 2; justify-self: end; }
     }
+    /* 手機：文字整塊置中、每行完整橫排（不為了閃立繪而換行）；立繪放在右下角、疊在文字後面 */
+    @media (max-width: 639px) {
+      #xp-extra-slides .xp-notes { grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr); }
+      #xp-extra-slides .xp-notes .xp-heading { grid-column: 2; grid-row: 1; }
+      #xp-extra-slides .xp-notes .xp-body { grid-column: 2; grid-row: 2; position: relative; z-index: 2; }
+      #xp-extra-slides .xp-notes .xp-chibi { grid-column: 1 / -1; grid-row: 3; justify-self: end; }
+    }
     /* 比較窄的平板（iPad mini 直式）：在立繪旁邊剩下的空間置中，避免碰到立繪 */
     @media (min-width: 640px) and (max-width: 759px) {
       #xp-extra-slides .xp-notes { grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr) auto; }
@@ -6027,10 +6034,33 @@ const CUSTOM_SITE_CONFIG = {
         // 圖片載入後高度會變，再對一次位置
         const shownImg = xpIndex === 0 ? document.getElementById('img-character-sheet') : document.querySelector('#xp-extra-slides img');
         if (shownImg && !shownImg.complete) shownImg.addEventListener('load', placeArrows, { once: true });
+        const chibiImg = document.querySelector('#xp-extra-slides .xp-chibi img');
+        if (chibiImg && !chibiImg.complete) chibiImg.addEventListener('load', placeArrows, { once: true });
+      }
+
+      // 手機：把立繪往上拉，讓它的底部對齊文字最後一行（疊在文字後面，不佔文字的寬度）
+      function layoutXpChibi() {
+        const notes = document.querySelector('#xp-extra-slides .xp-notes');
+        if (!notes) return;
+        const wrap = notes.querySelector('.xp-chibi'), body = notes.querySelector('.xp-body');
+        if (!wrap || !body) return;
+        wrap.style.marginTop = '';
+        if (window.innerWidth >= 640 || wrap.classList.contains('is-empty')) return;
+        const img = wrap.querySelector('img');
+        const w = wrap.getBoundingClientRect(), b = body.getBoundingClientRect();
+        if (!w.height) return;
+        const v = img ? img.getBoundingClientRect() : w;
+        const spillTop = Math.max(0, w.top - v.top), spillBottom = Math.max(0, v.bottom - w.bottom);
+        const gap = parseFloat(getComputedStyle(notes).rowGap) || 0;
+        // 立繪（含放大超出的部分）底部 ＝ 文字底部；但不要高過文字最上面
+        let up = w.height + gap + spillBottom;
+        up = Math.min(up, b.height + gap - spillTop);
+        wrap.style.marginTop = (-Math.max(0, up)) + 'px';
       }
 
       // 箭頭位置：卡片兩側有空間 → 放在卡片外面；沒有空間 → 縮小，貼在三視圖框的左右邊緣（不會碰到文字和Q版立繪）
       function placeArrows() {
+        layoutXpChibi();
         const card = document.querySelector('#block-sheet .kawaii-card');
         if (!card) return;
         const prev = card.querySelector(':scope > .xp-arrow[data-xp-act="prev"]');
