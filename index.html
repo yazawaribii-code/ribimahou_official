@@ -224,15 +224,7 @@
     .kawaii-card.overflow-hidden:has(img),
     #avatar-card, #main-video-player, .cw-window, .cw-pic {
       isolation: isolate;
-    }
-    /* will-change 只給手機／平板（觸控螢幕）用：電腦版開著它，在 Windows 125%、150% 顯示縮放
-       或 hover 放大動畫時，瀏覽器會把整張圖先畫成點陣圖再縮放，圖片和文字就會變得有點糊 */
-    @media (hover: none) and (pointer: coarse) {
-      .overflow-hidden[class*="rounded"]:has(img),
-      .kawaii-card.overflow-hidden:has(img),
-      #avatar-card, #main-video-player, .cw-window, .cw-pic {
-        will-change: transform;
-      }
+      will-change: transform;
     }
     /* 填滿整個框的圖也自己帶圓角：就算還沒裁切好，露出來的也是圓角，不會是直角方框 */
     .overflow-hidden[class*="rounded"] > img.absolute,
