@@ -484,6 +484,11 @@
       position: relative;
     }
 
+    /* 📺 行程標籤的平台圖示 */
+    .sch-pf { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+    .sch-pf-icon { font-size: 13px; line-height: 1; }
+    .sch-pf-text { margin-left: 1px; }
+
     /* 💖 行程「重點」卡片：粉色泡泡底板（特別活動／連動） */
     .sch-bubble-card {
       background: linear-gradient(160deg, #ffe3ec 0%, #ffc2d4 55%, #ffa8c2 100%);
@@ -4321,7 +4326,7 @@ const CUSTOM_SITE_CONFIG = {
         const desc = String(item.desc || '').trim();
         const a11y = isEditMode ? '' : ` role="button" tabindex="0" aria-label="複製 ${escapeAttr(tag)}"`;
         return `
-          <div class="subcard-item tag-pill${item.featured ? ' is-featured' : ''}" role="listitem" data-copy-tag="${escapeAttr(tag)}"${desc && !isEditMode ? ` title="${escapeAttr(desc)}"` : ''}${a11y}>
+          <div class="subcard-item tag-pill${item.featured ? ' is-featured' : ''}" role="listitem" data-copy-tag="${escapeAttr(tag)}"${desc && !isEditMode ? ` data-tip="${escapeAttr(desc)}"` : ''}${a11y}>
             ${createSubcardControlsHtml('hashtags', item.id)}
             <span class="tag-pill-line">
               <span${editableAttr('hashtags', item.id, 'tag')} class="tag-pill-tag">${escapeHtml(tag)}</span>
@@ -4332,6 +4337,22 @@ const CUSTOM_SITE_CONFIG = {
           </div>
         `;
       }).join('');
+    }
+
+    // 行程標籤 → 平台圖示：標籤寫 Twitch／圖奇／TW 顯示 Twitch 圖示，寫 YouTube／YT／油管 顯示 YouTube 圖示，兩個都寫就一起出現
+    // 沒寫到平台的標籤照原本文字顯示；編輯模式（?edit）時顯示文字方便修改
+    function scheduleTagHtml(tag) {
+      const raw = String(tag || '');
+      if (isEditMode) return escapeHtml(raw);
+      const t = raw.toLowerCase();
+      const tw = /twitch|圖奇|(^|[^a-z])tw([^a-z]|$)/.test(t);
+      const yt = /youtube|油管|(^|[^a-z])yt([^a-z]|$)/.test(t);
+      if (!tw && !yt) return escapeHtml(raw);
+      const twI = '<i class="fa-brands fa-twitch sch-pf-icon" aria-hidden="true"></i>';
+      const ytI = '<i class="fa-brands fa-youtube sch-pf-icon" aria-hidden="true"></i>';
+      if (tw && yt) return `<span class="sch-pf">${twI}${ytI}</span>`;
+      if (tw) return `<span class="sch-pf">${twI}<span class="sch-pf-text">Twitch</span></span>`;
+      return `<span class="sch-pf">${ytI}<span class="sch-pf-text">YouTube</span></span>`;
     }
 
     function renderScheduleGrid(weekKey = activeWeekKey) {
@@ -4364,7 +4385,7 @@ const CUSTOM_SITE_CONFIG = {
                   <span${editableAttr('scheduleDays', item.id, 'day', weekKey)} class="font-black text-base text-sakura-deep">${escapeHtml(item.day)}</span>
                   <span${editableAttr('scheduleDays', item.id, 'date', weekKey)} class="text-xs font-bold text-cocoa-light">${escapeHtml(item.date)}</span>
                 </div>
-                <span${editableAttr('scheduleDays', item.id, 'tag', weekKey)} class="inline-block mt-2 bg-white text-sakura-deep text-[11px] font-black px-2.5 py-0.5 rounded-full border border-sakura/50">${escapeHtml(item.tag)}</span>
+                <span${editableAttr('scheduleDays', item.id, 'tag', weekKey)} class="inline-block mt-2 bg-white text-sakura-deep text-[11px] font-black px-2.5 py-0.5 rounded-full border border-sakura/50">${scheduleTagHtml(item.tag)}</span>
                 <p${editableAttr('scheduleDays', item.id, 'title', weekKey)} class="mt-3 text-xs sm:text-sm font-bold text-cocoa-light leading-snug">${escapeHtml(item.title)}</p>
               </div>
               <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-[11px] font-black text-sakura-medium">
@@ -4387,7 +4408,7 @@ const CUSTOM_SITE_CONFIG = {
                 <span${editableAttr('scheduleDays', item.id, 'day', weekKey)} class="font-black text-base text-cocoa">${escapeHtml(item.day)}</span>
                 <span${editableAttr('scheduleDays', item.id, 'date', weekKey)} class="text-xs font-bold text-cocoa-light">${escapeHtml(item.date)}</span>
               </div>
-              <span${editableAttr('scheduleDays', item.id, 'tag', weekKey)} class="inline-block mt-2 bg-sakura-light text-sakura-deep text-[11px] font-black px-2.5 py-0.5 rounded-full">${escapeHtml(item.tag)}</span>
+              <span${editableAttr('scheduleDays', item.id, 'tag', weekKey)} class="inline-block mt-2 bg-sakura-light text-sakura-deep text-[11px] font-black px-2.5 py-0.5 rounded-full">${scheduleTagHtml(item.tag)}</span>
               <p${editableAttr('scheduleDays', item.id, 'title', weekKey)} class="mt-3 text-xs sm:text-sm font-bold text-cocoa leading-snug">${escapeHtml(item.title)}</p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
@@ -5048,7 +5069,7 @@ const CUSTOM_SITE_CONFIG = {
         const picInner = `<img src="${escapeAttr(optimizeImageUrl(src))}" data-orig="${escapeAttr(src)}" alt="${escapeAttr(title || '合作實績 ' + (i + 1))}" decoding="async" draggable="false" onerror="adsImgFallback(this)">` +
           (a.now ? '<span class="cw-now">NOW ♡</span>' : '');
         const pic = href
-          ? `<a class="cw-pic" draggable="false" href="${escapeAttr(href)}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${title ? ` title="${escapeAttr(title)}"` : ''}>${picInner}</a>`
+          ? `<a class="cw-pic" draggable="false" href="${escapeAttr(href)}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${title ? ` data-tip="${escapeAttr(title)}"` : ''}>${picInner}</a>`
           : `<span class="cw-pic">${picInner}</span>`;
         const label = ` aria-roledescription="slide" aria-label="${i + 1} / ${ads.length}${title ? '：' + escapeAttr(title) : ''}"`;
         return `<div class="cw-slide"${label}>${pic}<span class="cw-cap">${escapeHtml(cap)}</span></div>`;
@@ -6045,4 +6066,38 @@ const CUSTOM_SITE_CONFIG = {
 })();
 </script>
 
+
+<!-- 🎀 粉色小提示（滑鼠停在 Hashtag、合作實績圖片上時出現，取代瀏覽器預設的黑色提示） -->
+<style>
+  #pink-tip{position:fixed;z-index:10000;pointer-events:none;max-width:240px;padding:6px 12px;border-radius:12px;
+    background:#FF8DAA;color:#fff;font-size:12px;font-weight:700;line-height:1.45;white-space:pre-line;text-align:center;
+    box-shadow:0 4px 14px rgba(232,90,127,.28);opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+  #pink-tip.on{opacity:1;transform:translateY(0)}
+  #pink-tip::after{content:"";position:absolute;left:var(--ax,50%);top:100%;margin-left:-5px;border:5px solid transparent;border-top-color:#FF8DAA}
+  #pink-tip.below::after{top:auto;bottom:100%;border-top-color:transparent;border-bottom-color:#FF8DAA}
+</style>
+<script>
+(function(){
+  var tip,cur=null,timer=null;
+  function el(){ if(!tip){ tip=document.createElement('div'); tip.id='pink-tip'; tip.setAttribute('role','tooltip'); document.body.appendChild(tip);} return tip; }
+  function hide(){ clearTimeout(timer); timer=null; cur=null; if(tip) tip.classList.remove('on'); }
+  function show(t){
+    var text=t.getAttribute('data-tip'); if(!text) return;
+    var b=el(); b.textContent=text; b.classList.remove('below'); b.classList.add('on');
+    var r=t.getBoundingClientRect(), w=b.offsetWidth, h=b.offsetHeight;
+    var x=Math.max(8,Math.min(window.innerWidth-w-8,r.left+r.width/2-w/2)), y=r.top-h-10;
+    if(y<8){ y=r.bottom+10; b.classList.add('below'); }
+    b.style.left=x+'px'; b.style.top=y+'px';
+    b.style.setProperty('--ax',Math.max(12,Math.min(w-12,r.left+r.width/2-x))+'px');
+  }
+  document.addEventListener('mouseover',function(e){
+    var t=e.target.closest&&e.target.closest('[data-tip]');
+    if(t===cur) return; hide(); if(!t||document.body.classList.contains('edit-mode-active')) return;
+    cur=t; timer=setTimeout(function(){ if(cur===t) show(t); },400);
+  });
+  document.addEventListener('mouseout',function(e){ if(cur&&!cur.contains(e.relatedTarget)) hide(); });
+  window.addEventListener('scroll',hide,{passive:true});
+  document.addEventListener('mousedown',hide);
+})();
+</script>
 </body></html>
