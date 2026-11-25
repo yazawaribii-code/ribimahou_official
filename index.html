@@ -193,6 +193,44 @@
       #notes-card #chibi-wrap { position: relative; z-index: 0; }
       #notes-card #sheet-notes-container [data-item-field], #notes-card #sheet-notes-container p { overflow-wrap: anywhere; }
     }
+    /* 平板（直式）：小檔案的文字整塊放在「整張卡片」的正中間（左右留白一樣寬），立繪靠在右下角；文字本身仍靠左對齊，標題跟內文左緣對齊 */
+    @media (min-width: 640px) and (max-width: 1023px) {
+      /* （JS 會把欄位直接寫在元素上，所以這裡要用 !important 才蓋得過；立繪放右邊／左邊都支援） */
+      #notes-card { grid-template-columns: 1fr minmax(0, max-content) 1fr !important; }
+      #notes-card #notes-heading { grid-column: 2 !important; grid-row: 1; }
+      #notes-card #sheet-notes-container { grid-column: 2 !important; grid-row: 2; }
+      #notes-card #chibi-wrap { grid-column: 3 !important; grid-row: 2; justify-self: end; }
+      #notes-card:has(#chibi-wrap[data-side="left"]) #chibi-wrap { grid-column: 1 !important; justify-self: start; }
+    }
+    /* 比較窄的平板（例如 iPad mini 直式）：整張卡片置中會碰到放大的立繪，改成在「立繪旁邊剩下的空間」裡置中 */
+    @media (min-width: 640px) and (max-width: 759px) {
+      #notes-card { grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr) auto !important; }
+      #notes-card #chibi-wrap { grid-column: 4 !important; }
+      #notes-card:has(#chibi-wrap[data-side="left"]) { grid-template-columns: auto minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr) !important; }
+      #notes-card:has(#chibi-wrap[data-side="left"]) #notes-heading,
+      #notes-card:has(#chibi-wrap[data-side="left"]) #sheet-notes-container { grid-column: 3 !important; }
+      #notes-card:has(#chibi-wrap[data-side="left"]) #chibi-wrap { grid-column: 1 !important; }
+    }
+    /* 平板＋手機：自我介紹白底依文字長度縮短，整塊置中（對話框尖角仍對準下方大頭貼）；電腦版不變 */
+    @media (max-width: 1023px) {
+      .speech-bubble { width: fit-content; max-width: 100%; justify-self: center; }
+      /* 身分膠囊（繪圖系VTuber • 莉比Ribi）：只包住文字的長度，靠左對齊下方的大標題 */
+      .role-badge { width: fit-content; max-width: 100%; justify-self: start; }
+    }
+    /* 手機滑動時，圖片或毛玻璃還沒畫好，會先跑出「沒有圓角的灰框」（Safari／手機瀏覽器的圖層裁切問題）。
+       讓「圓角＋會裁切＋裡面有圖」的容器自己成為獨立圖層，裡面的圖層就一定會照著圓角被裁掉；
+       will-change 不會改變位置、不會影響陰影和 hover 動畫，只是請瀏覽器先準備好圖層。 */
+    .overflow-hidden[class*="rounded"]:has(img),
+    .kawaii-card.overflow-hidden:has(img),
+    #avatar-card, #main-video-player, .cw-window, .cw-pic {
+      isolation: isolate;
+      will-change: transform;
+    }
+    /* 填滿整個框的圖也自己帶圓角：就算還沒裁切好，露出來的也是圓角，不會是直角方框 */
+    .overflow-hidden[class*="rounded"] > img.absolute,
+    .overflow-hidden[class*="rounded"] > img.object-cover,
+    .kawaii-card.overflow-hidden > img,
+    #main-video-player img.absolute { border-radius: inherit; }
     /* 主要頻道與傳送門：文字清空的地方，一般瀏覽時整個文字區塊隱藏；編輯模式才會出現 */
     body:not(.edit-mode-active) #block-channels [data-editable-field]:empty,
     body:not(.edit-mode-active) #block-channels [data-item-field]:empty { display: none; }
@@ -890,7 +928,7 @@
           <!-- 左側個人檔案 -->
           <!-- 手機版：左欄用 contents 攤平，再用 order 讓「頭貼」排在「小資訊卡」前面 -->
           <div class="lg:col-span-7 space-y-5 max-lg:contents">
-            <div class="inline-flex flex-wrap items-center gap-2 bg-sakura-light border border-sakura px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-sakura-deep">
+            <div class="role-badge inline-flex flex-wrap items-center gap-2 bg-sakura-light border border-sakura px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-sakura-deep">
               <span data-editable-field="roleBadgeLeft" contenteditable="true" spellcheck="false">🌸 台灣個人勢 VTuber</span>
               <span class="text-sakura">•</span>
               <span data-editable-field="roleBadgeRight" contenteditable="true" spellcheck="false">繪師筆名：莉比Ribi</span>
@@ -3829,7 +3867,33 @@ const CUSTOM_SITE_CONFIG = {
         el.setAttribute('spellcheck', 'false');
       });
       updateContactMail();
+      fitIntroText();
     }
+
+    // 手機／平板：自我介紹每一行如果超出白底寬度，就把整段字稍微縮小，讓每行都排在同一行不換行
+    // （最小縮到 11px；真的太長的話才讓它自動換行。電腦版和編輯模式不縮。）
+    function fitIntroText() {
+      const el = document.querySelector('[data-editable-field="introBody"]');
+      if (!el) return;
+      el.style.fontSize = '';
+      if (isEditMode || window.innerWidth >= 1024) return;
+      const base = parseFloat(getComputedStyle(el).fontSize) || 14;
+      const prevWS = el.style.whiteSpace;
+      el.style.whiteSpace = 'pre';                       // 保留原本的換行，但不自動折行，量出最長那一行
+      const need = el.scrollWidth, have = el.clientWidth;
+      el.style.whiteSpace = prevWS;
+      if (!have || need <= have + 1) return;
+      const size = Math.max(11, Math.floor(base * (have / need) * 2) / 2 - 0.5);
+      el.style.fontSize = size + 'px';
+    }
+    let fitIntroLastW = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === fitIntroLastW) return;   // 手機網址列收合只改高度，不重算
+      fitIntroLastW = window.innerWidth;
+      fitIntroText();
+    });
+    window.addEventListener('load', fitIntroText);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitIntroText);
 
     function toggleEditMode() {
       isEditMode = !isEditMode;
