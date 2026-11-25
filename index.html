@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html lang="zh-Hant-TW"><head>
   <meta charset="UTF-8">
+  <!-- 📱 App 內建瀏覽器（IG／FB／Threads／LINE）效能比較弱 → 加上 .inapp，自動切換成省電模式 -->
+  <script>(function(){try{if(/Instagram|FBAN|FBAV|FB_IAB|Barcelona|Threads|\bLine\//i.test(navigator.userAgent))document.documentElement.classList.add('inapp');}catch(e){}})();</script>
+  <style>
+    /* 省電模式：關掉毛玻璃模糊（App 內建瀏覽器畫這個很吃力），其他外觀不變 */
+    html.inapp *{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+  </style>
   <!-- 防閃爍：在 JS 套用你的設定前先隱藏頁面，套用完成後才顯示 -->
   <style id="preload-hide">body{visibility:hidden}</style>
   <noscript><style>body{visibility:visible !important}</style></noscript>
@@ -4607,7 +4613,8 @@ const CUSTOM_SITE_CONFIG = {
       const images = getParticleImages();
       const emojis = PARTICLE_SETTINGS.emojis.length ? PARTICLE_SETTINGS.emojis : ['✨'];
       const frag = document.createDocumentFragment();
-      for (let i = 0; i < PARTICLE_SETTINGS.count; i++) {
+      const pCount = document.documentElement.classList.contains('inapp') ? Math.min(8, PARTICLE_SETTINGS.count) : PARTICLE_SETTINGS.count;   // IG 等 App 內建瀏覽器少放一點
+      for (let i = 0; i < pCount; i++) {
         let el;
         if (images.length) {
           const orig = images[i % images.length];
@@ -5523,6 +5530,10 @@ const CUSTOM_SITE_CONFIG = {
   #float-mascot{position:fixed;left:0;top:0;z-index:46;width:var(--fm-size,120px);touch-action:none;cursor:grab;
     user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;will-change:transform}
   #float-mascot.is-drag{cursor:grabbing}
+  /* 讓莉息的圖自己一個圖層：陰影只畫一次，之後搖擺、壓扁都交給顯示卡，不用每一幀重畫 */
+  #float-mascot img{will-change:transform;backface-visibility:hidden}
+  /* 省電模式（IG 等 App 內建瀏覽器）：拿掉陰影濾鏡，動起來更順 */
+  html.inapp #float-mascot img,html.inapp #float-mascot.is-drag img{filter:none}
   #float-mascot .img-edit-btn{cursor:pointer}
   /* 💬 可愛對話泡泡（取代瀏覽器內建的灰色提示框） */
   .fm-bubble{position:absolute;left:50%;bottom:calc(100% - 4px);z-index:2;pointer-events:none;white-space:nowrap;
