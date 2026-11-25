@@ -492,18 +492,20 @@
     }
 
     /* 可直接編輯文字樣式 */
+    /* 編輯時不再鋪白底：保留原本底色與字色，只用「粉框＋白色外暈」標示可編輯範圍，
+       這樣白字在粉底、深字在白底都看得清楚 */
     body.edit-mode-active [data-editable-field] {
       border-radius: 8px;
-      background-color: rgba(255, 240, 244, 0.92);
-      box-shadow: 0 0 0 1.5px rgba(232, 90, 127, 0.45);
+      background-color: transparent;
+      box-shadow: 0 0 0 1.5px rgba(232, 90, 127, 0.75), 0 0 0 3px rgba(255, 255, 255, 0.55);
       cursor: text;
-      transition: background-color 0.2s ease, box-shadow 0.2s ease;
+      transition: box-shadow 0.2s ease;
     }
 
     body.edit-mode-active [data-editable-field]:focus {
       outline: none;
-      background-color: #FFFFFF;
-      box-shadow: 0 0 0 2.5px #E85A7F;
+      background-color: transparent;
+      box-shadow: 0 0 0 2.5px #E85A7F, 0 0 0 4.5px #FFFFFF;
     }
 
     ::-webkit-scrollbar {
@@ -531,15 +533,16 @@
     body.edit-mode-active [data-item-field][contenteditable="true"],
     body.edit-mode-active #schedule-date-range[contenteditable="true"] {
       border-radius: 6px; padding: 0 4px; cursor: text;
-      background-color: rgba(255, 240, 244, 0.92);
-      box-shadow: 0 0 0 1.5px rgba(232, 90, 127, 0.45);
+      background-color: transparent;
+      box-shadow: 0 0 0 1.5px rgba(232, 90, 127, 0.75), 0 0 0 3px rgba(255, 255, 255, 0.55);
     }
     body.edit-mode-active [data-item-field][contenteditable="true"]:focus,
     body.edit-mode-active #schedule-date-range[contenteditable="true"]:focus {
-      outline: none; background-color: #fff; box-shadow: 0 0 0 2.5px #E85A7F;
+      outline: none; background-color: transparent; box-shadow: 0 0 0 2.5px #E85A7F, 0 0 0 4.5px #FFFFFF;
     }
-    body.edit-mode-active #main-video-player [data-item-field][contenteditable="true"],
-    body.edit-mode-active #schedule-date-range[contenteditable="true"] { color: #5A3E46; }
+    /* 選取文字時的顏色：粉底白字，任何底色上都看得到 */
+    body.edit-mode-active [contenteditable="true"]::selection,
+    body.edit-mode-active [contenteditable="true"] *::selection { background: #E85A7F; color: #FFFFFF; }
     /* 編輯模式才會出現的「換圖」按鈕 */
     .img-edit-btn { display: none; }
     body.edit-mode-active .img-edit-btn { display: inline-flex; }
@@ -959,8 +962,8 @@
           <button type="button" data-subcard-delete="mini-debut" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-debut" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">🎂 出道紀念日</div>
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-debut" data-item-field="value" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">2023.11.08</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-debut" data-item-field="label">🎂 出道紀念日</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-debut" data-item-field="value">2023.11.08</div>
         </div>
       
         <div class="subcard-item bg-sakura-light/80 border border-sakura/50 rounded-2xl p-3 text-center">
@@ -971,8 +974,8 @@
           <button type="button" data-subcard-delete="mini-fans" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-fans" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">💖 專屬粉絲名</div>
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-fans" data-item-field="value" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">莉息</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-fans" data-item-field="label">💖 專屬粉絲名</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-fans" data-item-field="value">莉息</div>
         </div>
       
         <div class="subcard-item bg-sakura-light/80 border border-sakura/50 rounded-2xl p-3 text-center">
@@ -983,8 +986,8 @@
           <button type="button" data-subcard-delete="mini-rest" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-rest" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">💤 固定休息日</div>
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-rest" data-item-field="value" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">每週六 無莉日</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-rest" data-item-field="label">💤 固定休息日</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-rest" data-item-field="value">每週六 無莉日</div>
         </div>
       
         <div class="subcard-item bg-sakura-light/80 border border-sakura/50 rounded-2xl p-3 text-center">
@@ -995,8 +998,8 @@
           <button type="button" data-subcard-delete="mini-comm" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-comm" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">🎨 繪師委託</div>
-          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-comm" data-item-field="value" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">2027.01 排單</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-comm" data-item-field="label">🎨 繪師委託</div>
+          <div contenteditable="true" spellcheck="false" data-item-list="profileMiniCards" data-item-id="mini-comm" data-item-field="value">2027.01 排單</div>
         </div>
       </div>
 
@@ -1080,8 +1083,8 @@
                 <span class="text-[10px] font-black mt-0.5 tracking-wider">YOUTUBE</span>
               </div>
               <div>
-                <h4 contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-youtube" data-item-field="title" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">YouTube 音樂與精華頻道</h4>
-                <p contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-youtube" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">翻唱 Cover MV • 短影音 Shorts • 實況精華</p>
+                <h4 contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-youtube" data-item-field="title">YouTube 音樂與精華頻道</h4>
+                <p contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-youtube" data-item-field="desc">翻唱 Cover MV • 短影音 Shorts • 實況精華</p>
               </div>
             </div>
             <span class="text-sakura-deep group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform pr-2">
@@ -1105,8 +1108,8 @@
                 <span class="text-[10px] font-black mt-0.5 tracking-wider">ARTWORK</span>
               </div>
               <div>
-                <h4 contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-commission" data-item-field="title" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">莉比Ribi 繪圖委託／排單資訊</h4>
-                <p contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-commission" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">插畫與角色設計委託（目前排單至 2027.01）</p>
+                <h4 contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-commission" data-item-field="title">莉比Ribi 繪圖委託／排單資訊</h4>
+                <p contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-commission" data-item-field="desc">插畫與角色設計委託（目前排單至 2027.01）</p>
               </div>
             </div>
             <span class="text-sakura-deep group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform pr-2">
@@ -1130,8 +1133,8 @@
                 <span class="text-[10px] font-black mt-0.5 tracking-wider">GOODS</span>
               </div>
               <div>
-                <h4 contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-goods" data-item-field="title" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">魔法周邊與莉息應援區</h4>
-                <p contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-goods" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">專屬 Hashtags 一鍵複製 • 粉絲互動與二創指南</p>
+                <h4 contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-goods" data-item-field="title">魔法周邊與莉息應援區</h4>
+                <p contenteditable="true" spellcheck="false" data-item-list="sideChannels" data-item-id="ch-goods" data-item-field="desc">專屬 Hashtags 一鍵複製 • 粉絲互動與二創指南</p>
               </div>
             </div>
             <span class="text-sakura-deep group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform pr-2">
@@ -1154,7 +1157,7 @@
       
           <a href="https://x.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
             <i class="fa-brands fa-x-twitter text-sakura-deep"></i>
-            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-x" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">X / Twitter</span>
+            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-x" data-item-field="label">X / Twitter</span>
           </a>
         </div>
       
@@ -1168,7 +1171,7 @@
       
           <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
             <i class="fa-brands fa-instagram text-sakura-deep"></i>
-            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-ig" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">Instagram</span>
+            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-ig" data-item-field="label">Instagram</span>
           </a>
         </div>
       
@@ -1182,7 +1185,7 @@
       
           <a href="https://www.pixiv.net/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
             <i class="fa-solid fa-paintbrush text-sakura-deep"></i>
-            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-pixiv" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">Pixiv 作品集</span>
+            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-pixiv" data-item-field="label">Pixiv 作品集</span>
           </a>
         </div>
       
@@ -1196,7 +1199,7 @@
       
           <a href="https://cluster.mu/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
             <i class="fa-solid fa-sparkles text-sakura-deep"></i>
-            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-clusters" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">Clusters</span>
+            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-clusters" data-item-field="label">Clusters</span>
           </a>
         </div>
       
@@ -1210,7 +1213,7 @@
       
           <a href="https://www.ganknow.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
             <i class="fa-solid fa-wand-sparkles text-sakura-deep"></i>
-            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-gank" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">Gank</span>
+            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-gank" data-item-field="label">Gank</span>
           </a>
         </div>
       
@@ -1224,7 +1227,7 @@
       
           <a href="https://discord.com/" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2">
             <i class="fa-brands fa-discord text-sakura-deep"></i>
-            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-dc" data-item-field="label" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">Discord 莉息小窩</span>
+            <span contenteditable="true" spellcheck="false" data-item-list="socialPills" data-item-id="soc-dc" data-item-field="label">Discord 莉息小窩</span>
           </a>
         </div>
       </div>
@@ -1277,8 +1280,8 @@
           <button type="button" data-subcard-delete="note-hair" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-hair" data-item-field="title" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">🎀 髮型與魔法星飾</div>
-          <p contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-hair" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">櫻花粉雙馬尾搭配金色魔法星飾與草莓髮夾，動作時會跟著輕輕搖晃喔！</p>
+          <div contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-hair" data-item-field="title">🎀 髮型與魔法星飾</div>
+          <p contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-hair" data-item-field="desc">櫻花粉雙馬尾搭配金色魔法星飾與草莓髮夾，動作時會跟著輕輕搖晃喔！</p>
         </div>
       
         <div class="subcard-item p-3 rounded-xl bg-sakura-light/60 border border-sakura/40">
@@ -1289,8 +1292,8 @@
           <button type="button" data-subcard-delete="note-outfit" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-outfit" data-item-field="title" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">👗 魔法服裝細節</div>
-          <p contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-outfit" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">以粉嫩草莓、蕾絲荷葉邊與蝴蝶結為核心元素，兼具可愛與元氣魔法感。</p>
+          <div contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-outfit" data-item-field="title">👗 魔法服裝細節</div>
+          <p contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-outfit" data-item-field="desc">以粉嫩草莓、蕾絲荷葉邊與蝴蝶結為核心元素，兼具可愛與元氣魔法感。</p>
         </div>
       
         <div class="subcard-item p-3 rounded-xl bg-sakura-light/60 border border-sakura/40">
@@ -1301,8 +1304,8 @@
           <button type="button" data-subcard-delete="note-fanart" title="刪除小卡片" class="hover:bg-red-500/80 px-1.5 py-0.5 rounded-full cursor-pointer">🗑️</button>
         </div>
       
-          <div contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-fanart" data-item-field="title" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">💖 莉息與二創歡迎</div>
-          <p contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-fanart" data-item-field="desc" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">粉絲「莉息」是莉比最珍惜的夥伴，歡迎大家繪製 #莉筆 作品分享！</p>
+          <div contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-fanart" data-item-field="title">💖 莉息與二創歡迎</div>
+          <p contenteditable="true" spellcheck="false" data-item-list="sheetNotes" data-item-id="note-fanart" data-item-field="desc">粉絲「莉息」是莉比最珍惜的夥伴，歡迎大家繪製 #莉筆 作品分享！</p>
         </div>
       </div>
           </div>
@@ -1402,19 +1405,19 @@
       
             <div>
               <div class="flex items-center justify-between gap-1">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週一</span>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/23</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="day" data-item-week="this">週一</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="date" data-item-week="this">11/23</span>
               </div>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="tag" data-item-week="this">
                 🎨 繪圖實況
               </span>
-              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="title" data-item-week="this">
                 委託稿件作業台＋聊天
               </p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
               <span class="sch-clock">⏰</span>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">20:30 - 23:00</span>
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-mon" data-item-field="time" data-item-week="this">20:30 - 23:00</span>
             </div>
           </div>
         
@@ -1428,19 +1431,19 @@
       
             <div>
               <div class="flex items-center justify-between gap-1">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週二</span>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/24</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="day" data-item-week="this">週二</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="date" data-item-week="this">11/24</span>
               </div>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="tag" data-item-week="this">
                 🎮 遊戲實況
               </span>
-              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="title" data-item-week="this">
                 和莉息一起玩派對遊戲！
               </p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
               <span class="sch-clock">⏰</span>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">21:00 - 23:30</span>
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-tue" data-item-field="time" data-item-week="this">21:00 - 23:30</span>
             </div>
           </div>
         
@@ -1454,19 +1457,19 @@
       
             <div>
               <div class="flex items-center justify-between gap-1">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週三</span>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/25</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="day" data-item-week="this">週三</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="date" data-item-week="this">11/25</span>
               </div>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="tag" data-item-week="this">
                 🎤 歌回／雜談
               </span>
-              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="title" data-item-week="this">
                 日系動漫歌回練習台
               </p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
               <span class="sch-clock">⏰</span>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">21:00 - 23:00</span>
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-wed" data-item-field="time" data-item-week="this">21:00 - 23:00</span>
             </div>
           </div>
         
@@ -1480,19 +1483,19 @@
       
             <div>
               <div class="flex items-center justify-between gap-1">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週四</span>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/26</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="day" data-item-week="this">週四</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="date" data-item-week="this">11/26</span>
               </div>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="tag" data-item-week="this">
                 💖 連動企劃
               </span>
-              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="title" data-item-week="this">
                 魔法少女好友連動茶會
               </p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
               <span class="sch-clock">⏰</span>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">20:30 - 22:30</span>
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-thu" data-item-field="time" data-item-week="this">20:30 - 22:30</span>
             </div>
           </div>
         
@@ -1506,19 +1509,19 @@
       
             <div>
               <div class="flex items-center justify-between gap-1">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週五</span>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/27</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="day" data-item-week="this">週五</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="date" data-item-week="this">11/27</span>
               </div>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="tag" data-item-week="this">
                 🎨 繪圖實況
               </span>
-              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="title" data-item-week="this">
                 新衣裝草圖設計小塗鴉
               </p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
               <span class="sch-clock">⏰</span>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">21:00 - 23:30</span>
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-fri" data-item-field="time" data-item-week="this">21:00 - 23:30</span>
             </div>
           </div>
         
@@ -1532,18 +1535,18 @@
       
               <div>
                 <div class="flex items-center justify-between gap-1">
-                  <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週六</span>
-                  <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/28</span>
+                  <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="day" data-item-week="this">週六</span>
+                  <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="date" data-item-week="this">11/28</span>
                 </div>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="tag" data-item-week="this">
                   💤 無莉日
                 </span>
-                <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+                <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="title" data-item-week="this">
                   固定休息日 • 補充魔力中
                 </p>
               </div>
               <div class="mt-3 pt-2 border-t border-sakura/30 text-[11px] font-black text-sakura-medium">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">全天休息</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sat" data-item-field="time" data-item-week="this">全天休息</span>
               </div>
             </div>
           
@@ -1557,19 +1560,19 @@
       
             <div>
               <div class="flex items-center justify-between gap-1">
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="day" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">週日</span>
-                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="date" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">11/29</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="day" data-item-week="this">週日</span>
+                <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="date" data-item-week="this">11/29</span>
               </div>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="tag" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="tag" data-item-week="this">
                 🎤 歌回／雜談
               </span>
-              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="title" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">
+              <p contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="title" data-item-week="this">
                 週末晚安睡前小雜談
               </p>
             </div>
             <div class="sch-time-row mt-3 pt-2 border-t border-sakura/30 text-xs font-black text-sakura-deep flex items-center gap-1">
               <span class="sch-clock">⏰</span>
-              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="time" data-item-week="this" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">21:30 - 23:30</span>
+              <span contenteditable="true" spellcheck="false" data-item-list="scheduleDays" data-item-id="this-sun" data-item-field="time" data-item-week="this">21:30 - 23:30</span>
             </div>
           </div>
         </div>
@@ -1646,8 +1649,8 @@
             <div class="aspect-video rounded-xl bg-gradient-to-tr from-[#FFA8BE] to-[#FFD6E0] flex items-center justify-center relative overflow-hidden mb-3 cursor-pointer">
               <img src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20360%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22640%22%20height%3D%22360%22%20fill%3D%22%23FFF0F5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22320%22%20cy%3D%22145%22%20r%3D%2264%22%20fill%3D%22%23FFA8BE%22%20opacity%3D%220.45%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22168%22%20text-anchor%3D%22middle%22%20font-size%3D%2268%22%3E%F0%9F%8E%80%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22255%22%20text-anchor%3D%22middle%22%20font-size%3D%2224%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3E%E3%83%84%E3%82%A4%E3%83%B3%E3%83%86%E3%83%BC%E3%83%AB%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22288%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%238A6A73%22%3E%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E8%8E%89%E6%AF%94%E9%86%AC%20Cover%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="【歌ってみた】ツインテール魔法少女" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
             </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-0" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">COVER MV • 經典魔法曲</div>
-            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-0" data-item-field="cardTitle" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">【歌ってみた】ツインテール魔法少女</div>
+            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-0" data-item-field="category">COVER MV • 經典魔法曲</div>
+            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-0" data-item-field="cardTitle">【歌ってみた】ツインテール魔法少女</div>
           </div>
         
           <div class="subcard-item text-left bg-white hover:bg-sakura-light/50 rounded-2xl border-2 border-sakura/50 hover:border-sakura-deep p-3.5 transition shadow-sm group" data-video-card-id="vid-1">
@@ -1661,8 +1664,8 @@
             <div class="aspect-video rounded-xl bg-gradient-to-tr from-[#FFA8BE] to-[#FFD6E0] flex items-center justify-center relative overflow-hidden mb-3 cursor-pointer">
               <img src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20360%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22640%22%20height%3D%22360%22%20fill%3D%22%23FFF0F5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22320%22%20cy%3D%22145%22%20r%3D%2264%22%20fill%3D%22%23FFA8BE%22%20opacity%3D%220.45%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22168%22%20text-anchor%3D%22middle%22%20font-size%3D%2268%22%3E%F0%9F%8C%99%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22255%22%20text-anchor%3D%22middle%22%20font-size%3D%2224%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3EZzz%20%E6%99%9A%E5%AE%89%E7%BF%BB%E5%94%B1%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22288%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%238A6A73%22%3E%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E8%8E%89%E6%AF%94%E9%86%AC%20Cover%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="【歌ってみた】Zzz / 魔法少女莉比醬" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
             </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-1" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">COVER MV • 治癒晚安曲</div>
-            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-1" data-item-field="cardTitle" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">【歌ってみた】Zzz / 魔法少女莉比醬</div>
+            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-1" data-item-field="category">COVER MV • 治癒晚安曲</div>
+            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-1" data-item-field="cardTitle">【歌ってみた】Zzz / 魔法少女莉比醬</div>
           </div>
         
           <div class="subcard-item text-left bg-white hover:bg-sakura-light/50 rounded-2xl border-2 border-sakura/50 hover:border-sakura-deep p-3.5 transition shadow-sm group" data-video-card-id="vid-2">
@@ -1676,8 +1679,8 @@
             <div class="aspect-video rounded-xl bg-gradient-to-tr from-[#FFA8BE] to-[#FFD6E0] flex items-center justify-center relative overflow-hidden mb-3 cursor-pointer">
               <img src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20640%20360%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22640%22%20height%3D%22360%22%20fill%3D%22%23FFF0F5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22320%22%20cy%3D%22145%22%20r%3D%2264%22%20fill%3D%22%23FFA8BE%22%20opacity%3D%220.45%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22168%22%20text-anchor%3D%22middle%22%20font-size%3D%2268%22%3E%F0%9F%8D%93%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22255%22%20text-anchor%3D%22middle%22%20font-size%3D%2224%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3E%E5%BF%83%E4%BA%88%E5%A0%B1%20%E7%94%9C%E6%AD%8C%E7%BF%BB%E5%94%B1%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22320%22%20y%3D%22288%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%238A6A73%22%3E%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E8%8E%89%E6%AF%94%E9%86%AC%20Cover%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="【歌ってみた】心予報 / 魔法少女莉比醬" class="w-full h-full object-cover group-hover:scale-105 transition-transform">
             </div>
-            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-2" data-item-field="category" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">COVER MV • 酸甜草莓心跳</div>
-            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-2" data-item-field="cardTitle" class="rounded px-1 bg-sakura-light/90 ring-1 ring-sakura-deep/50 focus:outline-none focus:bg-white focus:ring-2 focus:ring-sakura-deep cursor-text">【歌ってみた】心予報 / 魔法少女莉比醬</div>
+            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-2" data-item-field="category">COVER MV • 酸甜草莓心跳</div>
+            <div contenteditable="true" spellcheck="false" data-item-list="videos" data-item-id="vid-2" data-item-field="cardTitle">【歌ってみた】心予報 / 魔法少女莉比醬</div>
           </div>
         </div>
       </div>
@@ -1915,6 +1918,7 @@
       mainChannelBanner: '',
       characterSheet: '',
       scheduleMascot: '',
+      floatMascot: '',  // 畫面上漂浮、可以拖曳的吉祥物（留空＝用內建的粉紅兔兔；建議透明背景 PNG / WebP / GIF）
       videoThumbnails: ['', '', ''],
 
       // ★ 漂浮物圖片：填入一張或多張圖片網址（或相對路徑），背景就會飄這些圖片。
@@ -2353,7 +2357,8 @@ const CUSTOM_SITE_CONFIG = {
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Star.png?raw=true",
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/dango.png?raw=true",
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Heart.png?raw=true"
-    ]
+    ],
+    "floatMascot": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/lishi-white2.png?raw=true"
   },
   "imageAdjust": {
     "mainChannelBanner": {
@@ -3367,8 +3372,10 @@ const CUSTOM_SITE_CONFIG = {
       );
       bindImageWithFallback('img-character-sheet', getImageUrl('characterSheet'), FALLBACK_IMAGES.characterSheet);
       bindImageWithFallback('img-schedule-mascot', getImageUrl('scheduleMascot'), FALLBACK_IMAGES.scheduleMascot);
+      const fmImg = document.getElementById('img-float-mascot');   // 漂浮吉祥物：沒設定網址就用內建的粉紅兔兔
+      if (fmImg) { if (!fmImg._defSrc) fmImg._defSrc = fmImg.getAttribute('src'); bindImageWithFallback('img-float-mascot', getImageUrl('floatMascot'), fmImg._defSrc); }
       Object.keys(IMAGE_SLOTS).forEach(key => {
-        if (key === 'avatar') return;   // 大頭貼另外處理（電腦版／手機版各自設定）
+        if (key === 'avatar' || key === 'floatMascot') return;   // 大頭貼另外處理；漂浮吉祥物不用裁切（電腦版／手機版各自設定）
         applyImageAdjust(document.getElementById(IMAGE_SLOTS[key].imgId), (siteConfig.imageAdjust || {})[key]);
       });
       applyAvatarAdjust();
@@ -3388,7 +3395,8 @@ const CUSTOM_SITE_CONFIG = {
       avatar:            { label: '大頭貼',       imgId: 'img-avatar' },
       mainChannelBanner: { label: '主打頻道橫幅', imgId: 'img-main-channel-banner' },
       characterSheet:    { label: '角色三視圖',   imgId: 'img-character-sheet' },
-      scheduleMascot:    { label: '週表吉祥物',   imgId: 'img-schedule-mascot' }
+      scheduleMascot:    { label: '週表吉祥物',   imgId: 'img-schedule-mascot' },
+      floatMascot:       { label: '漂浮吉祥物',   imgId: 'img-float-mascot' }
     };
 
     const IMG_BTN_CLASS = 'bg-sakura-deep text-white text-[11px] font-black px-2.5 py-1 rounded-full shadow-md cursor-pointer hover:opacity-90';
@@ -3474,6 +3482,11 @@ const CUSTOM_SITE_CONFIG = {
             ? 'img-edit-btn absolute right-0 top-full mt-1 z-40 items-center gap-1 whitespace-nowrap'
             : 'img-edit-btn absolute top-2 right-2 z-30 items-center gap-1 flex-wrap justify-end max-w-[96%]';
         grp.innerHTML = imageEditButtonsHtml(key, '');
+        if (key === 'floatMascot') {   // 漂浮吉祥物：只放「換圖」，按鈕跟著牠飄、顯示在牠下面
+          grp.className = 'img-edit-btn absolute top-full mt-1 z-40 items-center whitespace-nowrap';
+          grp.style.left = '50%'; grp.style.transform = 'translateX(-50%)';
+          grp.innerHTML = grp.innerHTML.replace(/<button[^>]*data-img-adjust[^>]*>[^<]*<\/button>/, '');
+        }
         if (key === 'avatar') {
           grp.innerHTML = grp.innerHTML.replace('✂️ 裁切</button>', '✂️ 電腦版</button>') +
             `<button type="button" data-img-adjust="avatarMobile" title="調整手機版的位置與大小" class="${IMG_BTN_CLASS}">📱 手機版</button>`;
@@ -5504,5 +5517,192 @@ const CUSTOM_SITE_CONFIG = {
       document.addEventListener('dragstart', function (e) { if (isImg(e.target)) e.preventDefault(); }, true);
     })();
   </script>
+
+<!-- 🐰 漂浮吉祥物：會在畫面前景隨機飄來飄去，可以拖曳、甩出去會撞牆彈跳，點一下會開心跳起來 -->
+<style id="float-mascot-css">
+  #float-mascot{position:fixed;left:0;top:0;z-index:46;width:var(--fm-size,120px);touch-action:none;cursor:grab;
+    user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;will-change:transform}
+  #float-mascot.is-drag{cursor:grabbing}
+  #float-mascot .img-edit-btn{cursor:pointer}
+  #float-mascot img{display:block;width:100%;height:auto;pointer-events:none;-webkit-user-drag:none;
+    filter:drop-shadow(0 5px 10px rgba(255,175,205,.38));transform-origin:50% 90%}
+  #float-mascot.is-drag img{filter:drop-shadow(0 10px 16px rgba(255,175,205,.45))}
+  .fm-heart{position:fixed;z-index:47;pointer-events:none;font-size:18px;line-height:1;color:#ff6fa5;
+    text-shadow:0 0 6px #fff;animation:fm-heart 1s ease-out forwards}
+  @keyframes fm-heart{0%{opacity:0;transform:translate(0,0) scale(.4)}20%{opacity:1}
+    100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(var(--r))}}
+  @media (max-width:639px){#float-mascot{--fm-size:84px}}
+  @media print{#float-mascot{display:none}}
+</style>
+<div id="float-mascot" role="img" aria-label="漂浮的粉紅兔兔吉祥物（可以拖曳）" title="抓我丟丟看～">
+  <img id="img-float-mascot" alt="" draggable="false" decoding="async" src="data:image/webp;base64,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">
+</div>
+<script>
+(function floatMascot() {
+  const el = document.getElementById('float-mascot');
+  if (!el) return;
+  const img = el.querySelector('img');
+  const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---- 可調整的小參數 ----
+  const WANDER_SPEED = 0.035;   // 飄的時候追目標的力道（越大飄越快）
+  const BOUNCE = 0.1;          // 撞牆反彈力（0~1）
+  const FRICTION = 0.985;       // 被丟出去後的減速
+  const MARGIN = 8;             // 離畫面邊緣的距離
+  // ---- 彈簧（Q彈感）----
+  const SQUASH_POWER = 0.02;    // 撞牆時壓扁的程度（越大扁得越誇張）
+  const SQUASH_MAX = 0.15;      // 最多壓扁多少（0.35 ＝ 35%）
+  const SQUASH_STIFF = 0.25;    // 壓扁後彈回來的速度（越大回彈越快、抖得越快）
+  const SQUASH_DAMP = 0.78;     // 壓扁後抖動停下來的快慢（越接近 1 抖越久，0~1）
+  const HOP_POWER = 0.1;       // 點一下時跳多高
+  const HOP_STIFF = 0.12;       // 跳起來後落回來的速度
+  const STAY_AFTER_CLICK = 3000; // 點一下後乖乖停在原地多久（毫秒，3000 ＝ 3 秒）
+  const HOP_DAMP = 0.82;        // 跳完後上下晃動停下來的快慢（越接近 1 晃越久，0~1）
+
+  let W = 0, H = 0, x = 0, y = 0, vx = 0, vy = 0;
+  let mode = 'wander', tx = 0, ty = 0, nextPick = 0;
+  let sq = 0, sqV = 0, squashAxis = 'y';   // 撞到時的壓扁彈簧
+  let hop = 0, hopV = 0;                    // 點一下的跳躍
+  let drag = null, moved = false, last = 0, t0 = performance.now();
+  let hovering = false, restUntil = 0;     // 滑鼠停在牠身上／剛被點過 → 乖乖不動
+
+  const size = () => { W = el.offsetWidth; H = el.offsetHeight; };
+  const maxX = () => window.innerWidth - W - MARGIN;
+  const maxY = () => window.innerHeight - H - MARGIN;
+  const rand = (a, b) => a + Math.random() * (b - a);
+  function pickTarget(now) {
+    tx = rand(MARGIN, Math.max(MARGIN, maxX()));
+    ty = rand(window.innerHeight * 0.12, Math.max(MARGIN, maxY()));
+    nextPick = now + rand(3500, 7500);
+  }
+  function hearts(n) {
+    const cx = x + W / 2, cy = y + H * 0.3;
+    for (let i = 0; i < n; i++) {
+      const s = document.createElement('span');
+      s.className = 'fm-heart';
+      s.textContent = Math.random() < 0.7 ? '♥' : '✦';
+      s.style.left = cx + 'px'; s.style.top = cy + 'px';
+      s.style.setProperty('--dx', rand(-60, 60) + 'px');
+      s.style.setProperty('--dy', rand(-90, -40) + 'px');
+      s.style.setProperty('--r', rand(-40, 40) + 'deg');
+      document.body.appendChild(s);
+      setTimeout(() => s.remove(), 1100);
+    }
+  }
+
+  function step(now) {
+    const dt = Math.min(2.5, (now - last) / 16.67 || 1); last = now;
+    if (mode === 'wander' && !reduce && (hovering || now < restUntil)) {
+      vx *= Math.pow(0.8, dt); vy *= Math.pow(0.8, dt);   // 慢慢停下來，讓你好好點
+      nextPick = Math.max(nextPick, now + 1200);
+    } else if (mode === 'wander' && !reduce) {
+      if (now > nextPick) pickTarget(now);
+      vx += (tx - x) * WANDER_SPEED * 0.02 * dt;
+      vy += (ty - y) * WANDER_SPEED * 0.02 * dt;
+      vx *= Math.pow(0.94, dt); vy *= Math.pow(0.94, dt);
+      const sp = Math.hypot(vx, vy), cap = 1.6;
+      if (sp > cap) { vx *= cap / sp; vy *= cap / sp; }
+    } else if (mode === 'fly') {
+      vx *= Math.pow(FRICTION, dt); vy *= Math.pow(FRICTION, dt);
+      if (Math.hypot(vx, vy) < 1.2) { mode = 'wander'; pickTarget(now); }
+    }
+    if (mode !== 'drag') {
+      x += vx * dt; y += vy * dt;
+      // 撞牆彈跳
+      const mx = maxX(), my = maxY();
+      const hit = (axis, v) => {
+        if (Math.abs(v) > 2) { squashAxis = axis; sqV -= Math.min(SQUASH_MAX, Math.abs(v) * SQUASH_POWER); }
+      };
+      if (x < MARGIN)  { x = MARGIN; hit('x', vx); vx = Math.abs(vx) * (mode === 'fly' ? BOUNCE : 1); }
+      if (x > mx)      { x = Math.max(MARGIN, mx); hit('x', vx); vx = -Math.abs(vx) * (mode === 'fly' ? BOUNCE : 1); }
+      if (y < MARGIN)  { y = MARGIN; hit('y', vy); vy = Math.abs(vy) * (mode === 'fly' ? BOUNCE : 1); }
+      if (y > my)      { y = Math.max(MARGIN, my); hit('y', vy); vy = -Math.abs(vy) * (mode === 'fly' ? BOUNCE : 1); }
+    }
+    // 壓扁彈簧、跳躍彈簧
+    sqV += (-sq * SQUASH_STIFF) * dt; sqV *= Math.pow(SQUASH_DAMP, dt); sq += sqV * dt;
+    hopV += (-hop * HOP_STIFF) * dt; hopV *= Math.pow(HOP_DAMP, dt); hop += hopV * dt;
+
+    const t = (now - t0) / 1000;
+    const bob = (mode === 'wander' && !reduce) ? Math.sin(t * 2.2) * 6 : 0;
+    const tilt = mode === 'drag' ? Math.max(-25, Math.min(25, vx * 1.5))
+               : Math.max(-15, Math.min(15, vx * 4)) + (reduce ? 0 : Math.sin(t * 1.3) * 3);
+    const sx = squashAxis === 'y' ? 1 - sq : 1 + sq, sy = squashAxis === 'y' ? 1 + sq : 1 - sq;
+    el.style.transform = `translate3d(${x}px,${y + bob - hop * 30}px,0)`;
+    img.style.transform = `rotate(${tilt}deg) scale(${sx.toFixed(3)},${sy.toFixed(3)})`;
+    if (!document.hidden) requestAnimationFrame(step);
+  }
+
+  // ---- 滑鼠移到牠身上時先停下來 ----
+  el.addEventListener('pointerenter', (e) => { if (e.pointerType === 'mouse') hovering = true; });
+  el.addEventListener('pointerleave', (e) => { if (e.pointerType === 'mouse') hovering = false; });
+
+  // ---- 拖曳 ----
+  el.addEventListener('pointerdown', (e) => {
+    if (e.target.closest && e.target.closest('.img-edit-btn')) return;   // 編輯模式按「換圖」時不要拖
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    drag = { id: e.pointerId, ox: e.clientX - x, oy: e.clientY - y, sx: e.clientX, sy: e.clientY, px: e.clientX, py: e.clientY, pt: performance.now() };
+    moved = false; mode = 'drag'; vx = vy = 0;
+    try { el.setPointerCapture(e.pointerId); } catch (err) { /* 忽略 */ }
+    el.classList.add('is-drag');
+    squashAxis = 'x'; sqV += 0.08;   // 被抓起來時稍微伸長
+  });
+  el.addEventListener('pointermove', (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    if (Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) > 10) moved = true;   // 移動超過 10px 才算拖曳，手抖一下還是算「點」
+    const now = performance.now(), dtm = Math.max(16, now - drag.pt) / 16.67;   // 至少算一幀，避免速度被算得超大
+    // 記錄最近的速度，放開時拿來甩
+    vx = vx * 0.5 + ((e.clientX - drag.px) / dtm) * 0.5;
+    vy = vy * 0.5 + ((e.clientY - drag.py) / dtm) * 0.5;
+    drag.px = e.clientX; drag.py = e.clientY; drag.pt = now;
+    x = Math.min(Math.max(MARGIN, e.clientX - drag.ox), Math.max(MARGIN, maxX()));
+    y = Math.min(Math.max(MARGIN, e.clientY - drag.oy), Math.max(MARGIN, maxY()));
+  });
+  const release = (e) => {
+    if (!drag || e.pointerId !== drag.id) return;
+    const idle = performance.now() - drag.pt;
+    drag = null; el.classList.remove('is-drag');
+    if (!moved) {                                  // 只是點一下 → 原地開心跳一下，然後乖乖待著
+      const now = performance.now();
+      mode = 'wander'; vx = vy = 0; hopV += HOP_POWER; squashAxis = 'y'; sqV -= 0.2; hearts(6);
+      restUntil = now + STAY_AFTER_CLICK; nextPick = restUntil + 800;
+      return;
+    }
+    if (idle > 90) { vx = vy = 0; restUntil = performance.now() + 1500; }               // 拖到定點停一下才放開 → 放在那裡，不會飛走
+    const cap = 45, sp = Math.hypot(vx, vy);
+    if (sp > cap) { vx *= cap / sp; vy *= cap / sp; }
+    if (sp < 1.2) { mode = 'wander'; pickTarget(performance.now()); }
+    else mode = 'fly';
+    if (reduce) { mode = 'wander'; vx = vy = 0; }
+  };
+  el.addEventListener('pointerup', release);
+  el.addEventListener('pointercancel', release);
+
+  // ---- 開始 ----
+  function start() {
+    size();
+    x = Math.max(MARGIN, maxX() - 20);
+    y = Math.max(MARGIN, maxY() - 120);
+    pickTarget(performance.now());
+    last = performance.now();
+    requestAnimationFrame(step);
+  }
+  window.addEventListener('resize', () => {
+    size();
+    x = Math.min(x, Math.max(MARGIN, maxX())); y = Math.min(y, Math.max(MARGIN, maxY()));
+  });
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) { last = performance.now(); requestAnimationFrame(step); }
+  });
+  let started = false;
+  const onImg = () => {
+    if (!started) { started = true; start(); return; }
+    size();   // 換了新圖（大小比例可能不同）→ 重新量尺寸、拉回畫面內
+    x = Math.min(x, Math.max(MARGIN, maxX())); y = Math.min(y, Math.max(MARGIN, maxY()));
+  };
+  img.addEventListener('load', onImg);
+  if (img.complete && img.naturalWidth) onImg();
+})();
+</script>
 
 </body></html>
