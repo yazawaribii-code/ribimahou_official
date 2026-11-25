@@ -484,6 +484,89 @@
       position: relative;
     }
 
+    /* 💖 行程「重點」卡片：粉色泡泡底板（特別活動／連動） */
+    .sch-bubble-card {
+      background: linear-gradient(160deg, #ffe3ec 0%, #ffc2d4 55%, #ffa8c2 100%);
+      border-color: rgba(255, 255, 255, .35) !important;   /* 不要死板框線，改成淡淡的粉色柔光 */
+      box-shadow: 0 0 8px 1px rgba(255, 133, 164, .22), 0 6px 16px -6px rgba(232, 90, 127, .22);
+      animation: schSoftGlow 4s ease-in-out infinite;
+    }
+    @keyframes schSoftGlow {
+      0%, 100% { box-shadow: 0 0 7px 1px rgba(255, 133, 164, .18), 0 6px 16px -6px rgba(232, 90, 127, .20); }
+      50%      { box-shadow: 0 0 11px 2px rgba(255, 133, 164, .30), 0 6px 16px -6px rgba(232, 90, 127, .24); }
+    }
+    @media (prefers-reduced-motion: reduce) { .sch-bubble-card { animation: none; } }
+    html.inapp .sch-bubble-card { animation: none; }
+    .sch-bubble-card > :not(.sch-bubbles):not(.sch-glitter):not(.subcard-controls):not(.sch-bubble-badge) { position: relative; z-index: 1; }
+    .sch-bubbles {
+      position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 0;
+    }
+    .sch-bubbles i {   /* 往上飄的小愛心 */
+      position: absolute; bottom: -20px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C1 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.4 1-1.4C13.9 6.2 15.4 5 17.5 5 21 5 23 8.6 21.6 11.8 19.5 16.4 12 21 12 21z' fill='%23ffffff'/%3E%3C/svg%3E") center/contain no-repeat;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,.9)) drop-shadow(0 1px 3px rgba(232,90,127,.45));
+      animation: schBubbleUp linear infinite;
+      opacity: 0;
+    }
+    .sch-bubbles i:nth-child(1) { left: 8%;  width: 14px; height: 14px; animation-duration: 7s;   animation-delay: 0s; }
+    .sch-bubbles i:nth-child(2) { left: 30%; width: 10px; height: 10px; animation-duration: 5.5s; animation-delay: 1.4s; }
+    .sch-bubbles i:nth-child(3) { left: 52%; width: 17px; height: 17px; animation-duration: 8.5s; animation-delay: 2.6s; }
+    .sch-bubbles i:nth-child(4) { left: 72%; width: 11px; height: 11px; animation-duration: 6s;   animation-delay: .7s; }
+    .sch-bubbles i:nth-child(5) { left: 86%; width: 13px; height: 13px; animation-duration: 7.5s; animation-delay: 3.5s; }
+    .sch-bubbles i:nth-child(6) { left: 42%; width: 8px;  height: 8px;  animation-duration: 5s;   animation-delay: 4.2s; }
+    /* 固定在卡片角落的大愛心（半透明） */
+    .sch-bubbles::before, .sch-bubbles::after {
+      content: ''; position: absolute;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C1 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.4 1-1.4C13.9 6.2 15.4 5 17.5 5 21 5 23 8.6 21.6 11.8 19.5 16.4 12 21 12 21z' fill='%23ffffff'/%3E%3C/svg%3E") center/contain no-repeat;
+      opacity: .55;
+    }
+    .sch-bubbles::before { width: 58px; height: 58px; right: -12px; top: -10px; transform: rotate(14deg); }
+    .sch-bubbles::after  { width: 34px; height: 34px; left: -8px; bottom: 30px; transform: rotate(-16deg); opacity: .45; }
+    .sch-bubble-badge {
+      position: absolute !important; top: -10px; left: 10px; z-index: 2 !important; white-space: nowrap;
+      font-size: 10px; font-weight: 900; color: #fff; letter-spacing: .05em;
+      background: linear-gradient(135deg, #ff85a4, #e85a7f); padding: 2px 8px; border-radius: 999px;
+      box-shadow: 0 2px 6px rgba(232,90,127,.35);
+    }
+    .sch-bubble-card [data-item-field="tag"] { background: #fff !important; box-shadow: 0 1px 4px rgba(232,90,127,.2); }
+    @keyframes schBubbleUp {
+      0%   { transform: translateY(0) translateX(0) rotate(-10deg) scale(.7); opacity: 0; }
+      12%  { opacity: .95; }
+      50%  { transform: translateY(-105px) translateX(6px) rotate(10deg) scale(.95); }
+      85%  { opacity: .85; }
+      100% { transform: translateY(-210px) translateX(-4px) rotate(-8deg) scale(1.05); opacity: 0; }
+    }
+    /* ✨ 夢幻閃光：一閃一閃的星星 */
+    .sch-glitter {
+      position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 0;
+    }
+    .sch-glitter b {   /* 四芒星 */
+      position: absolute; width: 16px; height: 16px;
+      background: radial-gradient(circle, #fff 0 25%, #fff6c9 45%, #ffd1e3 100%);
+      clip-path: polygon(50% 0, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0 50%, 39% 39%);
+      filter: drop-shadow(0 0 2px #fff) drop-shadow(0 0 5px rgba(255,90,140,.9));
+      animation: schStarTwinkle 2.2s ease-in-out infinite;
+    }
+    .sch-glitter b:nth-child(1) { top: 14%; left: 70%; animation-delay: 0s; }
+    .sch-glitter b:nth-child(2) { top: 46%; left: 10%; width: 12px; height: 12px; animation-delay: .7s; }
+    .sch-glitter b:nth-child(3) { top: 62%; left: 82%; width: 19px; height: 19px; animation-delay: 1.3s; }
+    .sch-glitter b:nth-child(4) { top: 30%; left: 44%; width: 10px; height: 10px; animation-delay: 1.8s; }
+    .sch-glitter b:nth-child(5) { top: 84%; left: 34%; width: 13px; height: 13px; animation-delay: .4s; }
+    @keyframes schStarTwinkle {
+      0%, 100% { transform: scale(.45) rotate(0deg); opacity: .45; }
+      50%      { transform: scale(1.1) rotate(45deg); opacity: 1; }
+    }
+    .sch-bubble-badge { background: linear-gradient(135deg, #ffb3c9, #ff6f96 55%, #e85a7f) !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sch-bubbles i { animation: none; display: none; }
+      .sch-glitter, .sch-glitter b { animation: none; }
+      .sch-glitter b { transform: scale(.8); opacity: .9; }
+    }
+    html.inapp .sch-bubbles i { animation: none; display: none; }
+    html.inapp .sch-glitter, html.inapp .sch-glitter b { animation: none; }
+    html.inapp .sch-glitter b { transform: scale(.8); opacity: .9; }
+
     .subcard-controls {
       display: none;
     }
@@ -4292,12 +4375,13 @@ const CUSTOM_SITE_CONFIG = {
         }
 
         const highlightClass = item.highlight
-          ? 'bg-gradient-to-b from-white to-sakura-light border-sakura-deep ring-2 ring-sakura/40'
+          ? 'sch-bubble-card'
           : 'bg-white/95 border-sakura/60 hover:border-sakura-deep';
 
         return `
           <div class="subcard-item rounded-2xl ${highlightClass} border-2 p-3 sm:p-4 flex flex-col justify-between min-h-[120px] sm:min-h-[168px] w-[136px] shrink-0 snap-start sm:w-auto sm:shrink shadow-sm sm:hover:-translate-y-1 transition">
             ${createSubcardControlsHtml('scheduleDays', item.id, weekKey)}
+            ${item.highlight ? '<span class="sch-glitter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span class="sch-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="sch-bubble-badge" aria-hidden="true">✨ SPECIAL</span>' : ''}
             <div>
               <div class="flex items-center justify-between gap-1">
                 <span${editableAttr('scheduleDays', item.id, 'day', weekKey)} class="font-black text-base text-cocoa">${escapeHtml(item.day)}</span>
