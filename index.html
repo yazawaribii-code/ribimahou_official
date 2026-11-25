@@ -9,10 +9,7 @@
   <noscript><style>#magic-loader{display:none!important}</style></noscript>
   <style id="magic-loader-css">
     html.ml-lock,html.ml-lock body{overflow:hidden!important}
-    /* 載入中：整個畫布先塗成跟載入畫面邊緣一樣的粉色，視窗突然變大時露出來的地方也不會是白條 */
-    html.ml-lock{background:#ffe1ee!important}
-    #magic-loader{position:fixed;inset:-120px;padding:120px;   /* 往四周多鋪 120px：瀏覽器列收起、視窗變高的瞬間也蓋得住 */
-      z-index:99999;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    #magic-loader{position:fixed;inset:0;z-index:99999;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;
       background:radial-gradient(circle at 50% 42%,#fff 0%,#fff3f8 35%,#ffe1ee 75%,#ffd3e6 100%);transition:opacity .8s ease,visibility 0s linear .8s;overflow:hidden}
     #magic-loader.ml-out{opacity:0;visibility:hidden;pointer-events:none}
     .ml-stage{position:relative;width:min(92vmin,520px);height:min(92vmin,520px);margin:-6vmin 0 -14vmin}
@@ -5581,7 +5578,7 @@ const CUSTOM_SITE_CONFIG = {
   const HINT_LINES = ['可以點一下喔～'];   // 滑鼠停在牠身上一陣子時的小提示
   const HINT_DELAY = 1200;                  // 滑鼠停多久才出現小提示（毫秒，1200 ＝ 1.2 秒）
   const CLICK_LINES = ['你也是莉息嗎？ ', '一起應援莉比醬！', '今天有開台嗎？', '莉比醬最可愛了✧', '記得追蹤莉比醬喔～',
-                       '莉比醬～看這邊！ ♡', '應援棒揮起來 ✧', '莉息集合～！', '週表更新了喔！', '被發現了… (〃ω〃)', '抓到莉比偷吃貓貓！', '不要吃掉我～～(快跑啊)', '歡迎一起加入莉息大家族！', '!吃貓貓'];   // 點一下時說的話
+                       '莉比醬～看這邊！ ♡', '應援棒揮起來 ✧', '莉息集合～！', '週表更新了喔！', '被發現了… (〃ω〃)', '抓到莉比偷吃貓貓！', '不要吃掉我～～(快跑啊)', '!吃貓貓'];   // 點一下時說的話
   const STAY_AFTER_CLICK = 3000; // 點一下後乖乖停在原地多久（毫秒，3000 ＝ 3 秒）
   const HOP_DAMP = 0.82;        // 跳完後上下晃動停下來的快慢（越接近 1 晃越久，0~1）
 
