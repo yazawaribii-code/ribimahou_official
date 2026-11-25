@@ -9,7 +9,10 @@
   <noscript><style>#magic-loader{display:none!important}</style></noscript>
   <style id="magic-loader-css">
     html.ml-lock,html.ml-lock body{overflow:hidden!important}
-    #magic-loader{position:fixed;inset:0;z-index:99999;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;
+    /* 載入中：整個畫布先塗成跟載入畫面邊緣一樣的粉色，視窗突然變大時露出來的地方也不會是白條 */
+    html.ml-lock{background:#ffe1ee!important}
+    #magic-loader{position:fixed;inset:-120px;padding:120px;   /* 往四周多鋪 120px：瀏覽器列收起、視窗變高的瞬間也蓋得住 */
+      z-index:99999;visibility:visible;display:flex;flex-direction:column;align-items:center;justify-content:center;
       background:radial-gradient(circle at 50% 42%,#fff 0%,#fff3f8 35%,#ffe1ee 75%,#ffd3e6 100%);transition:opacity .8s ease,visibility 0s linear .8s;overflow:hidden}
     #magic-loader.ml-out{opacity:0;visibility:hidden;pointer-events:none}
     .ml-stage{position:relative;width:min(92vmin,520px);height:min(92vmin,520px);margin:-6vmin 0 -14vmin}
