@@ -5747,6 +5747,18 @@ const CUSTOM_SITE_CONFIG = {
     }
     /* 三視圖圖卡（點了會放大到燈箱的那張）：拿掉陰影，滑鼠移過去也不出現 */
     #character-sheet-card, #character-sheet-card:hover, .xp-sheet-card, .xp-sheet-card:hover { box-shadow: none !important; }
+    /* 平板（iPad 等）：角色小檔案跟莉比醬那頁一樣，文字整塊放在卡片正中間，立繪靠右下角 */
+    @media (min-width: 640px) and (max-width: 1023px) {
+      #xp-extra-slides .xp-notes { grid-template-columns: 1fr minmax(0, max-content) 1fr; }
+      #xp-extra-slides .xp-notes .xp-heading { grid-column: 2; grid-row: 1; }
+      #xp-extra-slides .xp-notes .xp-body { grid-column: 2; grid-row: 2; }
+      #xp-extra-slides .xp-notes .xp-chibi { grid-column: 3; grid-row: 2; justify-self: end; }
+    }
+    /* 比較窄的平板（iPad mini 直式）：在立繪旁邊剩下的空間置中，避免碰到立繪 */
+    @media (min-width: 640px) and (max-width: 759px) {
+      #xp-extra-slides .xp-notes { grid-template-columns: minmax(0, 1fr) minmax(0, max-content) minmax(0, 1fr) auto; }
+      #xp-extra-slides .xp-notes .xp-chibi { grid-column: 4; }
+    }
     .xp-arrow.is-off { opacity: 0; visibility: hidden; pointer-events: none; }
     .xp-arrow.is-small { width: 2.25rem; height: 2.25rem; box-shadow: 0 4px 10px -4px rgba(232, 90, 127, .5); }
     .xp-tools { display: none; gap: .35rem; }
