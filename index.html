@@ -527,12 +527,15 @@
     }
     .sch-bubbles::before { width: 58px; height: 58px; right: -12px; top: -10px; transform: rotate(14deg); }
     .sch-bubbles::after  { width: 34px; height: 34px; left: -8px; bottom: 30px; transform: rotate(-16deg); opacity: .45; }
-    .sch-bubble-badge {
-      position: absolute !important; top: -10px; left: 10px; z-index: 2 !important; white-space: nowrap;
-      font-size: 10px; font-weight: 900; color: #fff; letter-spacing: .05em;
-      background: linear-gradient(135deg, #ff85a4, #e85a7f); padding: 2px 8px; border-radius: 999px;
-      box-shadow: 0 2px 6px rgba(232,90,127,.35);
+    .sch-bubble-badge {   /* 左上角的圓形星星徽章 */
+      position: absolute !important; top: -9px; left: -9px; z-index: 2 !important;
+      width: 28px; height: 28px; border-radius: 50%; padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: none;
+      box-shadow: none;
     }
+    @media (max-width: 639px) { .sch-bubble-badge { top: -4px; left: -4px; width: 22px; height: 22px; } .sch-bubble-badge svg { width: 13px; height: 13px; } }   /* 手機版週表是橫向滑動，往外一點點就好，避免被切到 */
+    .sch-bubble-badge svg { width: 16px; height: 16px; display: block; }
     .sch-bubble-card .sch-time-row { color: #fff !important; text-shadow: 0 1px 3px rgba(214, 69, 112, .55); }   /* 重點日的時間改白字 */
     .sch-bubble-card [data-item-field="tag"] { background: #fff !important; box-shadow: 0 1px 4px rgba(232,90,127,.2); }
     @keyframes schBubbleUp {
@@ -562,7 +565,7 @@
       0%, 100% { transform: scale(.45) rotate(0deg); opacity: .45; }
       50%      { transform: scale(1.1) rotate(45deg); opacity: 1; }
     }
-    .sch-bubble-badge { background: linear-gradient(135deg, #ffb3c9, #ff6f96 55%, #e85a7f) !important; }
+    .sch-bubble-badge { background: #FFC2D4 !important; }   /* 平面蜜桃粉，不要立體感 */
 
     @media (prefers-reduced-motion: reduce) {
       .sch-bubbles i { animation: none; display: none; }
@@ -4403,7 +4406,7 @@ const CUSTOM_SITE_CONFIG = {
         return `
           <div class="subcard-item rounded-2xl ${highlightClass} border-2 p-3 sm:p-4 flex flex-col justify-between min-h-[120px] sm:min-h-[168px] w-[136px] shrink-0 snap-start sm:w-auto sm:shrink shadow-sm sm:hover:-translate-y-1 transition">
             ${createSubcardControlsHtml('scheduleDays', item.id, weekKey)}
-            ${item.highlight ? '<span class="sch-glitter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span class="sch-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="sch-bubble-badge" aria-hidden="true">✨ SPECIAL</span>' : ''}
+            ${item.highlight ? '<span class="sch-glitter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span class="sch-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="sch-bubble-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="#FFF4B8"/></svg></span>' : ''}
             <div>
               <div class="flex items-center justify-between gap-1">
                 <span${editableAttr('scheduleDays', item.id, 'day', weekKey)} class="font-black text-base text-cocoa">${escapeHtml(item.day)}</span>
