@@ -5479,6 +5479,135 @@ const CUSTOM_SITE_CONFIG = {
       }
     }
 
+    // =========================================================================
+    // ★ 行程週表 CSV 讀取（SCHEDULE_CSV_URL） ★
+    // 填入 CSV 網址後，網頁每次打開都會自動讀取最新行程，不用再重新匯出 HTML！
+    //  - 放在 GitHub 同一個資料夾：'./schedule.csv'
+    //  - Google 試算表：檔案 → 共用 → 發布到網路 → 選「逗號分隔值 (.csv)」→ 貼上網址
+    // 留空 '' ＝ 不讀 CSV，照舊使用程式碼內的行程。
+    // CSV 欄位（第一列標題，中英文都可以）：
+    //   週別(week) 星期(day) 日期(date) 標籤(tag) 標題(title) 時間(time) 重點(highlight) 休息(isRest) 日期範圍(range，可省略)
+    //   週別填「本週／this」或「下週／next」；重點、休息填 1／是／true 代表開啟
+    // =========================================================================
+    const SCHEDULE_CSV_URL = './schedule.csv';
+
+    function parseCsvText(text) {
+      text = String(text || '').replace(/^﻿/, '');
+      const rows = []; let row = []; let cur = ''; let q = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (q) {
+          if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+          else cur += c;
+        } else if (c === '"') q = true;
+        else if (c === ',') { row.push(cur); cur = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && text[i + 1] === '\n') i++;
+          row.push(cur); rows.push(row); row = []; cur = '';
+        } else cur += c;
+      }
+      if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+      return rows.filter(r => r.some(v => String(v).trim() !== ''));
+    }
+
+    function csvToSchedules(text) {
+      const rows = parseCsvText(text);
+      if (rows.length < 2) throw new Error('CSV 沒有資料列');
+      const alias = {
+        week: ['week', '週別', '週', '哪一週'], day: ['day', '星期', '星期幾'], date: ['date', '日期'],
+        tag: ['tag', '標籤', '類型'], title: ['title', '標題', '內容', '主題'], time: ['time', '時間'],
+        highlight: ['highlight', '重點', '亮點', '特別'], isRest: ['isrest', 'rest', '休息', '休假'],
+        range: ['range', '日期範圍', '範圍']
+      };
+      const head = rows[0].map(h => String(h).trim().toLowerCase());
+      const col = {};
+      Object.keys(alias).forEach(k => { col[k] = head.findIndex(h => alias[k].includes(h)); });
+      if (col.day < 0 && col.date < 0) throw new Error('找不到「星期」或「日期」欄位');
+      const get = (r, k) => (col[k] >= 0 && r[col[k]] !== undefined) ? String(r[col[k]]).trim() : '';
+      const yes = v => /^(1|true|yes|y|v|o|是|有|✓|✔|✅)$/i.test(String(v).trim());
+      const weeks = { this: { days: [], range: '' }, next: { days: [], range: '' } };
+      rows.slice(1).forEach((r, i) => {
+        const w = get(r, 'week').toLowerCase();
+        const key = /^(next|下週|下周|下一週)$/.test(w) ? 'next' : 'this';
+        const wk = weeks[key];
+        if (!wk.range && get(r, 'range')) wk.range = get(r, 'range');
+        wk.days.push({
+          id: 'csv-' + key + '-' + (wk.days.length + 1),
+          day: get(r, 'day'), date: get(r, 'date'), tag: get(r, 'tag'),
+          title: get(r, 'title'), time: get(r, 'time'),
+          highlight: yes(get(r, 'highlight')), isRest: yes(get(r, 'isRest'))
+        });
+      });
+      const year = new Date().getFullYear();
+      Object.keys(weeks).forEach(k => {
+        const wk = weeks[k];
+        if (!wk.range && wk.days.length) {
+          const a = wk.days[0].date, b = wk.days[wk.days.length - 1].date;
+          wk.range = (a && b ? a + ' – ' + b : (a || b)) + ' ' + year;
+        }
+      });
+      return weeks;
+    }
+
+    function applyScheduleCsvText(text) {
+      const weeks = csvToSchedules(text);
+      let applied = 0;
+      ['this', 'next'].forEach(k => {
+        if (weeks[k].days.length) { siteConfig.schedules[k] = weeks[k]; applied++; }
+      });
+      if (!applied) throw new Error('CSV 沒有可用的行程');
+      renderScheduleGrid(activeWeekKey);
+    }
+
+    // 本機雙擊開啟（file://）或 ?edit 編輯模式時，右下角出現「選擇行程 CSV」按鈕；一般訪客看不到
+    function setupLocalCsvPicker() {
+      if (location.protocol !== 'file:' && !CAN_EDIT) return;
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.csv,text/csv'; input.style.display = 'none';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '📂 選擇行程 CSV';
+      btn.title = '從電腦選一個 CSV 檔，馬上預覽行程（不會上傳到任何地方）';
+      btn.style.cssText = 'position:fixed;left:12px;bottom:12px;z-index:9999;background:#fff;color:#d6457a;border:2px solid #f4a6c1;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.15);cursor:pointer;';
+      btn.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            applyScheduleCsvText(String(reader.result));
+            showToast('📅 已讀取「' + file.name + '」的行程！');
+            const el = document.getElementById('block-schedule');
+            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          } catch (err) {
+            showToast('⚠️ CSV 讀取失敗：' + err.message);
+          }
+          input.value = '';
+        };
+        reader.readAsText(file, 'utf-8');
+      });
+      document.body.appendChild(input);
+      document.body.appendChild(btn);
+    }
+
+    async function loadScheduleFromCsv() {
+      setupLocalCsvPicker();
+      if (location.protocol === 'file:') return; // 本機雙擊開啟時瀏覽器不讓網頁自己讀檔，改用按鈕選檔
+
+      if (!SCHEDULE_CSV_URL) return;
+      try {
+        const url = SCHEDULE_CSV_URL + (SCHEDULE_CSV_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        applyScheduleCsvText(await res.text());
+        if (CAN_EDIT) showToast('📅 已從 CSV 讀取最新行程！');
+      } catch (err) {
+        console.warn('[行程 CSV] 讀取失敗，改用程式碼內的行程：', err);
+        if (CAN_EDIT) showToast('⚠️ 行程 CSV 讀取失敗，先顯示程式碼內的行程');
+      }
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       if (CAN_EDIT) document.getElementById('toggle-edit-btn').style.display = '';
       initLiveStatus();
@@ -5497,6 +5626,7 @@ const CUSTOM_SITE_CONFIG = {
       renderAll();
       renderAnnouncements();
       bindEvents();
+      loadScheduleFromCsv();
     });
   </script>
 
