@@ -489,87 +489,40 @@
     .sch-pf-icon { font-size: 13px; line-height: 1; }
     .sch-pf-text { margin-left: 1px; }
 
-    /* 💖 行程「重點」卡片：粉色泡泡底板（特別活動／連動） */
+    /* 💖 行程「重點」卡片：粉色底板（特別活動／連動） */
     .sch-bubble-card {
       background: linear-gradient(160deg, #ffe3ec 0%, #ffc2d4 55%, #ffa8c2 100%);
       border-color: rgba(255, 255, 255, .35) !important;   /* 不要死板框線，只留淡淡的白邊 */
       box-shadow: 0 1px 2px rgba(0, 0, 0, .05);   /* 不要外面暈開的光，跟其他卡片一樣乾淨 */
     }
-    .sch-bubble-card > :not(.sch-bubbles):not(.sch-glitter):not(.subcard-controls):not(.sch-bubble-badge) { position: relative; z-index: 1; }
+    .sch-bubble-card > :not(.sch-bubbles):not(.subcard-controls):not(.sch-bubble-badge) { position: relative; z-index: 1; }
     .sch-bubbles {
       position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 0;
     }
-    .sch-bubbles i {   /* 往上飄的小愛心 */
-      position: absolute; bottom: -20px;
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C1 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.4 1-1.4C13.9 6.2 15.4 5 17.5 5 21 5 23 8.6 21.6 11.8 19.5 16.4 12 21 12 21z' fill='%23ffffff' stroke='%23ff9fba' stroke-opacity='.55' stroke-width='1.2'/%3E%3C/svg%3E") center/contain no-repeat;
-      will-change: transform, opacity;   /* 只動位置和透明度，手機才順 */
-      animation: schBubbleUp linear infinite;
-      opacity: 0;
-    }
-    .sch-bubbles i:nth-child(1) { left: 8%;  width: 14px; height: 14px; animation-duration: 7s;   animation-delay: 0s; }
-    .sch-bubbles i:nth-child(2) { left: 30%; width: 10px; height: 10px; animation-duration: 5.5s; animation-delay: 1.4s; }
-    .sch-bubbles i:nth-child(3) { left: 52%; width: 17px; height: 17px; animation-duration: 8.5s; animation-delay: 2.6s; }
-    .sch-bubbles i:nth-child(4) { left: 72%; width: 11px; height: 11px; animation-duration: 6s;   animation-delay: .7s; }
-    .sch-bubbles i:nth-child(5) { left: 86%; width: 13px; height: 13px; animation-duration: 7.5s; animation-delay: 3.5s; }
-    .sch-bubbles i:nth-child(6) { left: 42%; width: 8px;  height: 8px;  animation-duration: 5s;   animation-delay: 4.2s; }
-    /* 固定在卡片角落的大愛心（半透明） */
+    /* 卡片角落的兩顆大愛心：輪流慢慢淡入淡出（只改透明度，手機也很順） */
     .sch-bubbles::before, .sch-bubbles::after {
       content: ''; position: absolute;
       background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C1 8.6 3 5 6.5 5c2.1 0 3.6 1.2 4.5 2.6l1 1.4 1-1.4C13.9 6.2 15.4 5 17.5 5 21 5 23 8.6 21.6 11.8 19.5 16.4 12 21 12 21z' fill='%23ffffff'/%3E%3C/svg%3E") center/contain no-repeat;
-      opacity: .55;
+      opacity: .5;
+      animation: schHeartFade 4s ease-in-out infinite;
     }
     .sch-bubbles::before { width: 58px; height: 58px; right: -12px; top: -10px; transform: rotate(14deg); }
-    .sch-bubbles::after  { width: 34px; height: 34px; left: -8px; bottom: 30px; transform: rotate(-16deg); opacity: .45; }
-    .sch-bubble-badge {   /* 左上角的圓形星星徽章 */
-      position: absolute !important; top: -9px; left: -9px; z-index: 2 !important;
-      width: 28px; height: 28px; border-radius: 50%; padding: 0;
-      display: flex; align-items: center; justify-content: center;
-      border: none;
-      box-shadow: none;
+    .sch-bubbles::after  { width: 34px; height: 34px; left: -8px; bottom: 30px; transform: rotate(-16deg); animation-delay: -2s; }
+    @keyframes schHeartFade { 0%, 100% { opacity: .15; } 50% { opacity: .6; } }
+    /* 卡片不在畫面上時暫停動畫，捲動、點選單跳轉時不佔手機效能 */
+    .sch-anim-paused .sch-bubbles::before, .sch-anim-paused .sch-bubbles::after { animation-play-state: paused; }
+    @media (prefers-reduced-motion: reduce) { .sch-bubbles::before, .sch-bubbles::after { animation: none; } }
+    html.inapp .sch-bubbles::before, html.inapp .sch-bubbles::after { animation: none; }
+    .sch-bubble-badge {   /* 左上方的「✨ SPECIAL」小標籤 */
+      position: absolute !important; top: -10px; left: 10px; z-index: 2 !important; white-space: nowrap;
+      font-size: 10px; font-weight: 900; color: #fff; letter-spacing: .05em; line-height: 1;
+      display: inline-flex; align-items: center; gap: 3px; height: 19px;   /* 固定高度＋置中，文字上下距離一致 */
+      padding: 2px 8px 0; border-radius: 999px; box-shadow: none;   /* 上面多 2px，英文字視覺上才會剛好置中 */
     }
-    @media (max-width: 639px) { .sch-bubble-badge { top: -4px; left: -4px; width: 22px; height: 22px; } .sch-bubble-badge svg { width: 13px; height: 13px; } }   /* 手機版週表是橫向滑動，往外一點點就好，避免被切到 */
-    .sch-bubble-badge svg { width: 16px; height: 16px; display: block; }
+    @media (max-width: 639px) { .sch-bubble-badge { top: -4px; font-size: 9px; height: 16px; padding: 0 7px; } }   /* 手機版週表是橫向滑動，往外一點點就好，避免被切到 */
     .sch-bubble-card .sch-time-row { color: #fff !important; text-shadow: 0 1px 3px rgba(214, 69, 112, .55); }   /* 重點日的時間改白字 */
     .sch-bubble-card [data-item-field="tag"] { background: #fff !important; box-shadow: 0 1px 4px rgba(232,90,127,.2); }
-    @keyframes schBubbleUp {
-      0%   { transform: translateY(0) translateX(0) rotate(-10deg) scale(.7); opacity: 0; }
-      12%  { opacity: .95; }
-      50%  { transform: translateY(-105px) translateX(6px) rotate(10deg) scale(.95); }
-      85%  { opacity: .85; }
-      100% { transform: translateY(-210px) translateX(-4px) rotate(-8deg) scale(1.05); opacity: 0; }
-    }
-    /* ✨ 夢幻閃光：一閃一閃的星星 */
-    .sch-glitter {
-      position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; z-index: 0;
-    }
-    .sch-glitter b {   /* 四芒星 */
-      position: absolute; width: 26px; height: 26px; margin: -5px 0 0 -5px;   /* 圖檔裡含光暈，所以框大一點 */
-      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cdefs%3E%3CradialGradient id='g'%3E%3Cstop offset='0' stop-color='%23ff7aa0' stop-opacity='.55'/%3E%3Cstop offset='1' stop-color='%23ff7aa0' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='20' cy='20' r='19' fill='url(%23g)'/%3E%3Cpath d='M20 6 L22.6 17.4 L34 20 L22.6 22.6 L20 34 L17.4 22.6 L6 20 L17.4 17.4 Z' fill='%23fffaf0'/%3E%3Ccircle cx='20' cy='20' r='3' fill='%23ffffff'/%3E%3C/svg%3E") center/contain no-repeat;
-      will-change: transform, opacity;
-      animation: schStarTwinkle 2.2s ease-in-out infinite;
-    }
-    .sch-glitter b:nth-child(1) { top: 14%; left: 70%; animation-delay: 0s; }
-    .sch-glitter b:nth-child(2) { top: 46%; left: 10%; width: 20px; height: 20px; animation-delay: .7s; }
-    .sch-glitter b:nth-child(3) { top: 62%; left: 82%; width: 30px; height: 30px; animation-delay: 1.3s; }
-    .sch-glitter b:nth-child(4) { top: 30%; left: 44%; width: 17px; height: 17px; animation-delay: 1.8s; }
-    .sch-glitter b:nth-child(5) { top: 84%; left: 34%; width: 21px; height: 21px; animation-delay: .4s; }
-    /* 卡片不在畫面上時暫停動畫，捲動、點選單跳轉時不佔手機效能 */
-    .sch-anim-paused .sch-bubbles i, .sch-anim-paused .sch-glitter b { animation-play-state: paused; }
-    @media (max-width: 639px) { .sch-bubbles i:nth-child(n+5) { display: none; } }
-    @keyframes schStarTwinkle {
-      0%, 100% { transform: scale(.45) rotate(0deg); opacity: .45; }
-      50%      { transform: scale(1.1) rotate(45deg); opacity: 1; }
-    }
-    .sch-bubble-badge { background: #FFC2D4 !important; }   /* 平面蜜桃粉，不要立體感 */
-
-    @media (prefers-reduced-motion: reduce) {
-      .sch-bubbles i { animation: none; display: none; }
-      .sch-glitter, .sch-glitter b { animation: none; }
-      .sch-glitter b { transform: scale(.8); opacity: .9; }
-    }
-    html.inapp .sch-bubbles i { animation: none; display: none; }
-    html.inapp .sch-glitter, html.inapp .sch-glitter b { animation: none; }
-    html.inapp .sch-glitter b { transform: scale(.8); opacity: .9; }
+    .sch-bubble-badge { background: #FF8DAA !important; }   /* 平面粉色，不要立體感 */
 
     .subcard-controls {
       display: none;
@@ -2420,7 +2373,7 @@ const CUSTOM_SITE_CONFIG = {
     "hashtagsHint": " ",
     "scheduleBadge": "✨ 直播與活動預告",
     "scheduleTitle": "莉比醬本週行程",
-    "scheduleTimezoneNote": "台灣時間 UTC+8 • 00:00 為隔日午夜\n每週六固定「無莉日」休息",
+    "scheduleTimezoneNote": "台灣時間 UTC+8 • 00:00 為隔日午夜 • 每週六固定「無莉日」",
     "scheduleMascotBubble": "這週也要加油\n欸欸喔—！٩(*' ' *)✨",
     "scheduleMascotKaomoji": "",
     "scheduleDisclaimer": "※ 行程若有臨時變動，以莉比醬的推特與DC公告為準喔！",
@@ -2689,79 +2642,76 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "schedules": {
     "this": {
-      "range": "11/23 – 11/29 <span class=\"text-sm font-bold opacity-90\">2026</span>",
+      "range": "11/23 – 11/29 2026",
       "days": [
         {
-          "id": "this-mon",
+          "id": "csv-this-1",
           "day": "週一",
           "date": "11/23",
           "tag": "",
           "title": "魔莉補充中",
           "time": "全天休息",
           "highlight": false,
-          "isRest": true,
-          "_prevTime": ""
+          "isRest": true
         },
         {
-          "id": "this-tue",
+          "id": "csv-this-2",
           "day": "週二",
           "date": "11/24",
-          "tag": "🎨無畫面工作台",
+          "tag": "圖奇",
           "title": "工作砸談台",
           "time": "14:30",
           "highlight": false,
           "isRest": false
         },
         {
-          "id": "this-wed",
+          "id": "csv-this-3",
           "day": "週三",
           "date": "11/25",
-          "tag": "🎨無畫面工作台",
+          "tag": "圖奇",
           "title": "工作砸談台",
           "time": "15:30",
           "highlight": false,
           "isRest": false
         },
         {
-          "id": "this-thu",
+          "id": "csv-this-4",
           "day": "週四",
           "date": "11/26",
           "tag": "",
           "title": "魔莉補充中",
           "time": "全天休息",
-          "highlight": true,
-          "isRest": true,
-          "_prevTime": ""
+          "highlight": false,
+          "isRest": true
         },
         {
-          "id": "this-fri",
+          "id": "csv-this-5",
           "day": "週五",
           "date": "11/27",
-          "tag": "",
-          "title": "同步視聽-CLANNAD\n第13~18集",
+          "tag": "圖奇",
+          "title": "同步視聽-CLANNAD\r\n第13~18集",
           "time": "21:30",
           "highlight": false,
           "isRest": false
         },
         {
-          "id": "this-sat",
+          "id": "csv-this-6",
           "day": "週六",
           "date": "11/28",
           "tag": "",
           "title": "固定無莉日",
           "time": "全天休息",
           "highlight": false,
-          "isRest": true,
-          "_prevTime": ""
+          "isRest": true
         },
         {
-          "id": "this-sun",
+          "id": "csv-this-7",
           "day": "週日",
           "date": "11/29",
           "tag": "圖奇/YT雙開",
           "title": "2千追台詞回紀念",
           "time": "21:00",
-          "highlight": false,
+          "highlight": true,
           "isRest": false
         }
       ]
@@ -4401,7 +4351,7 @@ const CUSTOM_SITE_CONFIG = {
         return `
           <div class="subcard-item rounded-2xl ${highlightClass} border-2 p-3 sm:p-4 flex flex-col justify-between min-h-[120px] sm:min-h-[168px] w-[136px] shrink-0 snap-start sm:w-auto sm:shrink shadow-sm sm:hover:-translate-y-1 transition">
             ${createSubcardControlsHtml('scheduleDays', item.id, weekKey)}
-            ${item.highlight ? '<span class="sch-glitter" aria-hidden="true"><b></b><b></b><b></b><b></b><b></b></span><span class="sch-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></span><span class="sch-bubble-badge" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2.6l2.8 5.9 6.4.8-4.7 4.4 1.2 6.4L12 17l-5.7 3.1 1.2-6.4-4.7-4.4 6.4-.8z" fill="#FFF4B8"/></svg></span>' : ''}
+            ${item.highlight ? '<span class="sch-bubbles" aria-hidden="true"></span><span class="sch-bubble-badge" aria-hidden="true">✨ SPECIAL</span>' : ''}
             <div>
               <div class="flex items-center justify-between gap-1">
                 <span${editableAttr('scheduleDays', item.id, 'day', weekKey)} class="font-black text-base text-cocoa">${escapeHtml(item.day)}</span>
@@ -5695,7 +5645,7 @@ const CUSTOM_SITE_CONFIG = {
       document.body.appendChild(btn);
     }
 
-    // 週表離開畫面時暫停重點卡片的愛心／星星動畫（省手機效能）
+    // 週表離開畫面時暫停重點卡片的大愛心動畫（省手機效能）
     (function () {
       function setup() {
         const grid = document.getElementById('schedule-grid');
