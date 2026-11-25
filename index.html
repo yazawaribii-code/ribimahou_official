@@ -6000,6 +6000,91 @@ const CUSTOM_SITE_CONFIG = {
   el.addEventListener('pointerup', release);
   el.addEventListener('pointercancel', release);
 
+  // =========================================================================
+  // 💬 莉息台詞 CSV 讀取（MASCOT_LINES_CSV_URL）
+  // 填入 CSV 網址後，網頁每次打開都會讀取最新台詞，不用再改程式碼！
+  //  - 放在 GitHub 同一個資料夾：'./mascot-lines.csv'
+  //  - Google 試算表：檔案 → 共用 → 發布到網路 → 選「逗號分隔值 (.csv)」→ 貼上網址
+  // 留空 '' ＝ 不讀 CSV，照舊使用上面程式碼裡的台詞。
+  // CSV 欄位（第一列標題，中英文都可以）：
+  //   類型(type)：點擊／click、提示／hint、暈／dizzy（空白＝點擊）
+  //   台詞(line)：要說的話
+  //   次數(weight，可省略)：填 3 ＝ 這句出現機率變 3 倍
+  // 某一種類型在 CSV 裡一句都沒有的話，那一類就繼續用程式碼裡的台詞。
+  // =========================================================================
+  const MASCOT_LINES_CSV_URL = './mascot-lines.csv';
+
+  function applyMascotLinesCsv(text) {
+    if (typeof parseCsvText !== 'function') throw new Error('找不到 CSV 讀取工具');
+    const rows = parseCsvText(text);
+    if (rows.length < 2) throw new Error('CSV 沒有資料列');
+    const head = rows[0].map(v => String(v).trim().toLowerCase());
+    const find = (names) => head.findIndex(v => names.includes(v));
+    const cType = find(['type', '類型', '種類', '時機']);
+    const cLine = find(['line', 'text', '台詞', '內容', '說的話']);
+    const cWeight = find(['weight', '次數', '權重', '機率']);
+    if (cLine < 0) throw new Error('找不到「台詞」欄位');
+    const got = { click: [], hint: [], dizzy: [] };
+    rows.slice(1).forEach(r => {
+      const line = String(r[cLine] || '').trim();
+      if (!line) return;
+      const t = cType >= 0 ? String(r[cType] || '').trim().toLowerCase() : '';
+      const key = /^(hint|提示|停留|滑鼠)/.test(t) ? 'hint' : /^(dizzy|暈|晃|轉)/.test(t) ? 'dizzy' : 'click';
+      const n = Math.min(10, Math.max(1, parseInt(cWeight >= 0 ? r[cWeight] : 1, 10) || 1));
+      for (let i = 0; i < n; i++) got[key].push(line);
+    });
+    const targets = { click: CLICK_LINES, hint: HINT_LINES, dizzy: DIZZY_LINES };
+    let total = 0;
+    Object.keys(got).forEach(k => {
+      if (!got[k].length) return;                     // 這一類 CSV 沒寫 → 保留程式碼裡的台詞
+      targets[k].length = 0; targets[k].push(...got[k]); total += got[k].length;
+    });
+    if (!total) throw new Error('CSV 裡沒有台詞');
+    return total;
+  }
+
+  // 本機雙擊開啟（file://）或 ?edit 編輯模式時，左下角出現「選擇台詞 CSV」按鈕；一般訪客看不到
+  (function setupMascotCsvPicker() {
+    const canEdit = (typeof CAN_EDIT !== 'undefined' && CAN_EDIT);
+    if (location.protocol !== 'file:' && !canEdit) return;
+    const input = document.createElement('input');
+    input.type = 'file'; input.accept = '.csv,text/csv'; input.style.display = 'none';
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '💬 選擇莉息台詞 CSV';
+    btn.title = '從電腦選一個 CSV 檔，馬上換成新台詞（不會上傳到任何地方）';
+    btn.style.cssText = 'position:fixed;left:12px;bottom:56px;z-index:9999;background:#fff;color:#d6457a;border:2px solid #f4a6c1;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:900;box-shadow:0 4px 12px rgba(232,90,127,.18);cursor:pointer';
+    btn.addEventListener('click', () => input.click());
+    input.addEventListener('change', () => {
+      const file = input.files && input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const toast = (m) => (typeof showToast === 'function' ? showToast(m) : alert(m));
+        try {
+          const n = applyMascotLinesCsv(String(reader.result));
+          toast('💬 莉息學會了 ' + n + ' 句新台詞！點點看～');
+        } catch (err) { toast('⚠️ 台詞 CSV 讀取失敗：' + err.message); }
+        input.value = '';
+      };
+      reader.readAsText(file, 'utf-8');
+    });
+    const add = () => { document.body.appendChild(input); document.body.appendChild(btn); };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add); else add();
+  })();
+
+  (async function loadMascotLinesCsv() {
+    if (!MASCOT_LINES_CSV_URL || location.protocol === 'file:') return;   // 本機雙擊開啟時改用按鈕選檔
+    try {
+      const url = MASCOT_LINES_CSV_URL + (MASCOT_LINES_CSV_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      applyMascotLinesCsv(await res.text());
+    } catch (err) {
+      console.warn('[莉息台詞 CSV] 讀取失敗，改用程式碼內的台詞：', err);
+    }
+  })();
+
   // ---- 開始 ----
   function start() {
     size();
