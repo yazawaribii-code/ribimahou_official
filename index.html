@@ -848,7 +848,7 @@
     .msb-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; align-items: center; }
     .msb-collab .cw-frame { max-width: 34rem; }
     .msb-latest { width: 100%; max-width: 34rem; margin: 0 auto; }
-    .msb-latest-head { font-size: .8rem; font-weight: 900; letter-spacing: .12em; color: #E85A7F; margin-bottom: .2rem; }
+    .msb-latest-head { font-size: .8rem; line-height: 1.2rem; font-weight: 900; letter-spacing: .12em; color: #E85A7F; margin-bottom: .2rem; }
     .msb-latest .ms-list { margin: 0; }
     .msb-latest .ms-item { margin: .5rem 0; }
     .msb-latest .ms-item::before { background: #fff; border-radius: 999px; }
@@ -859,7 +859,8 @@
       letter-spacing: .04em; text-decoration: none; transition: background-color .2s, border-color .2s, transform .2s, box-shadow .2s; }
     .msb-more a:hover { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgba(232,90,127,.55); }
     @media (min-width: 1024px) {
-      .msb-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 2.5rem; }
+      .msb-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 2.5rem; align-items: start; }   /* 兩欄靠上對齊，大標下面不會空一大塊 */
+      .msb-collab { padding-top: 1.7rem; }   /* 筆記本上緣對齊右邊第一張莉程碑卡片 */
       .msb-collab .cw-frame { max-width: none; }
       .msb-latest { max-width: none; }
     }
@@ -2466,7 +2467,7 @@ const CUSTOM_SITE_CONFIG = {
     "channels": 50,
     "hashtags": 0,
     "profile": 100,
-    "collab": 100
+    "collab": 0
   },
   "blockBorderOpacity": {
     "hashtags": 0,
@@ -2783,7 +2784,6 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "schedules": {
     "this": {
-      "range": "11/23 – 11/29 2026",
       "days": [
         {
           "id": "csv-this-1",
@@ -2855,7 +2855,8 @@ const CUSTOM_SITE_CONFIG = {
           "highlight": true,
           "isRest": false
         }
-      ]
+      ],
+      "range": "11/23 – 11/29 2026"
     },
     "next": {
       "range": "11/30 – 12/06 <span class=\"text-sm font-bold opacity-90\">2026</span>",
@@ -7114,7 +7115,7 @@ const CUSTOM_SITE_CONFIG = {
     const MILESTONES_SHEET_URL = '';
     const BIG_WORDS = ['周年', '週年', 'COVER', '更名', '出道', '生日'];
     const NEWEST_FIRST = true;   // true ＝ 最新的在最上面；false ＝ 從最早的開始
-    const LATEST_COUNT = 4;      // 莉程碑區塊右邊顯示幾個「最新莉程碑」
+    const LATEST_COUNT = 3;      // 莉程碑區塊右邊顯示幾個「最新莉程碑」
     const PAGE_SIZE = 8;         // 每一頁放幾個莉程碑（超過就會出現 1 2 3 … 的頁數）
 
     const modal = document.getElementById('ms-modal');
