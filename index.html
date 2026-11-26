@@ -493,6 +493,10 @@
     }
     #block-profile.bg-clear [data-editable-field="heroKaomoji"] { box-shadow: none !important; }
 
+    /* 📱 手機：個人檔案右上角的旋轉魔法陣往下移、縮小一點 */
+    @media (max-width: 639px) {
+      #block-profile > .kawaii-card > svg.animate-spin-slow { width: 17rem; height: 17rem; top: 3.5rem; right: -5.5rem; }
+    }
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
@@ -810,6 +814,8 @@
     .cw-cover-eb { font-size: 11px; font-weight: 900; letter-spacing: .3em; color: #E85A7F; }
     .cw-cover-title { font-family: 'Xiaolai SC', 'Xiaolai Mono SC', cursive; font-weight: 400; font-size: clamp(34px, 9vw, 52px); line-height: 1.25; color: #5A3E46;
       padding: 0 .3em; background: linear-gradient(transparent 60%, #FFD1DE 60%, #FFD1DE 88%, transparent 88%); transform: rotate(-2deg); white-space: pre-line; }
+    .cw-cover-title, .cw-cover-hint { opacity: 0; transition: opacity .35s ease; }
+    html.xl-ready .cw-cover-title, html.xl-ready .cw-cover-hint { opacity: 1; }
     .cw-cover-hint { position: absolute; right: 20px; bottom: 12px; font-family: 'Xiaolai SC', 'Xiaolai Mono SC', cursive; font-size: 15px; color: #E85A7F; }
     .cw-doodle { position: absolute; color: #FFB3CB; font-size: 18px; line-height: 1; pointer-events: none; }
     .cw-doodle.d1 { left: 16%; top: 20%; } .cw-doodle.d2 { right: 15%; top: 26%; color: #FF9EBB; font-size: 20px; } .cw-doodle.d3 { left: 22%; bottom: 18%; font-size: 14px; }
@@ -2689,6 +2695,7 @@ const CUSTOM_SITE_CONFIG = {
     "particles": [
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Magical.webp?raw=true",
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Star.png?raw=true",
+      "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/dango.png?raw=true",
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Heart.png?raw=true"
     ],
     "floatMascot": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/lishi-white2.png?raw=true",
@@ -5333,14 +5340,27 @@ const CUSTOM_SITE_CONFIG = {
     // 而且等合作實績快捲到畫面裡才開始載入，不拖慢網頁開啟速度
     const XIAOLAI_CSS = 'https://cdn.jsdelivr.net/npm/cn-fontsource-xiaolai-sc-regular@1.0.2/font.css';
     let coverFontObserver = null;
+    // 封面手寫字：字型（和要用到的那幾個字）真的下載好之後才顯示，不會先閃一下普通字體再變成手寫字
+    function coverFontReady() { document.documentElement.classList.add('xl-ready'); }
+    setTimeout(coverFontReady, 5000);   // 網路很慢時，最多等 5 秒就先顯示
     function loadCoverFont() {
       if (document.getElementById('cw-cover-font') || coverFontObserver) return;
       const add = () => {
         if (document.getElementById('cw-cover-font')) return;
         const link = document.createElement('link');
         link.id = 'cw-cover-font'; link.rel = 'stylesheet'; link.href = XIAOLAI_CSS;
+        link.onload = () => {
+          const text = Array.from(document.querySelectorAll('.cw-cover-title, .cw-cover-hint')).map(e => e.textContent).join('') || '合作實績翻開看看→';
+          if (!document.fonts || !document.fonts.load) { coverFontReady(); return; }
+          Promise.all([document.fonts.load('400 48px "Xiaolai SC"', text), document.fonts.load('400 15px "Xiaolai SC"', text)])
+            .then(coverFontReady, coverFontReady);
+        };
+        link.onerror = coverFontReady;
         document.head.appendChild(link);
       };
+      // 網頁載完、閒下來時就先偷偷下載（不用等滑到合作實績才開始抓，手機上就不會來不及）
+      const early = () => setTimeout(add, 600);
+      if (document.readyState === 'complete') early(); else window.addEventListener('load', early, { once: true });
       const sec = document.getElementById('block-collab');
       if (!sec || !('IntersectionObserver' in window)) { add(); return; }
       coverFontObserver = new IntersectionObserver((es) => {
