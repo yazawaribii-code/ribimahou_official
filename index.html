@@ -829,6 +829,11 @@
       .tag-pill-tag { font-size: .95rem; }
       .tag-pill-cat { font-size: .82rem; }
     }
+    .cw-more { display: flex; justify-content: center; margin-top: 1.1rem; }
+    .cw-more a { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.4rem; border-radius: 999px;
+      background: rgba(255,255,255,.95); border: 1.5px solid #F7BFD0; color: #E85A7F; font-weight: 900; font-size: .92rem;
+      letter-spacing: .04em; text-decoration: none; transition: background-color .2s, border-color .2s, transform .2s, box-shadow .2s; }
+    .cw-more a:hover { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgba(232,90,127,.55); }
   </style>
 </head>
 <body class="min-h-screen relative selection:bg-sakura selection:text-white">
@@ -1443,6 +1448,7 @@
           </div>
           <div id="cw-dots" class="cw-dots"></div>
         </div>
+        <div class="cw-more"><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pubhtml" target="_blank" rel="noopener noreferrer" data-ms-open="1">♡ 更多莉程碑 →</a></div>
       </section>
 
         <!-- Hashtags：直式膠囊清單，點整顆就能複製（不顯示複製圖示） -->
@@ -6955,4 +6961,267 @@ const CUSTOM_SITE_CONFIG = {
     });
   })();
 </script>
+  <!-- ♡ 莉程碑 Modal：資料直接讀 Google 試算表（發佈成 CSV），試算表更新、網站就跟著更新 -->
+  <style id="ms-css">
+    #ms-modal { position: fixed; inset: 0; z-index: 2147483001; display: none; }
+    #ms-modal.is-open { display: block; }
+    #ms-modal .ms-backdrop { position: absolute; inset: 0; background: rgba(90,62,70,.55); animation: msFade .25s ease; }
+    #ms-modal .ms-wrap { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 1rem; pointer-events: none; }
+    #ms-modal .ms-panel { pointer-events: auto; position: relative; width: 100%; max-width: 34rem; max-height: 88vh; display: flex; flex-direction: column;
+      background: #FFF9FB; border: 2px solid #FFC9DA; border-radius: 28px; box-shadow: 0 24px 60px -20px rgba(232,90,127,.55); overflow: hidden;
+      font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif; color: #5A3E46; animation: msPop .32s cubic-bezier(.2,.9,.3,1.25); }
+    .ms-head { text-align: center; padding: 1.5rem 3rem .9rem; background: linear-gradient(180deg, #FFE6EE, #FFF9FB); border-bottom: 1.5px dashed #FFC9DA; }
+    .ms-eb { font-size: .7rem; font-weight: 900; letter-spacing: .25em; color: #E85A7F; }
+    .ms-title { margin-top: .2rem; font-size: 1.7rem; font-weight: 900; line-height: 1.2; }
+    .ms-title span { color: #FF8FB1; font-size: 1.1rem; }
+    .ms-sub { margin-top: .3rem; font-size: .75rem; font-weight: 700; color: #A9838F; }
+    .ms-close { position: absolute; top: .8rem; right: .8rem; width: 34px; height: 34px; border-radius: 999px; border: 1.5px solid #F7BFD0; background: #fff;
+      color: #E85A7F; font-size: 1.1rem; font-weight: 900; line-height: 1; cursor: pointer; transition: transform .2s, background-color .2s; }
+    .ms-close:hover { background: #FFF0F4; transform: rotate(90deg); }
+    .ms-body { overflow-y: auto; overscroll-behavior: contain; padding: 1rem 1.4rem 1.4rem; scrollbar-width: thin; scrollbar-color: #FFC9DA transparent; }
+    .ms-year { position: sticky; top: -1rem; z-index: 2; display: flex; justify-content: flex-start; padding: .9rem 0 .5rem; background: linear-gradient(#FFF9FB 70%, rgba(255,249,251,0)); }
+    .ms-year b { display: inline-block; background: #E85A7F; color: #fff; font-size: .85rem; font-weight: 900; letter-spacing: .08em; padding: .2rem .85rem; border-radius: 999px; }
+    .ms-list { position: relative; margin: 0 0 .4rem; padding: 0 0 0 1.4rem; list-style: none; }
+    .ms-list::before { content: ''; position: absolute; left: .45rem; top: .4rem; bottom: .4rem; width: 2px; background: repeating-linear-gradient(#FFC9DA 0 6px, transparent 6px 11px); }
+    .ms-item { position: relative; margin: .55rem 0; padding: .6rem .85rem; background: #fff; border: 1.5px solid #FFE0EA; border-radius: 16px;
+      animation: msUp .35s ease both; }
+    .ms-item::before { content: '♡'; position: absolute; left: -1.38rem; top: .55rem; width: 1rem; text-align: center; color: #FF8FB1; font-size: .8rem; font-weight: 900; background: #FFF9FB; line-height: 1.4; }
+    .ms-date { display: inline-block; font-size: .72rem; font-weight: 900; color: #E85A7F; letter-spacing: .03em; }
+    .ms-text { display: block; margin-top: .15rem; font-size: .92rem; font-weight: 700; line-height: 1.55; overflow-wrap: anywhere; }
+    .ms-item.is-big { background: linear-gradient(135deg, #FFF0F5, #FFFFFF); border-color: #FF8FB1; box-shadow: 0 6px 14px -10px rgba(232,90,127,.6); }
+    .ms-item.is-big::before { content: '★'; color: #E85A7F; }
+    .ms-item.is-big .ms-text { color: #C8436A; }
+    .ms-state { text-align: center; padding: 2.5rem 1rem; font-size: .9rem; font-weight: 700; color: #A9838F; }
+    .ms-state a, .ms-foot a { color: #E85A7F; font-weight: 900; }
+    .ms-pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .3rem; padding: .7rem .8rem 0; }
+    .ms-pager:empty { display: none; }
+    .ms-pg { min-width: 2.1rem; height: 2.1rem; padding: 0 .45rem; border-radius: 999px; border: 1.5px solid #F7BFD0; background: #fff;
+      color: #C8436A; font: inherit; font-size: .85rem; font-weight: 900; cursor: pointer; transition: background-color .2s, border-color .2s, transform .2s; }
+    .ms-pg:hover:not(:disabled):not([aria-current="page"]) { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-1px); }
+    .ms-pg[aria-current="page"] { background: #E85A7F; border-color: #E85A7F; color: #fff; cursor: default; }
+    .ms-pg:disabled { opacity: .35; cursor: default; }
+    .ms-gap { color: #F4A6BF; font-weight: 900; letter-spacing: .1em; padding: 0 .1rem; }
+    .ms-foot { text-align: center; padding: .7rem 1rem .9rem; font-size: .72rem; font-weight: 700; color: #A9838F; border-top: 1.5px dashed #FFE0EA; }
+    @keyframes msFade { from { opacity: 0; } }
+    @keyframes msPop { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+    @keyframes msUp { from { opacity: 0; transform: translateY(8px); } }
+    @media (max-width: 520px) {
+      .ms-pg { min-width: 1.9rem; height: 1.9rem; font-size: .8rem; }
+      .ms-pager { gap: .22rem; }
+      #ms-modal .ms-wrap { padding: .6rem; }
+      #ms-modal .ms-panel { max-height: 92vh; border-radius: 22px; }
+      .ms-head { padding: 1.2rem 2.8rem .75rem; }
+      .ms-title { font-size: 1.45rem; }
+      .ms-body { padding: .8rem 1rem 1.1rem; }
+      .ms-text { font-size: .88rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { #ms-modal *, #ms-modal { animation: none !important; } }
+    body.ms-lock { overflow: hidden; }
+  </style>
+  <div id="ms-modal" role="dialog" aria-modal="true" aria-labelledby="ms-title" aria-hidden="true">
+    <div class="ms-backdrop" data-ms-close="1"></div>
+    <div class="ms-wrap">
+      <div class="ms-panel">
+        <button type="button" class="ms-close" data-ms-close="1" aria-label="關閉">✕</button>
+        <div class="ms-head">
+          <div class="ms-eb">♡ MILESTONES ♡</div>
+          <div id="ms-title" class="ms-title"><span>✦</span> 莉程碑 <span>✦</span></div>
+          <div id="ms-sub" class="ms-sub">一起走過的每一步 ♡</div>
+        </div>
+        <div id="ms-body" class="ms-body"></div>
+        <nav id="ms-pager" class="ms-pager" aria-label="莉程碑頁數"></nav>
+        <div class="ms-foot"><a id="ms-sheet-link" href="#" target="_blank" rel="noopener noreferrer">在試算表查看 ↗</a></div>
+      </div>
+    </div>
+  </div>
+  <script id="ms-js">
+  (function () {
+    // =========================================================================
+    // ★ 莉程碑 CSV 讀取（MILESTONES_CSV_URL） ★
+    // 按下「更多莉程碑」時才去讀 CSV，所以試算表更新後，網站不用重新匯出 HTML！
+    //  - Google 試算表：檔案 → 共用 → 發布到網路 → 選「逗號分隔值 (.csv)」→ 貼上網址
+    //  - 放在 GitHub 同一個資料夾：'./milestones.csv'
+    // CSV 兩種寫法都可以：
+    //  ① 一格寫完：「2024/3/31 正式更名為『魔法少女莉比醬』」（沒有日期的列，例如標題，會自動跳過）
+    //  ② 分欄（第一列標題，中英文都可以）：日期(date) 內容(text) 重點(highlight，可省略)
+    //     重點填 1／是／true ＝ 用 ★ 標示；沒有「重點」欄時，含 BIG_WORDS 的會自動標示
+    // =========================================================================
+    const MILESTONES_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pub?output=csv';
+    // 「在試算表查看」連到的網址（留空 '' ＝ 不顯示這個連結）
+    const MILESTONES_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pubhtml';
+    const BIG_WORDS = ['周年', '週年', 'COVER', '更名', '出道', '生日'];
+    const NEWEST_FIRST = true;   // true ＝ 最新的在最上面；false ＝ 從最早的開始
+    const PAGE_SIZE = 8;         // 每一頁放幾個莉程碑（超過就會出現 1 2 3 … 的頁數）
+
+    const modal = document.getElementById('ms-modal');
+    const body = document.getElementById('ms-body');
+    const sub = document.getElementById('ms-sub');
+    const pager = document.getElementById('ms-pager');
+    let list = [], page = 1;
+    const sheetLink = document.getElementById('ms-sheet-link');
+    if (MILESTONES_SHEET_URL) sheetLink.href = MILESTONES_SHEET_URL; else sheetLink.parentNode.style.display = 'none';
+    let cache = null, loading = null, lastFocus = null;
+
+    const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    const toast = m => (typeof showToast === 'function' ? showToast(m) : console.log(m));
+
+    function parseCSV(text) {
+      text = String(text || '').replace(/^﻿/, '');
+      const rows = []; let row = [], cell = '', q = false;
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        if (q) {
+          if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else q = false; }
+          else cell += c;
+        } else if (c === '"') q = true;
+        else if (c === ',') { row.push(cell); cell = ''; }
+        else if (c === '\n' || c === '\r') {
+          if (c === '\r' && text[i + 1] === '\n') i++;
+          row.push(cell); rows.push(row); row = []; cell = '';
+        } else cell += c;
+      }
+      if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
+      return rows.map(r => r.map(v => String(v || '').trim())).filter(r => r.some(Boolean));
+    }
+
+    const DATE_RE = /^\s*(\d{4})\s*[\/\-.年]\s*(\d{1,2})\s*[\/\-.月]\s*(\d{1,2})(\s*[~～\-]\s*\d{1,2})?\s*日?/;
+    const yes = v => /^(1|true|yes|y|v|o|是|有|✓|✔|✅|★|☆)$/i.test(String(v).trim());
+    function csvToMilestones(text) {
+      const rows = parseCSV(text);
+      const head = (rows[0] || []).map(h => h.toLowerCase());
+      const find = names => head.findIndex(h => names.includes(h));
+      const cDate = find(['date', '日期', '時間']);
+      const cText = find(['text', 'title', '內容', '莉程碑', '里程碑', '事件', '標題']);
+      const cBig = find(['highlight', 'big', '重點', '亮點', '特別']);
+      const hasHead = cDate >= 0 && cText >= 0;
+      const items = [];
+      (hasHead ? rows.slice(1) : rows).forEach((r, idx) => {
+        const line = hasHead ? (r[cDate] + ' ' + r[cText]) : r.filter(Boolean).join(' ');
+        const m = line.match(DATE_RE);
+        if (!m) return;   // 沒有日期的列（例如標題「♡莉程碑♡」）跳過
+        const t = line.slice(m[0].length).replace(/^[\s｜|:：\-—]+/, '').trim();
+        if (!t) return;
+        const big = (hasHead && cBig >= 0) ? yes(r[cBig]) : BIG_WORDS.some(w => t.toUpperCase().includes(w.toUpperCase()));
+        items.push({ year: m[1], date: `${m[1]}/${+m[2]}/${+m[3]}${m[4] ? m[4].replace(/\s/g, '') : ''}`,
+                     text: t, key: (+m[1]) * 10000 + (+m[2]) * 100 + (+m[3]), idx, big });
+      });
+      if (!items.length) throw new Error('CSV 裡找不到「日期＋內容」的莉程碑');
+      items.sort((a, b) => (a.key - b.key) || (a.idx - b.idx));
+      if (NEWEST_FIRST) items.reverse();
+      return items;
+    }
+
+    function render(items) {
+      list = items; page = 1;
+      sub.textContent = `一起走過的 ${items.length} 個莉程碑 ♡`;
+      renderPage();
+    }
+    // 頁數按鈕：頁數少就全列；頁數多就「1 … 4 5 6 … 16」
+    function pageNumbers(total, cur) {
+      if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1);
+      const set = new Set([1, total, cur - 1, cur, cur + 1]);
+      if (cur <= 3) [2, 3, 4].forEach(n => set.add(n));
+      if (cur >= total - 2) [total - 3, total - 2, total - 1].forEach(n => set.add(n));
+      const nums = [...set].filter(n => n >= 1 && n <= total).sort((a, b) => a - b);
+      const out = [];
+      nums.forEach((n, i) => { if (i && n - nums[i - 1] > 1) out.push('…'); out.push(n); });
+      return out;
+    }
+    function renderPage() {
+      const total = Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+      page = Math.min(Math.max(1, page), total);
+      const start = (page - 1) * PAGE_SIZE;
+      let html = '', year = null, n = 0;
+      list.slice(start, start + PAGE_SIZE).forEach(it => {
+        if (it.year !== year) {
+          if (year !== null) html += '</ol>';
+          year = it.year;
+          html += `<div class="ms-year"><b>${esc(year)}</b></div><ol class="ms-list">`;
+        }
+        html += `<li class="ms-item${it.big ? ' is-big' : ''}" style="animation-delay:${n++ * 35}ms">` +
+                `<span class="ms-date">${esc(it.date)}</span><span class="ms-text">${esc(it.text)}</span></li>`;
+      });
+      body.innerHTML = html + '</ol>';
+      body.scrollTop = 0;
+      if (total <= 1) { pager.innerHTML = ''; return; }
+      pager.innerHTML =
+        `<button type="button" class="ms-pg" data-ms-page="${page - 1}" aria-label="上一頁"${page === 1 ? ' disabled' : ''}>‹</button>` +
+        pageNumbers(total, page).map(v => v === '…'
+          ? '<span class="ms-gap" aria-hidden="true">…</span>'
+          : `<button type="button" class="ms-pg" data-ms-page="${v}" aria-label="第 ${v} 頁"${v === page ? ' aria-current="page"' : ''}>${v}</button>`).join('') +
+        `<button type="button" class="ms-pg" data-ms-page="${page + 1}" aria-label="下一頁"${page === total ? ' disabled' : ''}>›</button>`;
+    }
+    function renderError() {
+      pager.innerHTML = '';
+      body.innerHTML = '<div class="ms-state">莉程碑暫時載入不了 🥺' +
+        (MILESTONES_SHEET_URL ? `<br><a href="${esc(MILESTONES_SHEET_URL)}" target="_blank" rel="noopener noreferrer">點這裡直接看試算表 ↗</a>` : '') + '</div>';
+    }
+
+    function load() {
+      if (cache) return Promise.resolve(cache);
+      if (loading) return loading;
+      if (!MILESTONES_CSV_URL) return Promise.reject(new Error('沒有設定 MILESTONES_CSV_URL'));
+      body.innerHTML = '<div class="ms-state">✦ 莉程碑載入中… ✦</div>'; pager.innerHTML = '';
+      const url = MILESTONES_CSV_URL + (MILESTONES_CSV_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
+      loading = fetch(url, { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
+        .then(t => (cache = csvToMilestones(t)))
+        .finally(() => { loading = null; });
+      return loading;
+    }
+
+    function open() {
+      lastFocus = document.activeElement;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('ms-lock');
+      modal.querySelector('.ms-close').focus();
+      load().then(render).catch(err => { console.warn('[莉程碑 CSV] 讀取失敗：', err); renderError(); });
+    }
+    function close() {
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('ms-lock');
+      if (lastFocus && lastFocus.focus) lastFocus.focus();
+    }
+
+    document.addEventListener('click', e => {
+      if (e.target.closest('[data-ms-open]')) { e.preventDefault(); open(); return; }
+      const pg = e.target.closest('[data-ms-page]');
+      if (pg && !pg.disabled) { page = +pg.dataset.msPage; renderPage(); const cur = pager.querySelector('[aria-current]'); if (cur) cur.focus(); return; }
+      if (e.target.closest('[data-ms-close]')) close();
+    });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('is-open')) close(); });
+
+    // 本機雙擊開啟（file://）或 ?edit 編輯模式時，左下角出現「選擇莉程碑 CSV」按鈕；一般訪客看不到
+    (function setupMilestonesCsvPicker() {
+      const canEdit = (typeof CAN_EDIT !== 'undefined' && CAN_EDIT);
+      if (location.protocol !== 'file:' && !canEdit) return;
+      const input = document.createElement('input');
+      input.type = 'file'; input.accept = '.csv,text/csv'; input.style.display = 'none';
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.textContent = '🏁 選擇莉程碑 CSV';
+      btn.title = '從電腦選一個 CSV 檔，馬上預覽莉程碑（不會上傳到任何地方）';
+      btn.style.cssText = 'position:fixed;left:12px;bottom:100px;z-index:9999;background:#fff;color:#d6457a;border:2px solid #f4a6c1;border-radius:999px;padding:8px 14px;font-size:13px;font-weight:900;box-shadow:0 4px 12px rgba(232,90,127,.18);cursor:pointer';
+      btn.addEventListener('click', () => input.click());
+      input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          try {
+            cache = csvToMilestones(String(reader.result));
+            toast('🏁 已讀取「' + file.name + '」的 ' + cache.length + ' 個莉程碑！');
+            open();
+          } catch (err) { toast('⚠️ 莉程碑 CSV 讀取失敗：' + err.message); }
+          input.value = '';
+        };
+        reader.readAsText(file, 'utf-8');
+      });
+      const add = () => { document.body.appendChild(input); document.body.appendChild(btn); };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add); else add();
+    })();
+  })();
+  </script>
 </body></html>
