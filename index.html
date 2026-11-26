@@ -568,7 +568,11 @@
     [data-editable-field="scheduleDisclaimer"]::before, [data-editable-field="scheduleDisclaimer"]::after {
       content: ''; flex: 0 1 3.5rem; height: 1px; background: linear-gradient(90deg, transparent, #F4A6BF); }
     [data-editable-field="scheduleDisclaimer"]::after { background: linear-gradient(90deg, #F4A6BF, transparent); }
-    @media (max-width: 639px) { [data-editable-field="scheduleDisclaimer"]::before, [data-editable-field="scheduleDisclaimer"]::after { flex-basis: 1.5rem; } }
+    /* 📱 手機：不換行，字稍微縮小塞進一行；兩側細線可以縮短讓位給文字 */
+    @media (max-width: 639px) {
+      #block-schedule [data-editable-field="scheduleDisclaimer"] { white-space: nowrap; font-size: clamp(9px, 3vw, 12px); gap: .45rem; letter-spacing: .01em; }
+      #block-schedule [data-editable-field="scheduleDisclaimer"]::before, #block-schedule [data-editable-field="scheduleDisclaimer"]::after { flex: 0 1 1.5rem; min-width: 0; }
+    }
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
@@ -7880,6 +7884,26 @@ const CUSTOM_SITE_CONFIG = {
     }
     if (menu) new MutationObserver(measure).observe(menu, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
     measure();
+  })();
+  </script>
+  <script id="sch-disc-fit-js">
+  // 手機：週表備註如果還是太長（例如改了文字），就再把字縮小一點，保證排在同一行
+  (function () {
+    const el = document.querySelector('[data-editable-field="scheduleDisclaimer"]');
+    if (!el) return;
+    function fit() {
+      el.style.fontSize = '';
+      if (window.innerWidth >= 640 || document.body.classList.contains('edit-mode-active')) return;
+      let size = parseFloat(getComputedStyle(el).fontSize) || 12;
+      let guard = 0;
+      while (el.scrollWidth > el.clientWidth + 1 && size > 8 && guard++ < 20) { size -= .5; el.style.fontSize = size + 'px'; }
+    }
+    let lastW = window.innerWidth;
+    window.addEventListener('resize', () => { if (window.innerWidth !== lastW) { lastW = window.innerWidth; fit(); } });
+    window.addEventListener('load', fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    new MutationObserver(fit).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+    fit();
   })();
   </script>
 </body></html>
