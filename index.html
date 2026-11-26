@@ -7152,6 +7152,9 @@ const CUSTOM_SITE_CONFIG = {
   // =========================================================================
   const MASCOT_LINES_CSV_URL = './mascot-lines.csv';
 
+  // 給 ?edit 雲端發布「更新 CSV」用：先預覽、確認格式沒問題才上傳
+  window.ribiPreviewMascotCsv = (text) => applyMascotLinesCsv(text);
+
   function applyMascotLinesCsv(text) {
     if (typeof parseCsvText !== 'function') throw new Error('找不到 CSV 讀取工具');
     const rows = parseCsvText(text);
@@ -7692,6 +7695,9 @@ const CUSTOM_SITE_CONFIG = {
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && modal.classList.contains('is-open')) close(); });
 
+    // 給 ?edit 雲端發布「更新 CSV」用：先預覽、確認格式沒問題才上傳
+    window.ribiPreviewMilestonesCsv = (t) => { csvToMilestones(t); pinned = true; useText(t); return cache.length; };
+
     // 本機雙擊開啟（file://）或 ?edit 編輯模式時，左下角出現「選擇莉程碑 CSV」按鈕；一般訪客看不到
     (function setupMilestonesCsvPicker() {
       const canEdit = (typeof CAN_EDIT !== 'undefined' && CAN_EDIT);
@@ -7964,6 +7970,15 @@ const CUSTOM_SITE_CONFIG = {
   .ghp-recent img { width: 46px; height: 46px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
   .ghp-recent span { flex: 1; min-width: 0; font-size: 0.75rem; color: #9c8689; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .ghp-recent button { flex-shrink: 0; padding: 0.35rem 0.8rem; font-size: 0.78rem; }
+  .ghp-csv-row { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+  #ghp-csv-confirm:empty { display: none; }
+  #ghp-csv-confirm { margin-top: 0.8rem; background: #fff; border: 2px dashed #ff8fae; border-radius: 16px; padding: 0.9rem 1rem; font-size: 0.85rem; }
+  #ghp-csv-confirm b.t { display: block; color: #ff6f98; font-size: 0.95rem; margin-bottom: 0.4rem; }
+  #ghp-csv-confirm .kv { margin: 0.15rem 0; }
+  #ghp-csv-confirm .warn { margin: 0.5rem 0 0; padding: 0.45rem 0.6rem; border-radius: 10px; background: #fff8e6; border: 1.5px solid #f4c56a; color: #8f6000; }
+  #ghp-csv-confirm pre { margin: 0.5rem 0 0; padding: 0.5rem 0.6rem; background: #fff6f9; border-radius: 10px; font-size: 0.75rem; line-height: 1.5; white-space: pre; overflow-x: auto; max-height: 7.5rem; }
+  #ghp-csv-confirm .ghp-row .ghp-btn { flex: 1; }
+  .ghp-csv-row .ghp-btn { flex: 1; min-width: 110px; }
   #ghp-token-box { display: none; }
   #ghp-token-box.open { display: block; }
   #ghp-token-link { background: none; border: none; color: #ff8fae; font-size: 0.8rem; text-decoration: underline; cursor: pointer; padding: 0; font-family: inherit; }
@@ -8028,6 +8043,15 @@ const CUSTOM_SITE_CONFIG = {
       '<p class="ghp-tip">上傳後網址會自動複製；接著去點要換的圖的「換圖」，網址也會<b>自動帶入</b>，按確定就好。</p>' +
       '<label id="ghp-drop"><input type="file" accept="image/*" hidden id="ghp-file">把圖片拖進來<small>或點這裡選圖片・會自動轉 webp、縮到 2000px（GIF 保持原樣）</small></label>' +
       '<div id="ghp-recent-list"></div>' +
+      '<h4>📅 更新 CSV</h4>' +
+      '<p class="ghp-tip">選好 CSV 後會先在畫面上預覽，格式沒問題才會直接上傳到網站（取代 GitHub 上原本的檔案），大約 1～2 分鐘後大家就會看到。</p>' +
+      '<div class="ghp-csv-row">' +
+        '<button class="ghp-btn ghost" data-csv="schedule">📅 行程</button>' +
+        '<button class="ghp-btn ghost" data-csv="milestones">🏁 莉程碑</button>' +
+        '<button class="ghp-btn ghost" data-csv="mascot">💬 莉息台詞</button>' +
+      '</div>' +
+      '<input type="file" accept=".csv,text/csv" hidden id="ghp-csv-file">' +
+      '<div id="ghp-csv-confirm"></div>' +
       '<div class="ghp-row" style="margin-top:1rem"><button id="ghp-token-link">🔑 設定金鑰</button></div>' +
       '<div id="ghp-token-box">' +
         '<p class="ghp-tip">貼上官網用的 GitHub 金鑰（github_pat_ 開頭，需要勾選 ' + SITE_REPO.repo + ' 和 ' + IMAGE_REPO.repo + '，Contents 設為 Read and write）。金鑰只會存在這台裝置的瀏覽器。</p>' +
@@ -8206,6 +8230,99 @@ const CUSTOM_SITE_CONFIG = {
   ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
   ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
   drop.addEventListener('drop', e => uploadFile(e.dataTransfer.files[0]));
+
+  // ---- 更新 CSV：先預覽檢查，再上傳到官網倉庫 ----
+  const CSV_FILES = {
+    schedule:   { path: 'schedule.csv',     name: '行程',     preview: t => { applyScheduleCsvText(t); return null; } },
+    milestones: { path: 'milestones.csv',   name: '莉程碑',   preview: t => window.ribiPreviewMilestonesCsv(t) },
+    mascot:     { path: 'mascot-lines.csv', name: '莉息台詞', preview: t => { window.ribiPreviewMascotCsv(t); return null; } }
+  };
+  let csvKind = null;
+  modal.querySelectorAll('[data-csv]').forEach(btn => btn.addEventListener('click', () => {
+    if (needToken()) return;
+    csvKind = btn.dataset.csv;
+    $('ghp-csv-file').click();
+  }));
+  // 每種 CSV 應該要有的欄位（用來檢查有沒有選錯檔案）
+  const CSV_HEADERS = { schedule: ['週別', '標題'], milestones: ['日期', '內容'], mascot: ['類型', '台詞'] };
+  const countRows = t => t.replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim()).length - 1;
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const confirmBox = $('ghp-csv-confirm');
+
+  $('ghp-csv-file').addEventListener('change', async e => {
+    const file = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!file || !csvKind) return;
+    const kind = csvKind;
+    const conf = CSV_FILES[kind];
+    confirmBox.innerHTML = '';
+    try {
+      const buf = new Uint8Array(await file.arrayBuffer());
+      const text = new TextDecoder('utf-8').decode(buf);
+
+      // 1. 讀 GitHub 上目前的檔案（拿版本號，也用來比較筆數、取消時還原畫面）
+      status('讀取網站上目前的' + conf.name + ' CSV…');
+      const r = await fetch(api(SITE_REPO) + '/contents/' + encPath(conf.path) + '?ref=' + SITE_REPO.branch, { headers: headers(), cache: 'no-store' });
+      let sha = null, oldText = null;
+      if (r.ok) {
+        const j = await r.json();
+        sha = j.sha;
+        if (j.content) {
+          const ob = Uint8Array.from(atob(j.content.replace(/\n/g, '')), c => c.charCodeAt(0));
+          oldText = new TextDecoder('utf-8').decode(ob);
+        }
+      } else if (r.status !== 404) throw new Error(friendlyError(r.status, SITE_REPO.repo));
+
+      // 2. 先在畫面上預覽：格式有問題會在這裡出錯，就不會進到確認步驟
+      try { conf.preview(text); }
+      catch (err) { throw new Error(conf.name + ' CSV 格式有問題，沒有上傳：' + err.message); }
+
+      // 3. 顯示確認內容
+      const header = (text.replace(/^﻿/, '').split(/\r?\n/)[0] || '');
+      const missing = CSV_HEADERS[kind].filter(h => !header.includes(h));
+      const newN = countRows(text), oldN = oldText != null ? countRows(oldText) : null;
+      const warns = [];
+      if (missing.length) warns.push('這個檔案看起來不像' + conf.name + ' CSV（找不到「' + missing.join('、') + '」欄位），確定沒選錯檔案嗎？');
+      if (oldN != null && oldN > 0 && newN < oldN * 0.5) warns.push('新檔案的筆數比網站上少了一半以上（' + oldN + ' → ' + newN + '），確定沒選錯檔案嗎？');
+      if (oldText != null && oldText.replace(/^﻿/, '').trim() === text.replace(/^﻿/, '').trim()) warns.push('這個檔案跟網站上的內容一模一樣，上傳也不會有變化喔。');
+      const lines = text.replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim()).slice(0, 5);
+      confirmBox.innerHTML =
+        '<b class="t">📋 確認要上傳嗎？</b>' +
+        '<div class="kv">📄 檔案：<b>' + esc(file.name) + '</b></div>' +
+        '<div class="kv">🔄 要更新：<b>' + conf.name + '</b>（' + conf.path + '）</div>' +
+        '<div class="kv">📊 筆數：' + (oldN != null ? '網站目前 <b>' + oldN + '</b> 筆 → ' : '') + '新檔案 <b>' + newN + '</b> 筆</div>' +
+        warns.map(w => '<div class="warn">⚠️ ' + esc(w) + '</div>').join('') +
+        '<pre>' + esc(lines.join('\n')) + (newN > 4 ? '\n…' : '') + '</pre>' +
+        '<p class="ghp-tip" style="margin:0.5rem 0 0">畫面上已經先換成新內容了，可以關掉這個視窗看看預覽效果，再回來按確認。</p>' +
+        '<div class="ghp-row"><button class="ghp-btn" id="ghp-csv-ok">確認上傳 ✦</button><button class="ghp-btn ghost" id="ghp-csv-cancel">取消</button></div>';
+      status(warns.length ? '請確認一下上傳內容 ⚠️' : '預覽好了，請確認上傳內容 👀', warns.length ? 'warn' : '');
+
+      // 取消：畫面恢復成網站目前的內容，什麼都不上傳
+      $('ghp-csv-cancel').onclick = () => {
+        confirmBox.innerHTML = '';
+        if (oldText != null) { try { conf.preview(oldText); } catch (err) { /* 還原失敗就算了，重新整理就會恢復 */ } }
+        status('已取消，沒有上傳任何東西 👌（畫面也恢復成網站目前的內容了）', 'ok');
+      };
+      // 確認：才真正上傳
+      $('ghp-csv-ok').onclick = async () => {
+        const okBtn = $('ghp-csv-ok');
+        okBtn.disabled = true; $('ghp-csv-cancel').disabled = true;
+        try {
+          status('上傳' + conf.name + ' CSV 中…');
+          const stamp = new Date().toLocaleString('zh-TW', { hour12: false });
+          await putFile(SITE_REPO, conf.path, bytesToBase64(buf), '更新' + conf.name + ' CSV（?edit 上傳）' + stamp, sha);
+          confirmBox.innerHTML = '';
+          status('✅ ' + conf.name + ' CSV 已更新（共 ' + newN + ' 筆）！大約 1～2 分鐘後大家就會看到新內容 🎉', 'ok');
+          if (typeof showToast === 'function') showToast('📅 ' + conf.name + ' CSV 已上傳！');
+        } catch (err) {
+          status(err.message, 'err');
+          okBtn.disabled = false; $('ghp-csv-cancel').disabled = false;
+        }
+      };
+    } catch (err) {
+      status(err.message, 'err');
+    }
+  });
 
   // 「換圖」時，自動把剛上傳的圖片網址帶進輸入框
   const nativePrompt = window.prompt.bind(window);
