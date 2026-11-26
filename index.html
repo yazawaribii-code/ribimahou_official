@@ -5821,6 +5821,7 @@ const CUSTOM_SITE_CONFIG = {
       #xp-extra-slides .xp-notes .xp-chibi { grid-column: 4; }
     }
     .xp-arrow.is-off { opacity: 0; visibility: hidden; pointer-events: none; }
+    .xp-arrow.is-off.is-dim { opacity: .35; visibility: visible; box-shadow: none; }   /* 手機／平板：到底了 → 變淡、不能按，但位置不變 */
     .xp-arrow.is-small { width: 2.25rem; height: 2.25rem; box-shadow: 0 4px 10px -4px rgba(232, 90, 127, .5); }
     .xp-tools { display: none; gap: .35rem; }
     body.edit-mode-active .xp-tools { display: inline-flex; }
@@ -6177,9 +6178,17 @@ const CUSTOM_SITE_CONFIG = {
           const t = (h.top - c.top) + h.height / 2;
           [prev, next].forEach(btn => { btn.style.top = t + 'px'; });
           if (visHead && visHead !== head) visHead.style.paddingRight = (S * 2 + G + 6) + 'px';   // 標題很長時換行，不會跑到箭頭底下
+          // 位置固定：＜ 永遠在左、＞ 永遠在右（以前最後一頁 ＞ 消失時，＜ 會補到右邊，很不直覺）
           next.style.left = (c.width - pad - S) + 'px';
-          prev.style.left = (c.width - pad - S - (next.classList.contains('is-off') ? 0 : S + G)) + 'px';
+          prev.style.left = (c.width - pad - S - S - G) + 'px';
         }
+        // 手機／平板：不能按的那顆變淡但保留在原位，「＜ ＞」永遠成對出現；只有一位角色時兩顆都不顯示
+        const single = prev.classList.contains('is-off') && next.classList.contains('is-off');
+        [prev, next].forEach(b => {
+          const off = b.classList.contains('is-off');
+          b.classList.toggle('is-dim', !outside && !single && off);
+          b.setAttribute('aria-disabled', off ? 'true' : 'false');
+        });
       }
 
       function go(i, dir) {
