@@ -120,8 +120,14 @@
     }
     html.inapp body::after { filter: none; }
 
+    /* 漂浮物的「畫布」：固定在畫面上，高度用不會變的 100lvh（手機網址列收合／展開時，裡面的漂浮物不會跟著跳動或被推上去） */
+    #magic-particles-container {
+      position: fixed; left: 0; top: 0; width: 100%; height: 100vh; height: 100lvh;
+      pointer-events: none; z-index: 0; overflow: hidden; contain: strict;
+      transform: translateZ(0); backface-visibility: hidden;
+    }
     .magic-particle {
-      position: fixed;
+      position: absolute;
       pointer-events: none;
       z-index: 0;
       animation: floatSparkle var(--duration, 8s) ease-in-out infinite;
@@ -4977,6 +4983,24 @@ const CUSTOM_SITE_CONFIG = {
       const list = cfg.length ? cfg : (Array.isArray(SITE_IMAGES.particles) ? SITE_IMAGES.particles : []);
       return list.map(u => safeImageUrl(u)).filter(Boolean);
     }
+
+    // 漂浮物畫布的高度鎖成固定像素：手機網址列收合／展開（只有高度變）時不跟著變，漂浮物就不會一下被推上去、一下跳回來；
+    // 只有寬度真的改變（例如手機轉橫）才重新量
+    (function lockParticleCanvas() {
+      let lastW = 0, h = 0;
+      const apply = () => {
+        const c = document.getElementById('magic-particles-container');
+        if (!c) return;
+        const w = window.innerWidth;
+        if (w !== lastW) { lastW = w; h = 0; }
+        const touch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+        // 手機／平板：直接用整個螢幕的高度（一定 ≥ 網址列收起來後的畫面），之後網址列怎麼動都不用改；電腦：跟著視窗大小
+        const tall = touch ? Math.max(window.innerHeight, screen.height || 0) : window.innerHeight;
+        if (touch ? tall > h : tall !== h) { h = tall; c.style.height = h + 'px'; }
+      };
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', apply); else apply();
+      window.addEventListener('resize', apply);
+    })();
 
     function createMagicParticles() {
       const container = document.getElementById('magic-particles-container');
