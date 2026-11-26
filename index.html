@@ -81,14 +81,33 @@
       background-color: #FFF4F7;
       color: #5A3E46;
       font-family: 'Zen Maru Gothic', 'Noto Sans TC', sans-serif;
-      background-image:
-        radial-gradient(#FFA8BE 1.25px, transparent 1.25px),
-        linear-gradient(to right, rgba(255, 168, 190, 0.12) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 168, 190, 0.12) 1px, transparent 1px);
-      background-size: 36px 36px, 36px 36px, 36px 36px;
-      background-position: 0 0, 18px 18px, 18px 18px;
       overflow-x: hidden;
     }
+    /* 夢幻背景：固定在畫面上，不跟著捲動 */
+    body::before, body::after {
+      content: ''; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+    }
+    /* 底層：粉紫蜜桃的柔光暈染 */
+    body::before {
+      background:
+        radial-gradient(60vmax 45vmax at 8% 6%, rgba(255, 196, 221, .85), transparent 62%),
+        radial-gradient(55vmax 45vmax at 95% 12%, rgba(255, 221, 230, .8), transparent 60%),
+        radial-gradient(50vmax 40vmax at 85% 88%, rgba(255, 200, 220, .7), transparent 62%),
+        radial-gradient(55vmax 45vmax at 10% 92%, rgba(255, 226, 236, .75), transparent 60%),
+        radial-gradient(40vmax 30vmax at 50% 50%, rgba(255, 255, 255, .7), transparent 70%),
+        linear-gradient(160deg, #FFF1F7 0%, #FFF0F4 45%, #FFF5F8 100%);
+    }
+    /* 上層：灑落的小星星與光點 */
+    body::after {
+      opacity: .9;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M40 30l2.2 7.8 7.8 2.2-7.8 2.2L40 50l-2.2-7.8L30 40l7.8-2.2z'/%3E%3Cpath d='M190 150l1.6 5.4 5.4 1.6-5.4 1.6-1.6 5.4-1.6-5.4-5.4-1.6 5.4-1.6z'/%3E%3C/g%3E%3Cg fill='%23FFB8CF'%3E%3Cpath d='M150 60l1.4 4.6 4.6 1.4-4.6 1.4-1.4 4.6-1.4-4.6-4.6-1.4 4.6-1.4z'/%3E%3Cpath d='M70 200l1.8 6.2 6.2 1.8-6.2 1.8-1.8 6.2-1.8-6.2-6.2-1.8 6.2-1.8z'/%3E%3C/g%3E%3Cg fill='%23FFC4D8'%3E%3Cpath d='M230 40l1.2 3.8 3.8 1.2-3.8 1.2-1.2 3.8-1.2-3.8-3.8-1.2 3.8-1.2z'/%3E%3Cpath d='M110 120l1.3 4.2 4.2 1.3-4.2 1.3-1.3 4.2-1.3-4.2-4.2-1.3 4.2-1.3z'/%3E%3C/g%3E%3Cg fill='%23FFFFFF' opacity='.95'%3E%3Ccircle cx='95' cy='40' r='1.6'/%3E%3Ccircle cx='210' cy='95' r='1.2'/%3E%3Ccircle cx='20' cy='130' r='1.4'/%3E%3Ccircle cx='160' cy='225' r='1.5'/%3E%3Ccircle cx='245' cy='200' r='1.1'/%3E%3C/g%3E%3Cg fill='%23FFC2D6'%3E%3Ccircle cx='60' cy='100' r='1.3'/%3E%3Ccircle cx='125' cy='180' r='1'/%3E%3Ccircle cx='235' cy='250' r='1.2'/%3E%3Ccircle cx='15' cy='245' r='1'/%3E%3C/g%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='410' height='410'%3E%3Cg fill='%23FFFFFF'%3E%3Cpath d='M300 70l3 10.5 10.5 3-10.5 3-3 10.5-3-10.5-10.5-3 10.5-3z'/%3E%3Cpath d='M90 310l2.4 8.4 8.4 2.4-8.4 2.4-2.4 8.4-2.4-8.4-8.4-2.4 8.4-2.4z'/%3E%3C/g%3E%3Cg fill='%23FFDDE8'%3E%3Ccircle cx='200' cy='260' r='2'/%3E%3Ccircle cx='360' cy='340' r='1.6'/%3E%3C/g%3E%3Cg fill='%23FFD1E0'%3E%3Ccircle cx='40' cy='170' r='1.8'/%3E%3Ccircle cx='250' cy='150' r='1.4'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 260px 260px, 410px 410px;
+      background-position: 0 0, 130px 90px;
+      filter: drop-shadow(0 0 2px rgba(255, 255, 255, .9));
+    }
+    html.inapp body::after { filter: none; }
 
     .magic-particle {
       position: fixed;
@@ -123,6 +142,30 @@
     /* 手機版週表／標籤：橫向滑動時隱藏卷軸 */
     #schedule-grid, #hashtags-container { scrollbar-width: none; }
     #schedule-grid::-webkit-scrollbar, #hashtags-container::-webkit-scrollbar { display: none; }
+    #img-avatar { opacity: 0; transition: opacity .45s ease; }
+    #img-avatar.av-ready { opacity: 1; }
+    /* 流星劃過（固定在背景，不跟著捲動） */
+    #bg-meteors { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
+    #bg-meteors i {
+      position: absolute; top: var(--y); left: var(--x); width: var(--len, 170px); height: 2.5px; border-radius: 999px;
+      background: linear-gradient(90deg, #fff 0%, rgba(255, 166, 198, .95) 17%, rgba(255, 172, 202, .48) 52%, rgba(255, 172, 202, 0) 100%);
+      filter: drop-shadow(0 0 3.5px rgba(255, 140, 182, .55));
+      transform-origin: left center; opacity: 0;
+      animation: meteorFall var(--dur, 9s) linear var(--delay, 0s) infinite;
+    }
+    #bg-meteors i::before {
+      content: ''; position: absolute; left: -2px; top: 50%; width: 5.5px; height: 5.5px; border-radius: 50%;
+      background: #fff; transform: translateY(-50%);
+      box-shadow: 0 0 5px 2.5px rgba(255, 255, 255, .95), 0 0 14px 5px rgba(255, 152, 190, .62);
+    }
+    @keyframes meteorFall {
+      0%   { opacity: 0; transform: rotate(-28deg) translateX(0); }
+      1.5% { opacity: .92; }
+      7%   { opacity: .92; }
+      10%  { opacity: 0; transform: rotate(-28deg) translateX(-55vmax); }
+      100% { opacity: 0; transform: rotate(-28deg) translateX(-55vmax); }
+    }
+    @media (prefers-reduced-motion: reduce) { #bg-meteors { display: none; } }
     /* 大頭貼：電腦版／手機版各自的縮放、位置（由 imageAdjust.avatar / avatarMobile 設定） */
     #img-avatar { scale: var(--av-m-scale, 1); translate: var(--av-m-translate, 0 0); object-fit: var(--av-m-fit, contain); }
     @media (min-width: 1024px) { #img-avatar { scale: var(--av-d-scale, 1); translate: var(--av-d-translate, 0 0); object-fit: var(--av-d-fit, contain); } }
@@ -1061,7 +1104,7 @@
             <div id="avatar-card" class="relative w-full max-w-[210px] aspect-square lg:max-w-[360px] lg:aspect-[3/4] rounded-[28px] bg-gradient-to-b from-white/85 via-sakura-light/65 to-sakura/30 border-2 border-white shadow-kawaii flex flex-col items-center justify-center p-2 lg:p-4 overflow-hidden animate-float">
 
               <div class="w-full h-full flex flex-col items-center justify-center text-center">
-                <img id="img-avatar" fetchpriority="high" decoding="async" src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20320%20420%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22avBg%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23FFF7FA%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23FFE2EC%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22420%22%20rx%3D%2226%22%20fill%3D%22url(%23avBg)%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22160%22%20cy%3D%22136%22%20r%3D%2264%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M92%20132%20C92%2072%2C%20228%2072%2C%20228%20132%20C204%20106%2C%20180%20112%2C%20160%20126%20C140%20112%2C%20116%20106%2C%2092%20132%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M96%20125%20C50%20156%2C%2044%20252%2C%2072%20315%22%20fill%3D%22none%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M224%20125%20C270%20156%2C%20276%20252%2C%20248%20315%22%20fill%3D%22none%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%2218%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M116%20202%20L204%20202%20L218%20268%20L102%20268%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M98%20268%20L222%20268%20L244%20358%20Q160%20378%2076%20358%20Z%22%20fill%3D%22%23FFF9FB%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%224%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22138%22%20cy%3D%22144%22%20r%3D%226.5%22%20fill%3D%22%235A3E46%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22182%22%20cy%3D%22144%22%20r%3D%226.5%22%20fill%3D%22%235A3E46%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M150%20160%20Q160%20170%20170%20160%22%20fill%3D%22none%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223.5%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22160%22%20y%3D%22396%22%20text-anchor%3D%22middle%22%20font-size%3D%2215%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3ERIBI%20AVATAR%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="魔法少女莉比醬大頭貼" class="w-full h-full object-contain drop-shadow-md rounded-2xl">
+                <img id="img-avatar" fetchpriority="high" decoding="async" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="魔法少女莉比醬大頭貼" class="w-full h-full object-contain drop-shadow-md rounded-2xl">
               </div>
             </div>
           </div>
@@ -1089,7 +1132,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
           <!-- 左側寬版主打頻道卡片 -->
           <div class="lg:col-span-6 kawaii-card p-6 sm:p-8 shadow-kawaii hover:shadow-kawaii-hover hover:-translate-y-1 flex flex-col justify-between min-h-[260px] relative overflow-hidden group bg-gradient-to-br from-[#FF85A4] via-[#FFA8BE] to-[#FFD6E0] text-white border-white">
-            <img id="img-main-channel-banner" loading="lazy" decoding="async" src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20960%20540%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22sheetBg%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23FFF7FA%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23FFE4EC%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22960%22%20height%3D%22540%22%20rx%3D%2224%22%20fill%3D%22url(%23sheetBg)%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2220%22%20y%3D%2220%22%20width%3D%22920%22%20height%3D%22500%22%20rx%3D%2218%22%20fill%3D%22none%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%2210%206%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22480%22%20y%3D%2266%22%20text-anchor%3D%22middle%22%20font-size%3D%2224%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3E%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E8%8E%89%E6%AF%94%E9%86%AC%EF%BD%9C%E6%A9%AB%E5%BC%8F%E8%A7%92%E8%89%B2%E4%B8%89%E8%A6%96%E5%9C%96%E6%8F%92%E7%95%AB%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22480%22%20y%3D%2294%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%238A6A73%22%3E%E6%96%BC%20SITE_IMAGES.characterSheet%20%E5%A1%AB%E5%85%A5%E5%96%AE%E5%BC%B5%E6%A9%AB%E5%BC%8F%E6%8F%92%E7%95%AB%E7%B6%B2%E5%9D%80%E6%88%96%E8%B7%AF%E5%BE%91%E5%8D%B3%E5%8F%AF%E8%87%AA%E5%8B%95%E6%9B%BF%E6%8F%9B%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2270%22%20y%3D%22122%22%20width%3D%22250%22%20height%3D%22348%22%20rx%3D%2220%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23FFD6E0%22%20stroke-width%3D%222.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22195%22%20y%3D%22158%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3EFRONT%20%E6%AD%A3%E9%9D%A2%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22195%22%20cy%3D%22238%22%20r%3D%2242%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M150%20298%20L240%20298%20L255%20412%20L135%20412%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%22355%22%20y%3D%22122%22%20width%3D%22250%22%20height%3D%22348%22%20rx%3D%2220%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23FFD6E0%22%20stroke-width%3D%222.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22480%22%20y%3D%22158%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3ESIDE%20%E5%81%B4%E9%9D%A2%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22480%22%20cy%3D%22238%22%20r%3D%2240%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M452%20298%20L508%20298%20L522%20412%20L438%20412%20Z%22%20fill%3D%22%23FFC4D4%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%22640%22%20y%3D%22122%22%20width%3D%22250%22%20height%3D%22348%22%20rx%3D%2220%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23FFD6E0%22%20stroke-width%3D%222.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22765%22%20y%3D%22158%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3EBACK%20%E8%83%8C%E9%9D%A2%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22765%22%20cy%3D%22238%22%20r%3D%2242%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M720%20298%20L810%20298%20L825%20412%20L705%20412%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="主打頻道橫幅" class="hidden absolute inset-0 w-full h-full object-cover z-0 group-hover:scale-105 transition-transform duration-500">
+            <img id="img-main-channel-banner" loading="lazy" decoding="async" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="主打頻道橫幅" class="hidden absolute inset-0 w-full h-full object-cover z-0 group-hover:scale-105 transition-transform duration-500">
             <div id="overlay-main-channel-banner" class="hidden absolute inset-0 bg-gradient-to-t from-cocoa/75 via-cocoa/25 to-transparent z-[1]"></div>
             <div id="fallback-main-channel-decor" class="absolute -right-8 -bottom-8 text-[130px] opacity-20 group-hover:scale-110 group-hover:rotate-6 transition-transform select-none z-0">
               🎀
@@ -1300,7 +1343,7 @@
           <div class="lg:col-span-7">
             <div id="character-sheet-card" role="button" tabindex="0" aria-label="點擊放大檢視橫式角色三視圖" class="group cursor-pointer bg-white rounded-2xl border-2 border-sakura/60 hover:border-sakura-deep p-3 sm:p-4 transition shadow-sm hover:shadow-md">
               <div class="aspect-[16/9] w-full rounded-xl bg-sakura-light/65 flex items-center justify-center relative overflow-hidden">
-                <img id="img-character-sheet" loading="lazy" decoding="async" src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20960%20540%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3ClinearGradient%20id%3D%22sheetBg%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23FFF7FA%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23FFE4EC%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%20%20%3C%2FlinearGradient%3E%0A%20%20%20%20%20%20%20%20%20%20%3C%2Fdefs%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20width%3D%22960%22%20height%3D%22540%22%20rx%3D%2224%22%20fill%3D%22url(%23sheetBg)%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2220%22%20y%3D%2220%22%20width%3D%22920%22%20height%3D%22500%22%20rx%3D%2218%22%20fill%3D%22none%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%223%22%20stroke-dasharray%3D%2210%206%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22480%22%20y%3D%2266%22%20text-anchor%3D%22middle%22%20font-size%3D%2224%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3E%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E8%8E%89%E6%AF%94%E9%86%AC%EF%BD%9C%E6%A9%AB%E5%BC%8F%E8%A7%92%E8%89%B2%E4%B8%89%E8%A6%96%E5%9C%96%E6%8F%92%E7%95%AB%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22480%22%20y%3D%2294%22%20text-anchor%3D%22middle%22%20font-size%3D%2214%22%20fill%3D%22%238A6A73%22%3E%E6%96%BC%20SITE_IMAGES.characterSheet%20%E5%A1%AB%E5%85%A5%E5%96%AE%E5%BC%B5%E6%A9%AB%E5%BC%8F%E6%8F%92%E7%95%AB%E7%B6%B2%E5%9D%80%E6%88%96%E8%B7%AF%E5%BE%91%E5%8D%B3%E5%8F%AF%E8%87%AA%E5%8B%95%E6%9B%BF%E6%8F%9B%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%2270%22%20y%3D%22122%22%20width%3D%22250%22%20height%3D%22348%22%20rx%3D%2220%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23FFD6E0%22%20stroke-width%3D%222.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22195%22%20y%3D%22158%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3EFRONT%20%E6%AD%A3%E9%9D%A2%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22195%22%20cy%3D%22238%22%20r%3D%2242%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M150%20298%20L240%20298%20L255%20412%20L135%20412%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%22355%22%20y%3D%22122%22%20width%3D%22250%22%20height%3D%22348%22%20rx%3D%2220%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23FFD6E0%22%20stroke-width%3D%222.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22480%22%20y%3D%22158%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3ESIDE%20%E5%81%B4%E9%9D%A2%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22480%22%20cy%3D%22238%22%20r%3D%2240%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M452%20298%20L508%20298%20L522%20412%20L438%20412%20Z%22%20fill%3D%22%23FFC4D4%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%0A%20%20%20%20%20%20%20%20%20%20%3Crect%20x%3D%22640%22%20y%3D%22122%22%20width%3D%22250%22%20height%3D%22348%22%20rx%3D%2220%22%20fill%3D%22%23FFFFFF%22%20stroke%3D%22%23FFD6E0%22%20stroke-width%3D%222.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ctext%20x%3D%22765%22%20y%3D%22158%22%20text-anchor%3D%22middle%22%20font-size%3D%2216%22%20font-weight%3D%22bold%22%20fill%3D%22%23E85A7F%22%3EBACK%20%E8%83%8C%E9%9D%A2%3C%2Ftext%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%22765%22%20cy%3D%22238%22%20r%3D%2242%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M720%20298%20L810%20298%20L825%20412%20L705%20412%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="魔法少女莉比醬三視圖" class="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300">
+                <img id="img-character-sheet" loading="lazy" decoding="async" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="魔法少女莉比醬三視圖" class="w-full h-full object-contain group-hover:scale-[1.02] transition-transform duration-300">
               </div>
               <div class="mt-3 flex flex-wrap items-center justify-between gap-2 px-1">
                 <span data-editable-field="sheetCaptionLeft" class="font-black text-sm text-cocoa" contenteditable="true" spellcheck="false">CHARACTER SHEET • 莉比醬橫式三視圖插畫</span>
@@ -1432,7 +1475,7 @@
             </div>
 
             <div class="hidden sm:flex flex-col items-center justify-center bg-white/25 backdrop-blur-md border-2 border-white/60 rounded-3xl p-4 w-48 shrink-0 text-center animate-float overflow-hidden">
-              <img id="img-schedule-mascot" loading="lazy" decoding="async" src="data:image/svg+xml;charset=utf-8,%0A%20%20%20%20%20%20%20%20%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20160%20160%22%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2280%22%20cy%3D%2280%22%20r%3D%2272%22%20fill%3D%22%23FFF5F8%22%20stroke%3D%22%23FFA8BE%22%20stroke-width%3D%225%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2280%22%20cy%3D%2284%22%20r%3D%2240%22%20fill%3D%22%23FFE6EE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M40%2080%20C40%2044%2C%20120%2044%2C%20120%2080%20C104%2064%2C%2092%2068%2C%2080%2076%20C68%2068%2C%2056%2064%2C%2040%2080%20Z%22%20fill%3D%22%23FFA8BE%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223.5%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2266%22%20cy%3D%2292%22%20r%3D%224.5%22%20fill%3D%22%235A3E46%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Ccircle%20cx%3D%2294%22%20cy%3D%2292%22%20r%3D%224.5%22%20fill%3D%22%235A3E46%22%2F%3E%0A%20%20%20%20%20%20%20%20%20%20%3Cpath%20d%3D%22M73%20102%20Q80%20110%2087%20102%22%20fill%3D%22none%22%20stroke%3D%22%23E85A7F%22%20stroke-width%3D%223%22%20stroke-linecap%3D%22round%22%2F%3E%0A%20%20%20%20%20%20%20%20%3C%2Fsvg%3E%0A%20%20%20%20%20%20" alt="莉比醬週表吉祥物" class="w-24 h-24 object-contain mb-2 drop-shadow">
+              <img id="img-schedule-mascot" loading="lazy" decoding="async" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="莉比醬週表吉祥物" class="w-24 h-24 object-contain mb-2 drop-shadow">
               <div data-editable-field="scheduleMascotBubble" class="text-xs font-black bg-white text-sakura-deep px-3 py-1 rounded-full shadow-sm" contenteditable="true" spellcheck="false">本週也請多指教！</div>
               <div data-editable-field="scheduleMascotKaomoji" class="text-[11px] font-bold mt-1.5 text-white" contenteditable="true" spellcheck="false">٩(*' ' *)✨</div>
             </div>
@@ -2316,6 +2359,19 @@ const CUSTOM_SITE_CONFIG = {
       "caption": "",
       "heading": "｜莉息的小檔案(๑' '๑)",
       "body": "\n名字｜莉息\n身高｜一個手掌大小\n喜歡｜陪伴在莉比醬身邊歡笑嬉鬧\n創作靈感｜錢包、麻糬糰子\n\n\n\n"
+    },
+    {
+      "id": "xp-mwx1fpu3",
+      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/2026HBD.webp?raw=true",
+      "chibi": "",
+      "chibiSize": 120,
+      "eyebrow": "2026 BIRTHDAY SPECIAL",
+      "title": "莉息蛋糕大家族",
+      "caption": "2026生日特企🎂\n感謝參加活動的莉息們！",
+      "heading": "",
+      "body": "",
+      "lightboxTitle": "2026莉息蛋糕大家族",
+      "lightboxBadge": "2026 BIRTHDAY SPECIAL"
     }
   ],
   "announcements": [
@@ -2904,6 +2960,15 @@ const CUSTOM_SITE_CONFIG = {
   ]
 };
 
+
+    // 大頭貼：真正的圖片載入完成才淡入（透明佔位圖不算）
+    (function avatarFadeIn() {
+      const img = document.getElementById('img-avatar');
+      if (!img) return;
+      const check = () => { if (img.complete && img.naturalWidth > 1) img.classList.add('av-ready'); };
+      img.addEventListener('load', check);
+      check();
+    })();
     // 大頭貼優先載入：設定一讀進來就預載＋直接開始下載，不用等其他初始化；其他圖片稍後才載
     (function preloadAvatarFirst() {
       try {
@@ -2936,65 +3001,9 @@ const CUSTOM_SITE_CONFIG = {
     }
 
     const FALLBACK_IMAGES = {
-      avatar: makeSvgDataUri(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 420">
-          <defs>
-            <linearGradient id="avBg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FFF7FA"/>
-              <stop offset="100%" stop-color="#FFE2EC"/>
-            </linearGradient>
-          </defs>
-          <rect width="320" height="420" rx="26" fill="url(#avBg)"/>
-          <circle cx="160" cy="136" r="64" fill="#FFE6EE" stroke="#E85A7F" stroke-width="4"/>
-          <path d="M92 132 C92 72, 228 72, 228 132 C204 106, 180 112, 160 126 C140 112, 116 106, 92 132 Z" fill="#FFA8BE" stroke="#E85A7F" stroke-width="4"/>
-          <path d="M96 125 C50 156, 44 252, 72 315" fill="none" stroke="#FFA8BE" stroke-width="18" stroke-linecap="round"/>
-          <path d="M224 125 C270 156, 276 252, 248 315" fill="none" stroke="#FFA8BE" stroke-width="18" stroke-linecap="round"/>
-          <path d="M116 202 L204 202 L218 268 L102 268 Z" fill="#FFA8BE" stroke="#E85A7F" stroke-width="4"/>
-          <path d="M98 268 L222 268 L244 358 Q160 378 76 358 Z" fill="#FFF9FB" stroke="#E85A7F" stroke-width="4"/>
-          <circle cx="138" cy="144" r="6.5" fill="#5A3E46"/>
-          <circle cx="182" cy="144" r="6.5" fill="#5A3E46"/>
-          <path d="M150 160 Q160 170 170 160" fill="none" stroke="#E85A7F" stroke-width="3.5" stroke-linecap="round"/>
-          <text x="160" y="396" text-anchor="middle" font-size="15" font-weight="bold" fill="#E85A7F">RIBI AVATAR</text>
-        </svg>
-      `),
-      characterSheet: makeSvgDataUri(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540">
-          <defs>
-            <linearGradient id="sheetBg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#FFF7FA"/>
-              <stop offset="100%" stop-color="#FFE4EC"/>
-            </linearGradient>
-          </defs>
-          <rect width="960" height="540" rx="24" fill="url(#sheetBg)"/>
-          <rect x="20" y="20" width="920" height="500" rx="18" fill="none" stroke="#FFA8BE" stroke-width="3" stroke-dasharray="10 6"/>
-          <text x="480" y="66" text-anchor="middle" font-size="24" font-weight="bold" fill="#E85A7F">魔法少女莉比醬｜橫式角色三視圖插畫</text>
-          <text x="480" y="94" text-anchor="middle" font-size="14" fill="#8A6A73">於 SITE_IMAGES.characterSheet 填入單張橫式插畫網址或路徑即可自動替換</text>
-          <rect x="70" y="122" width="250" height="348" rx="20" fill="#FFFFFF" stroke="#FFD6E0" stroke-width="2.5"/>
-          <text x="195" y="158" text-anchor="middle" font-size="16" font-weight="bold" fill="#E85A7F">FRONT 正面</text>
-          <circle cx="195" cy="238" r="42" fill="#FFE6EE" stroke="#E85A7F" stroke-width="3"/>
-          <path d="M150 298 L240 298 L255 412 L135 412 Z" fill="#FFA8BE" stroke="#E85A7F" stroke-width="3"/>
-
-          <rect x="355" y="122" width="250" height="348" rx="20" fill="#FFFFFF" stroke="#FFD6E0" stroke-width="2.5"/>
-          <text x="480" y="158" text-anchor="middle" font-size="16" font-weight="bold" fill="#E85A7F">SIDE 側面</text>
-          <circle cx="480" cy="238" r="40" fill="#FFE6EE" stroke="#E85A7F" stroke-width="3"/>
-          <path d="M452 298 L508 298 L522 412 L438 412 Z" fill="#FFC4D4" stroke="#E85A7F" stroke-width="3"/>
-
-          <rect x="640" y="122" width="250" height="348" rx="20" fill="#FFFFFF" stroke="#FFD6E0" stroke-width="2.5"/>
-          <text x="765" y="158" text-anchor="middle" font-size="16" font-weight="bold" fill="#E85A7F">BACK 背面</text>
-          <circle cx="765" cy="238" r="42" fill="#FFA8BE" stroke="#E85A7F" stroke-width="3"/>
-          <path d="M720 298 L810 298 L825 412 L705 412 Z" fill="#FFA8BE" stroke="#E85A7F" stroke-width="3"/>
-        </svg>
-      `),
-      scheduleMascot: makeSvgDataUri(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160">
-          <circle cx="80" cy="80" r="72" fill="#FFF5F8" stroke="#FFA8BE" stroke-width="5"/>
-          <circle cx="80" cy="84" r="40" fill="#FFE6EE" stroke="#E85A7F" stroke-width="3.5"/>
-          <path d="M40 80 C40 44, 120 44, 120 80 C104 64, 92 68, 80 76 C68 68, 56 64, 40 80 Z" fill="#FFA8BE" stroke="#E85A7F" stroke-width="3.5"/>
-          <circle cx="66" cy="92" r="4.5" fill="#5A3E46"/>
-          <circle cx="94" cy="92" r="4.5" fill="#5A3E46"/>
-          <path d="M73 102 Q80 110 87 102" fill="none" stroke="#E85A7F" stroke-width="3" stroke-linecap="round"/>
-        </svg>
-      `),
+      avatar: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',   // 頭貼未載入／載入失敗時不顯示任何預設插圖
+      characterSheet: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',   // 主要頻道／三視圖：未載入或失敗時不顯示預設插圖
+      scheduleMascot: 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',   // 本週行程吉祥物：未載入或失敗時不顯示預設插圖
       videoThumb: (emoji, label) => makeSvgDataUri(`
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 360">
           <rect width="640" height="360" fill="#FFF0F5"/>
@@ -5799,6 +5808,11 @@ const CUSTOM_SITE_CONFIG = {
     body:not(.edit-mode-active) .xp-chibi.is-empty { display: none; }
     .xp-img-btns { display: none; }
     body.edit-mode-active .xp-img-btns { display: inline-flex; }
+    /* 右邊沒有說明文字也沒有Q版立繪時：藏起右邊白框，三視圖置中（編輯模式照常顯示，方便輸入） */
+    body:not(.edit-mode-active) .xp-slide.xp-no-notes > .xp-notes { display: none; }
+    @media (min-width: 1024px) {
+      body:not(.edit-mode-active) .xp-slide.xp-no-notes > :first-child { grid-column: 1 / -1; width: calc((100% - 1.5rem * 11) / 12 * 7 + 1.5rem * 6); justify-self: center; }
+    }
   </style>
   <script>
     (function xpProfiles() {
@@ -5918,6 +5932,7 @@ const CUSTOM_SITE_CONFIG = {
           const p = slide && profiles().find(x => x.id === slide.dataset.xpId);
           if (!p) return;
           p[f.dataset.xpField] = readText(f);
+          if (slide.classList.contains('xp-slide')) slide.classList.toggle('xp-no-notes', !xpHasNotes(p));
           persistConfig(false);
         });
 
@@ -5945,6 +5960,11 @@ const CUSTOM_SITE_CONFIG = {
         return `<img src="${escapeAttr(fast)}" data-orig="${escapeAttr(url)}" alt="${escapeAttr(alt)}" decoding="async" class="${cls}" onerror="if(this.dataset.orig&&this.src!==this.dataset.orig){this.src=this.dataset.orig}else{this.onerror=null;this.style.visibility='hidden'}">`;
       }
 
+      // 右邊白框有沒有內容（說明文字或Q版立繪）
+      function xpHasNotes(p) {
+        return !!(String(p.heading || '').trim() || String(p.body || '').trim() || p.chibi);
+      }
+
       function slideHtml(p) {
         const ed = isEditMode ? ' contenteditable="true" spellcheck="false"' : '';
         const size = Math.min(400, Math.max(60, Number(p.chibiSize) || Number(siteConfig.chibiSize) || 120));
@@ -5956,7 +5976,7 @@ const CUSTOM_SITE_CONFIG = {
           ? imgTag(p.chibi, 'w-full h-auto object-contain select-none pointer-events-none', 'Q版立繪').replace('<img ', '<img' + adjustStyleAttr(chibiAdj) + ' ') + sparklesHtml(chibiAdj)
           : '<div class="aspect-[3/4] w-full rounded-2xl border-2 border-dashed border-sakura/70 text-sakura-deep/70 text-[11px] font-bold flex items-center justify-center text-center p-2 leading-snug">🖼️ Q版立繪<br>按「換圖」放入</div>';
         return `
-        <div class="xp-slide grid grid-cols-1 lg:grid-cols-12 gap-6 items-start" data-xp-id="${escapeAttr(p.id)}">
+        <div class="xp-slide grid grid-cols-1 lg:grid-cols-12 gap-6 items-start${xpHasNotes(p) ? '' : ' xp-no-notes'}" data-xp-id="${escapeAttr(p.id)}">
           <div class="lg:col-span-7">
             <div class="xp-sheet-card group cursor-pointer bg-white rounded-2xl border-2 border-sakura/60 hover:border-sakura-deep p-3 sm:p-4 transition shadow-sm hover:shadow-md">
               <div class="aspect-[16/9] w-full rounded-xl ${p.image ? '' : 'bg-sakura-light/65 '}flex items-center justify-center relative overflow-hidden">
@@ -6682,4 +6702,9 @@ const CUSTOM_SITE_CONFIG = {
   document.addEventListener('mousedown',hide);
 })();
 </script>
+<div id="bg-meteors" aria-hidden="true">
+  <i style="--x:58%;--y:-3%;--dur:10s;--delay:1.5s;--len:190px"></i>
+  <i style="--x:84%;--y:3%;--dur:11s;--delay:2.7s"></i>
+  <i style="--x:103%;--y:16%;--dur:12s;--delay:4.2s;--len:150px"></i>
+</div>
 </body></html>
