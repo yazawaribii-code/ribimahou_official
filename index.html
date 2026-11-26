@@ -126,6 +126,10 @@
     #announce-text { transition: opacity .28s ease, transform .28s ease; }
     #announce-text.announce-out { opacity: 0; transform: translateY(6px); }
     @media (prefers-reduced-motion: reduce) { #announce-text { transition: none; } }
+    /* 公告太長：先顯示兩行，按「查看完整」展開 */
+    #announce-text.is-expanded { display: block; -webkit-line-clamp: unset; line-clamp: unset; overflow: visible; }
+    #announce-text { overflow-wrap: anywhere; }
+    #announce-bar > div.has-expanded { border-radius: 1.25rem; }
     /* LOGO 大小：由 siteConfig.logoSize（px，電腦版高度）控制，手機版自動縮成 70% */
     #img-logo { height: calc(var(--logo-size, 72) * .7px); width: auto; max-width: 70vw; }
     /* LOGO 載入前先保留高度，避免版面跳動 */
@@ -974,7 +978,10 @@
   <div id="announce-bar" class="hidden relative z-10 max-w-6xl mx-auto px-4 mt-2" role="region" aria-label="最新公告">
     <div class="flex items-center gap-3 rounded-full bg-gradient-to-r from-sakura-light via-white to-sakura-light border-2 border-sakura/60 shadow-pill pl-2 pr-4 py-1.5 min-h-[44px]">
       <span class="shrink-0 inline-flex items-center gap-1 bg-sakura-deep text-white text-[11px] sm:text-xs font-black px-3 py-1 rounded-full">📢 公告</span>
-      <div id="announce-text" class="flex-1 min-w-0 text-xs sm:text-sm font-bold text-cocoa leading-snug line-clamp-2"></div>
+      <div class="flex-1 min-w-0 flex items-end gap-1">
+        <div id="announce-text" class="flex-1 min-w-0 text-xs sm:text-sm font-bold text-cocoa leading-snug line-clamp-1"></div>
+        <button id="announce-more" type="button" aria-expanded="false" class="hidden shrink-0 text-xs sm:text-sm font-black text-sakura-deep leading-snug hover:underline cursor-pointer whitespace-nowrap">更多</button>
+      </div>
       <div id="announce-dots" class="shrink-0 flex items-center gap-1.5"></div>
     </div>
   </div>
@@ -4801,6 +4808,25 @@ const CUSTOM_SITE_CONFIG = {
     let announceTimer = null;
     let announceIndex = 0;
     let announcePaused = false;
+    let announceExpanded = false;   // 使用者展開完整公告時，暫停輪播
+
+    function setAnnounceExpanded(on) {
+      announceExpanded = on;
+      const holder = document.getElementById('announce-text');
+      const btn = document.getElementById('announce-more');
+      holder.classList.toggle('is-expanded', on);
+      holder.parentElement.parentElement.classList.toggle('has-expanded', on);
+      btn.textContent = on ? '收合' : '更多';
+      btn.setAttribute('aria-expanded', on ? 'true' : 'false');
+    }
+
+    // 文字有被截斷才顯示「查看完整」按鈕
+    function checkAnnounceOverflow() {
+      const holder = document.getElementById('announce-text');
+      const btn = document.getElementById('announce-more');
+      if (announceExpanded) { btn.classList.remove('hidden'); return; }
+      btn.classList.toggle('hidden', holder.scrollHeight <= holder.clientHeight + 1);
+    }
 
     function getAnnouncements() {
       return (siteConfig.announcements || []).filter(a => a && String(a.text || '').trim());
@@ -4825,6 +4851,8 @@ const CUSTOM_SITE_CONFIG = {
       }
       el.textContent = it.text;
       holder.appendChild(el);
+      setAnnounceExpanded(false);
+      checkAnnounceOverflow();
       document.querySelectorAll('#announce-dots button').forEach((d, idx) => {
         d.className = 'w-2 h-2 rounded-full cursor-pointer transition ' + (idx === i ? 'bg-sakura-deep' : 'bg-sakura/50 hover:bg-sakura-medium');
         d.setAttribute('aria-current', idx === i ? 'true' : 'false');
@@ -4870,7 +4898,7 @@ const CUSTOM_SITE_CONFIG = {
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (items.length > 1 && !reduce) {
         announceTimer = setInterval(() => {
-          if (announcePaused || document.hidden) return;
+          if (announcePaused || announceExpanded || document.hidden) return;
           showAnnouncement((announceIndex + 1) % getAnnouncements().length, true);
         }, ANNOUNCE_SETTINGS.interval);
       }
@@ -5382,6 +5410,17 @@ const CUSTOM_SITE_CONFIG = {
         e.preventDefault();
         if (!e.target.closest('#announce-dots')) openAnnounceModal();
       }, true);
+      document.getElementById('announce-more').addEventListener('click', (e) => {
+        if (isEditMode) return;   // 編輯模式點公告列＝開編輯視窗
+        e.stopPropagation();
+        setAnnounceExpanded(!announceExpanded);
+      });
+      let announceResizeW = window.innerWidth;
+      window.addEventListener('resize', () => {
+        if (window.innerWidth === announceResizeW) return;   // 手機捲動時網址列伸縮不算
+        announceResizeW = window.innerWidth;
+        checkAnnounceOverflow();
+      });
       abar.addEventListener('mouseenter', () => { announcePaused = true; });
       abar.addEventListener('mouseleave', () => { announcePaused = false; });
       abar.addEventListener('focusin', () => { announcePaused = true; });
