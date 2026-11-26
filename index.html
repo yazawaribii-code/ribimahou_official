@@ -409,6 +409,72 @@
       #avatar-card { aspect-ratio: var(--av-m-aspect, 1 / 1); max-width: var(--av-m-maxw, 210px); }
     }
 
+    /* ===== 關於莉比醬（個人檔案）：手機／平板也用跟電腦版一樣的「左文字、右大頭貼」排版，第一眼就看得到主視覺 ===== */
+    @media (max-width: 1023px) {
+      #block-profile .pf-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 40%); column-gap: 1.75rem; row-gap: 1.1rem; align-items: center;
+        grid-template-areas: "badge avatar" "title avatar" "bubble avatar" "minis minis" "attrs attrs"; }
+      #block-profile .pf-left > .role-badge { grid-area: badge; align-self: end; }
+      #block-profile .pf-left > .pf-title { grid-area: title; }
+      #block-profile .pf-left > .speech-bubble { grid-area: bubble; align-self: start; width: auto; justify-self: stretch; }
+      #block-profile #profile-mini-cards-container { grid-area: minis; }
+      #block-profile .pf-attrs { grid-area: attrs; }
+      #block-profile .pf-right { grid-area: avatar; }
+      #block-profile .pf-left > * { margin-top: 0 !important; }
+      /* 大頭貼：跟電腦版一樣的直式框與裁切設定 */
+      #block-profile #avatar-card { aspect-ratio: 3 / 4; max-width: 100%; }
+      #block-profile #img-avatar { scale: var(--av-d-scale, 1); translate: var(--av-d-translate, 0 0); object-fit: var(--av-d-fit, contain); }
+      /* 對話框尖角：指向右邊的大頭貼（跟電腦版一樣） */
+      #block-profile .speech-bubble::after { left: auto; right: -13px; bottom: auto; top: calc(50% - 12px);
+        border-color: rgba(255, 168, 190, calc(.5 * var(--bo, 1))); border-left-color: transparent; border-bottom-color: transparent; }
+    }
+    @media (max-width: 639px) {
+      /* 手機：身分膠囊＋大標題 → 4:3 大頭貼（主視覺）→ 自我介紹 → 小卡片 */
+      #block-profile .pf-grid { grid-template-columns: minmax(0, 1fr); row-gap: 1rem;
+        grid-template-areas: "badge" "title" "avatar" "minis" "bubble" "attrs"; }
+      #block-profile .pf-left > .role-badge { justify-self: start; }
+      #block-profile .pf-left > .speech-bubble { width: fit-content; justify-self: center; }
+      /* 大頭貼：用手機版的框比例（4:3）與「📱 手機版」裁切設定，寬度撐滿 */
+      #block-profile .pf-right { width: 100%; }
+      #block-profile #avatar-card { aspect-ratio: var(--av-m-aspect, 4 / 3); max-width: 100%; width: 100%; }
+      #block-profile #img-avatar { scale: var(--av-m-scale, 1); translate: var(--av-m-translate, 0 0); object-fit: var(--av-m-fit, contain); }
+      /* 對話框就在大頭貼正下方：尖角放在上緣中間，指向大頭貼 */
+      #block-profile .speech-bubble::after { display: block; left: calc(50% - 12px); right: auto; top: -13px; bottom: auto;
+        border-color: rgba(255, 168, 190, calc(.5 * var(--bo, 1))); border-right-color: transparent; border-bottom-color: transparent; }
+      #block-profile .pf-left > .speech-bubble { margin-top: .35rem !important; }
+    }
+
+    /* 📱 手機：自我介紹預設收合，點一下才展開（電腦／平板、編輯模式都維持全部顯示） */
+    .intro-toggle { display: none; }
+    @media (max-width: 639px) {
+      body:not(.edit-mode-active) #block-profile .intro-toggle {
+        display: flex; align-items: center; justify-content: center; gap: .4rem; width: 100%;
+        font-size: .85rem; font-weight: 900; color: #E85A7F; background: none; border: 0; padding: 0; cursor: pointer; letter-spacing: .02em;
+      }
+      #block-profile .intro-chev { display: inline-block; font-size: .8rem; transition: transform .3s ease; }
+      #block-profile .speech-bubble.is-open .intro-chev { transform: rotate(180deg); }
+      body:not(.edit-mode-active) #block-profile .speech-bubble:not(.is-open) { padding: .7rem 1.25rem; }
+      body:not(.edit-mode-active) #block-profile .speech-bubble [data-editable-field="introBody"] {
+        display: block; overflow: hidden; max-height: 0; opacity: 0; margin-top: 0;
+        transition: max-height .45s ease, opacity .35s ease, margin-top .35s ease;
+      }
+      body:not(.edit-mode-active) #block-profile .speech-bubble.is-open [data-editable-field="introBody"] { max-height: 40em; opacity: 1; margin-top: .7rem; }
+      body:not(.edit-mode-active) #block-profile .speech-bubble:not(.is-open) [data-editable-field="introHeading"] { display: none; }
+      body:not(.edit-mode-active) #block-profile .speech-bubble [data-editable-field="introHeading"]:empty { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #block-profile .speech-bubble [data-editable-field="introBody"], #block-profile .intro-chev { transition: none !important; }
+    }
+
+    /* 📱 手機：自我介紹不做對話框（沒有白底、外框、尖角），放在小卡片下面，只留「展開更多介紹」文字按鈕 */
+    @media (max-width: 639px) {
+      body:not(.edit-mode-active) #block-profile .speech-bubble {
+        background: none !important; border: 0 !important; box-shadow: none !important; border-radius: 0;
+        padding: 0 !important; width: 100%; justify-self: stretch; margin-top: 0 !important;
+      }
+      body:not(.edit-mode-active) #block-profile .speech-bubble::after { display: none !important; }
+      body:not(.edit-mode-active) #block-profile .speech-bubble [data-editable-field="introBody"] { text-align: left; }   /* 介紹文字靠左；按鈕維持置中 */
+    }
+
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
@@ -1127,17 +1193,17 @@
           <polygon points="100,185 173,58 27,58" stroke="currentColor" stroke-width="1.5" fill="none"></polygon>
         </svg>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center relative z-10">
+        <div class="pf-grid grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-8 items-center relative z-10">
           <!-- 左側個人檔案 -->
           <!-- 手機版：左欄用 contents 攤平，再用 order 讓「頭貼」排在「小資訊卡」前面 -->
-          <div class="lg:col-span-7 space-y-5 max-lg:contents">
+          <div class="pf-left lg:col-span-7 space-y-5 max-lg:contents">
             <div class="role-badge inline-flex flex-wrap items-center gap-2 bg-sakura-light border border-sakura px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold text-sakura-deep">
               <span data-editable-field="roleBadgeLeft" contenteditable="true" spellcheck="false">🌸 台灣個人勢 VTuber</span>
               <span class="text-sakura">•</span>
               <span data-editable-field="roleBadgeRight" contenteditable="true" spellcheck="false">繪師筆名：莉比Ribi</span>
             </div>
 
-            <div>
+            <div class="pf-title">
               <h1 class="text-3xl sm:text-5xl font-black text-cocoa tracking-tight leading-tight">
                 <span data-editable-field="heroPrefix" contenteditable="true" spellcheck="false">魔法少女</span><span data-editable-field="heroHighlight" class="text-sakura-deep" contenteditable="true" spellcheck="false">莉比醬</span>
               </h1>
@@ -1148,6 +1214,7 @@
             </div>
 
             <div class="speech-bubble bg-white/90 border-2 border-sakura/50 rounded-2xl p-4 sm:p-5 shadow-sm">
+              <button type="button" class="intro-toggle" aria-expanded="false"><span class="intro-toggle-text">展開更多介紹</span><span class="intro-chev" aria-hidden="true">▾</span></button>
               <div data-editable-field="introHeading" class="text-xs font-black text-sakura-deep mb-1.5 flex items-center gap-1.5" contenteditable="true" spellcheck="false">🪄 魔法少女自我介紹</div>
               <p data-editable-field="introBody" class="text-sm sm:text-base leading-relaxed text-cocoa font-medium" contenteditable="true" spellcheck="false">嗨咿～這裡是熱愛畫畫、唱歌、玩遊戲與變身魔法的魔法少女莉比醬！平時也是接案與創作的繪師「莉比Ribi」🎨✨ 希望能用歌聲、插畫與歡樂的實況，陪伴每一位可愛的「莉息」度過閃亮亮的每一天！</p>
             </div>
@@ -1204,14 +1271,14 @@
       </div>
 
             <!-- 魔法屬性小標籤（可上下移動、刪除、編輯文字） -->
-            <div class="flex flex-wrap items-center gap-2 pt-1 max-lg:order-6">
+            <div class="pf-attrs flex flex-wrap items-center gap-2 pt-1 max-lg:order-6">
               <span data-editable-field="attrLabel" class="text-xs font-bold text-cocoa-light mr-1" contenteditable="true" spellcheck="false"><br></span>
               <div id="profile-attributes-container" class="flex flex-wrap items-center gap-2"></div>
             </div>
           </div>
 
           <!-- 右側單一大頭貼卡片 -->
-          <div class="lg:col-span-5 flex flex-col items-center max-lg:order-4">
+          <div class="pf-right lg:col-span-5 flex flex-col items-center max-lg:order-4">
             <div id="avatar-card" class="relative w-full max-w-[210px] aspect-square lg:max-w-[360px] lg:aspect-[3/4] rounded-[28px] bg-gradient-to-b from-white/85 via-sakura-light/65 to-sakura/30 border-2 border-white shadow-kawaii flex flex-col items-center justify-center p-2 lg:p-4 overflow-hidden animate-float">
 
               <div class="w-full h-full flex flex-col items-center justify-center text-center">
@@ -7545,6 +7612,20 @@ const CUSTOM_SITE_CONFIG = {
     window.addEventListener('load', () => setTimeout(check, 50));
     check();
     setTimeout(show, 6000);   // 網路很慢時，最多等 6 秒就顯示
+  })();
+  </script>
+  <script id="intro-toggle-js">
+  // 手機版自我介紹：點一下展開／收合
+  (function () {
+    document.addEventListener('click', e => {
+      const btn = e.target.closest && e.target.closest('.intro-toggle');
+      if (!btn) return;
+      const bubble = btn.closest('.speech-bubble');
+      const open = bubble.classList.toggle('is-open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      btn.querySelector('.intro-toggle-text').textContent = open ? '收合' : '展開更多介紹';
+      if (open && typeof fitIntroText === 'function') fitIntroText();
+    });
   })();
   </script>
 </body></html>
