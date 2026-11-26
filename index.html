@@ -562,6 +562,13 @@
     /* 點選單「主打影片」時，停的位置再往下一點，主打影片和下面的影片卡片能看到更多（電腦／平板／手機都一樣） */
     #blocks-container #block-videos { scroll-margin-top: 20px; }
     @media (max-width: 639px) { #blocks-container #block-videos { scroll-margin-top: 36px; } }   /* 手機：留位置給最上面的愛心進度條 */
+    /* 週表下方備註：不用白色描邊，改成置中的淡色小字，兩側各一條漸淡的細線，像週表的小結尾 */
+    [data-editable-field="scheduleDisclaimer"] { text-shadow: none !important; text-align: center; padding: 0 !important;
+      font-size: .75rem; color: #B48A97; letter-spacing: .03em; display: flex; align-items: center; justify-content: center; gap: .6rem; }
+    [data-editable-field="scheduleDisclaimer"]::before, [data-editable-field="scheduleDisclaimer"]::after {
+      content: ''; flex: 0 1 3.5rem; height: 1px; background: linear-gradient(90deg, transparent, #F4A6BF); }
+    [data-editable-field="scheduleDisclaimer"]::after { background: linear-gradient(90deg, #F4A6BF, transparent); }
+    @media (max-width: 639px) { [data-editable-field="scheduleDisclaimer"]::before, [data-editable-field="scheduleDisclaimer"]::after { flex-basis: 1.5rem; } }
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
