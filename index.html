@@ -164,6 +164,7 @@
     #schedule-grid, #hashtags-container { scrollbar-width: none; }
     #schedule-grid::-webkit-scrollbar, #hashtags-container::-webkit-scrollbar { display: none; }
     #img-avatar { opacity: 0; transition: opacity .45s ease; }
+    @media (max-width: 639px) { #img-avatar { transition: none; } }   /* 手機：大頭貼一準備好就直接出現，不再慢慢淡入 */
     #img-avatar.av-ready { opacity: 1; }
     /* 流星劃過（固定在背景，不跟著捲動） */
     #bg-meteors { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
@@ -529,27 +530,6 @@
       background: linear-gradient(90deg, #FFA8BE, #E85A7F); border-radius: 0 3px 3px 0;
       transform-origin: 0 50%; transform: scaleX(0); }
     body.edit-mode-active #scroll-progress { display: none; }
-    /* 📱 手機：可愛的魔法進度條（細細的粉色軌道＋跟著跑的愛心，滑動時愛心下面會冒出目前區塊的名字） */
-    #m-progress { display: none; }
-    @media (max-width: 639px) {
-      #scroll-progress { display: none; }
-      #m-progress { display: block; position: fixed; left: 12px; right: 12px; top: 10px; height: 5px; z-index: 48; pointer-events: none;
-        border-radius: 999px; background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 1px rgba(255, 168, 190, .25), 0 2px 6px rgba(232, 90, 127, .12); }
-      body.edit-mode-active #m-progress { display: none; }
-      #m-progress .mp-fill { position: absolute; inset: 0; border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0);
-        background: repeating-linear-gradient(-45deg, #FF8FB1 0 6px, #FFA8C4 6px 12px); }
-      #m-progress .mp-tip { position: absolute; left: 0; top: 50%; width: 0; height: 0; }
-      #m-progress .mp-heart { position: absolute; left: -9px; top: -10px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
-        font-size: 13px; line-height: 1; color: #E85A7F; background: #fff; border-radius: 999px;
-        box-shadow: 0 0 0 1.5px #FFB3CB, 0 2px 6px rgba(232, 90, 127, .3); animation: mpBeat 1.6s ease-in-out infinite; }
-      #m-progress .mp-label { position: absolute; top: 12px; left: 0; transform: translateX(-50%) translateY(-4px); white-space: nowrap;
-        padding: 3px 10px 4px; border-radius: 999px; background: #fff; color: #E85A7F; font-size: 11px; font-weight: 900; letter-spacing: .04em;
-        box-shadow: 0 0 0 1.5px #FFD0DE, 0 4px 10px -2px rgba(232, 90, 127, .25);
-        opacity: 0; transition: opacity .25s ease, transform .3s cubic-bezier(.34, 1.56, .64, 1); }
-      #m-progress.is-talk .mp-label { opacity: 1; transform: translateX(-50%) translateY(0); }
-      @keyframes mpBeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } }
-    }
-    @media (prefers-reduced-motion: reduce) { #m-progress .mp-heart { animation: none; } }
     /* 導覽列：目前看到的區塊，選單上那一項會有淡粉色底 */
     /* 目前看到的區塊：選單那一項變粉紅字，下面冒出一顆小愛心（莉比醬自己的風格） */
     #nav-menu a { position: relative; }
@@ -1222,7 +1202,6 @@
 
   <!-- 頂部導覽列 -->
   <div id="scroll-progress" aria-hidden="true"></div>
-  <div id="m-progress" aria-hidden="true"><span class="mp-fill"></span><span class="mp-tip"><span class="mp-heart">♥</span><span class="mp-label"></span></span></div>
   <div id="hdr-spacer" aria-hidden="true"></div>
   <header id="site-header" class="relative z-20 pt-5 pb-2 px-4">
     <nav class="max-w-6xl mx-auto px-1 sm:px-2 py-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
@@ -1948,7 +1927,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center bg-sakura-light/70 p-4 sm:p-6 rounded-3xl border-2 border-sakura/50">
           <div class="lg:col-span-7">
             <div id="main-video-player" class="aspect-video w-full rounded-2xl overflow-hidden bg-gradient-to-br from-[#FF85A4] to-[#E85A7F] relative shadow-md text-white border-2 border-white">
-              <img id="featured-video-thumb" alt="" decoding="async" class="absolute inset-0 w-full h-full object-cover">
+              <img id="featured-video-thumb" alt="" loading="lazy" decoding="async" class="absolute inset-0 w-full h-full object-cover">
               <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent pointer-events-none"></div>
               <button id="featured-video-open" type="button" aria-label="在此播放影片" class="absolute inset-0 z-10 flex items-center justify-center group/play cursor-pointer">
                 <span class="w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center drop-shadow-md group-hover/play:scale-110 transition-transform">
@@ -3270,7 +3249,12 @@ const CUSTOM_SITE_CONFIG = {
     (function avatarFadeIn() {
       const img = document.getElementById('img-avatar');
       if (!img) return;
-      const check = () => { if (img.complete && img.naturalWidth > 1) img.classList.add('av-ready'); };
+      // 圖片下載完先在背景解碼好（趁載入動畫還在播的時候），顯示時就不會再卡一下
+      const check = () => {
+        if (!(img.complete && img.naturalWidth > 1) || img.classList.contains('av-ready')) return;
+        const show = () => img.classList.add('av-ready');
+        if (img.decode) img.decode().then(show, show); else show();
+      };
       img.addEventListener('load', check);
       check();
     })();
@@ -3731,6 +3715,27 @@ const CUSTOM_SITE_CONFIG = {
       else if (img.complete && img.naturalWidth) { img.classList.remove('hidden'); wrap.classList.remove('chibi-empty'); }
     }
 
+    // 等大頭貼載好（或最多 2.5 秒、編輯模式不用等）才執行：讓手機一打開就先把頻寬留給大頭貼
+    let avatarGateOpen = false;
+    const avatarGateQueue = [];
+    function openAvatarGate() {
+      if (avatarGateOpen) return;
+      avatarGateOpen = true;
+      avatarGateQueue.splice(0).forEach(fn => { try { fn(); } catch (err) { console.warn(err); } });
+    }
+    (function setupAvatarGate() {
+      const av = document.getElementById('img-avatar');
+      if (!av) { avatarGateOpen = true; return; }
+      const done = () => { if (av.complete && av.naturalWidth > 1) openAvatarGate(); };
+      av.addEventListener('load', done);
+      av.addEventListener('error', openAvatarGate);
+      setTimeout(openAvatarGate, 2500);
+    })();
+    function afterAvatar(fn) {
+      if (avatarGateOpen || (typeof isEditMode !== 'undefined' && isEditMode)) fn();
+      else avatarGateQueue.push(fn);
+    }
+
     function applySiteImages() {
       const faviconEl = document.getElementById('dynamic-favicon');
       const favUrl = getImageUrl('favicon').trim();
@@ -3743,45 +3748,47 @@ const CUSTOM_SITE_CONFIG = {
 
       applyLogo();
       bindImageWithFallback('img-avatar', getImageUrl('avatar'), FALLBACK_IMAGES.avatar);
-      bindImageWithFallback(
-        'img-main-channel-banner',
-        getImageUrl('mainChannelBanner'),
-        FALLBACK_IMAGES.characterSheet,
-        'overlay-main-channel-banner',
-        'fallback-main-channel-decor'
-      );
-      bindImageWithFallback('img-character-sheet', getImageUrl('characterSheet'), FALLBACK_IMAGES.characterSheet);
-      bindImageWithFallback('img-schedule-mascot', getImageUrl('scheduleMascot'), FALLBACK_IMAGES.scheduleMascot);
-      const fmImg = document.getElementById('img-float-mascot');   // 漂浮吉祥物：沒設定網址就用內建的粉紅兔兔
-      if (fmImg) { if (!fmImg._defSrc) fmImg._defSrc = fmImg.getAttribute('src'); bindImageWithFallback('img-float-mascot', getImageUrl('floatMascot'), fmImg._defSrc); }
-      // 漂浮吉祥物的第二張圖（拖到左下角休息時顯示）：沒設定或載入失敗 → 維持原本的圖
-      const fmImg2 = document.getElementById('img-float-mascot-docked');
-      const fmBox = document.getElementById('float-mascot');
-      if (fmImg2 && fmBox) {
-        const u2 = String(getImageUrl('floatMascotDocked') || '').trim();
-        if (u2) {
-          const fast2 = optimizeImageUrl(u2);
-          let retried2 = false;
-          fmImg2.onload = () => fmBox.classList.add('has-docked-img');
-          fmImg2.onerror = () => {
-            if (!retried2 && fast2 !== u2) { retried2 = true; fmImg2.src = u2; return; }
+      afterAvatar(() => {   // 其他圖片等大頭貼先出來再開始下載（手機網路慢時，大頭貼不會被搶頻寬）
+        bindImageWithFallback(
+          'img-main-channel-banner',
+          getImageUrl('mainChannelBanner'),
+          FALLBACK_IMAGES.characterSheet,
+          'overlay-main-channel-banner',
+          'fallback-main-channel-decor'
+        );
+        bindImageWithFallback('img-character-sheet', getImageUrl('characterSheet'), FALLBACK_IMAGES.characterSheet);
+        bindImageWithFallback('img-schedule-mascot', getImageUrl('scheduleMascot'), FALLBACK_IMAGES.scheduleMascot);
+        const fmImg = document.getElementById('img-float-mascot');   // 漂浮吉祥物：沒設定網址就用內建的粉紅兔兔
+        if (fmImg) { if (!fmImg._defSrc) fmImg._defSrc = fmImg.getAttribute('src'); bindImageWithFallback('img-float-mascot', getImageUrl('floatMascot'), fmImg._defSrc); }
+        // 漂浮吉祥物的第二張圖（拖到左下角休息時顯示）：沒設定或載入失敗 → 維持原本的圖
+        const fmImg2 = document.getElementById('img-float-mascot-docked');
+        const fmBox = document.getElementById('float-mascot');
+        if (fmImg2 && fmBox) {
+          const u2 = String(getImageUrl('floatMascotDocked') || '').trim();
+          if (u2) {
+            const fast2 = optimizeImageUrl(u2);
+            let retried2 = false;
+            fmImg2.onload = () => fmBox.classList.add('has-docked-img');
+            fmImg2.onerror = () => {
+              if (!retried2 && fast2 !== u2) { retried2 = true; fmImg2.src = u2; return; }
+              fmBox.classList.remove('has-docked-img');
+            };
+            if (fmImg2.getAttribute('src') !== fast2) fmImg2.src = fast2;
+            else if (fmImg2.complete && fmImg2.naturalWidth) fmBox.classList.add('has-docked-img');
+          } else {
             fmBox.classList.remove('has-docked-img');
-          };
-          if (fmImg2.getAttribute('src') !== fast2) fmImg2.src = fast2;
-          else if (fmImg2.complete && fmImg2.naturalWidth) fmBox.classList.add('has-docked-img');
-        } else {
-          fmBox.classList.remove('has-docked-img');
-          fmImg2.onload = fmImg2.onerror = null;
-          fmImg2.removeAttribute('src');
+            fmImg2.onload = fmImg2.onerror = null;
+            fmImg2.removeAttribute('src');
+          }
         }
-      }
+        applyChibi();
+        applyContactChibi();
+      });
       Object.keys(IMAGE_SLOTS).forEach(key => {
         if (key === 'avatar' || key === 'floatMascot' || key === 'floatMascotDocked') return;   // 大頭貼另外處理；漂浮吉祥物不用裁切（電腦版／手機版各自設定）
         applyImageAdjust(document.getElementById(IMAGE_SLOTS[key].imgId), (siteConfig.imageAdjust || {})[key]);
       });
       applyAvatarAdjust();
-      applyChibi();
-      applyContactChibi();
       applyBorderOpacity();
       ensureImageEditButtons();
     }
@@ -5475,7 +5482,7 @@ const CUSTOM_SITE_CONFIG = {
         const cap = String(a.desc || '').trim();
         // 只有「圖片」是連結；點白色紙張的地方＝翻頁，不會誤觸連結
         const ext = href && !href.startsWith('#');
-        const picInner = `<img src="${escapeAttr(optimizeImageUrl(src))}" data-orig="${escapeAttr(src)}" alt="${escapeAttr(title || '合作實績 ' + (i + 1))}" decoding="async" draggable="false" onerror="adsImgFallback(this)">` +
+        const picInner = `<img src="${escapeAttr(optimizeImageUrl(src))}" data-orig="${escapeAttr(src)}" alt="${escapeAttr(title || '合作實績 ' + (i + 1))}" loading="lazy" decoding="async" draggable="false" onerror="adsImgFallback(this)">` +
           (a.now ? '<span class="cw-now">NOW ♡</span>' : '');
         const pic = href
           ? `<a class="cw-pic" draggable="false" href="${escapeAttr(href)}"${ext ? ' target="_blank" rel="noopener noreferrer"' : ''}${title ? ` data-tip="${escapeAttr(title)}"` : ''}>${picInner}</a>`
@@ -7826,7 +7833,7 @@ const CUSTOM_SITE_CONFIG = {
   // 省效能：區塊位置只在載入、視窗大小改變、內容高度改變時量一次；滑動時只比對數字，不會逼瀏覽器重排版面
   (function () {
     const menu = document.getElementById('nav-menu');
-    const mp = document.getElementById('m-progress');
+    const mp = null;   // 手機版進度條已拿掉
     const mpFill = mp && mp.querySelector('.mp-fill'), mpTip = mp && mp.querySelector('.mp-tip'), mpLabel = mp && mp.querySelector('.mp-label');
     const phoneMQ = window.matchMedia('(max-width: 639px)');
     let raf = 0, talkTimer = 0, lastY = window.scrollY, curLink = null;
@@ -7846,6 +7853,7 @@ const CUSTOM_SITE_CONFIG = {
     }
     function update() {
       raf = 0;
+      if (phoneMQ.matches) return;   // 手機：選單收在 ☰ 裡，不用算目前區塊，省效能
       const y = window.scrollY;
       const ratio = Math.min(1, Math.max(0, y / maxScroll));
       // 目前區塊
