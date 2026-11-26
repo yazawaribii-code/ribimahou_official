@@ -497,6 +497,68 @@
     @media (max-width: 639px) {
       #block-profile > .kawaii-card > svg.animate-spin-slow { width: 17rem; height: 17rem; top: 3.5rem; right: -5.5rem; }
     }
+    /* 🖥️ 電腦版：整體往上移一點（公告列到個人檔案之間的空白縮小） */
+    @media (min-width: 1024px) {
+      #blocks-container { padding-top: .5rem; }
+      #block-profile > .kawaii-card { padding-top: 1.75rem; padding-bottom: 1.5rem; }
+    }
+    /* ===== 頂部導覽列：往下滑收起來、往上滑從上方滑出一條（電腦／平板／手機都有） ===== */
+    #hdr-spacer { display: none; }
+    body.hdr-floating #hdr-spacer { display: block; }
+    /* 平板／電腦：導覽列一開始就是一條獨立的淺粉色橫條（參考影片），往下收、往上滑出來都是同一條；手機維持原本的樣子 */
+    @media (min-width: 640px) {
+      #site-header {
+        padding-top: .45rem; padding-bottom: .45rem;
+        background: #FFF3F7;
+        border-bottom: 1px solid rgba(255, 168, 190, .28);
+      }
+      #site-header #img-logo { height: calc(var(--logo-size, 72) * .62px); }
+      #site-header #logo-wrap { min-height: calc(var(--logo-size, 72) * .62px); }
+      #announce-bar { margin-top: 1rem; }   /* 橫條下面跟公告列之間留一點呼吸空間 */
+      #site-header.hdr-float {
+        position: fixed; left: 0; right: 0; top: 0; z-index: 44;
+        box-shadow: 0 6px 16px -14px rgba(232, 90, 127, .35);
+        transform: translateY(-110%); transition: transform .38s cubic-bezier(.22, .9, .3, 1);
+      }
+    }
+    #site-header.hdr-float.hdr-show { transform: translateY(0); }
+    #site-header.hdr-float.no-anim { transition: none; }
+    @media (prefers-reduced-motion: reduce) { #site-header.hdr-float { transition: none; } }
+    /* 頁面最上緣的進度線：電腦／平板不使用（不要像「載入中」），只保留手機版的可愛進度條 */
+    #scroll-progress { display: none !important; position: fixed; left: 0; top: 0; height: 3px; width: 100%; z-index: 48; pointer-events: none;
+      background: linear-gradient(90deg, #FFA8BE, #E85A7F); border-radius: 0 3px 3px 0;
+      transform-origin: 0 50%; transform: scaleX(0); }
+    body.edit-mode-active #scroll-progress { display: none; }
+    /* 📱 手機：可愛的魔法進度條（細細的粉色軌道＋跟著跑的愛心，滑動時愛心下面會冒出目前區塊的名字） */
+    #m-progress { display: none; }
+    @media (max-width: 639px) {
+      #scroll-progress { display: none; }
+      #m-progress { display: block; position: fixed; left: 12px; right: 12px; top: 10px; height: 5px; z-index: 48; pointer-events: none;
+        border-radius: 999px; background: rgba(255, 255, 255, .7); box-shadow: 0 0 0 1px rgba(255, 168, 190, .25), 0 2px 6px rgba(232, 90, 127, .12); }
+      body.edit-mode-active #m-progress { display: none; }
+      #m-progress .mp-fill { position: absolute; inset: 0; border-radius: inherit; transform-origin: 0 50%; transform: scaleX(0);
+        background: repeating-linear-gradient(-45deg, #FF8FB1 0 6px, #FFA8C4 6px 12px); }
+      #m-progress .mp-tip { position: absolute; left: 0; top: 50%; width: 0; height: 0; }
+      #m-progress .mp-heart { position: absolute; left: -9px; top: -10px; width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;
+        font-size: 13px; line-height: 1; color: #E85A7F; background: #fff; border-radius: 999px;
+        box-shadow: 0 0 0 1.5px #FFB3CB, 0 2px 6px rgba(232, 90, 127, .3); animation: mpBeat 1.6s ease-in-out infinite; }
+      #m-progress .mp-label { position: absolute; top: 12px; left: 0; transform: translateX(-50%) translateY(-4px); white-space: nowrap;
+        padding: 3px 10px 4px; border-radius: 999px; background: #fff; color: #E85A7F; font-size: 11px; font-weight: 900; letter-spacing: .04em;
+        box-shadow: 0 0 0 1.5px #FFD0DE, 0 4px 10px -2px rgba(232, 90, 127, .25);
+        opacity: 0; transition: opacity .25s ease, transform .3s cubic-bezier(.34, 1.56, .64, 1); }
+      #m-progress.is-talk .mp-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+      @keyframes mpBeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.18); } 30% { transform: scale(1); } 45% { transform: scale(1.1); } }
+    }
+    @media (prefers-reduced-motion: reduce) { #m-progress .mp-heart { animation: none; } }
+    /* 導覽列：目前看到的區塊，選單上那一項會有淡粉色底 */
+    /* 目前看到的區塊：選單那一項變粉紅字，下面冒出一顆小愛心（莉比醬自己的風格） */
+    #nav-menu a { position: relative; }
+    #nav-menu a.is-current { color: #E85A7F; text-decoration: none; }
+    #nav-menu a::after { content: '♥'; position: absolute; left: 50%; bottom: -.55rem; font-size: .55rem; line-height: 1; color: #FF8FB1;
+      transform: translateX(-50%) scale(0); transition: transform .3s cubic-bezier(.34, 1.56, .64, 1); pointer-events: none; }
+    #nav-menu a.is-current::after { transform: translateX(-50%) scale(1); }
+    @media (max-width: 639px) { #nav-menu a::after { display: none; } }
+
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
@@ -1145,7 +1207,10 @@
   </div>
 
   <!-- 頂部導覽列 -->
-  <header class="relative z-20 pt-5 pb-2 px-4">
+  <div id="scroll-progress" aria-hidden="true"></div>
+  <div id="m-progress" aria-hidden="true"><span class="mp-fill"></span><span class="mp-tip"><span class="mp-heart">♥</span><span class="mp-label"></span></span></div>
+  <div id="hdr-spacer" aria-hidden="true"></div>
+  <header id="site-header" class="relative z-20 pt-5 pb-2 px-4">
     <nav class="max-w-6xl mx-auto px-1 sm:px-2 py-1 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <a href="#" class="flex items-center gap-3 group">
         <!-- LOGO 區：在 SITE_IMAGES.logo 填網址，或在 ?edit 編輯模式對 LOGO 按「換圖」；載入前只會保留空位，不顯示任何替代圖示 -->
@@ -2024,7 +2089,7 @@
   </section>
 
   <!-- 頁尾 -->
-  <footer class="relative z-10 mt-10 pb-24 pt-8 px-4 border-t-2 border-sakura/40 bg-white/70 backdrop-blur-md">
+  <footer style="padding-top:1.4rem;padding-bottom:1.4rem" class="relative z-10 mt-10 px-4 border-t-2 border-sakura/40 bg-white/70 backdrop-blur-md">
     <div class="max-w-6xl mx-auto text-center space-y-2">
       <p data-editable-field="footerCopyright" class="footer-line footer-line-1" contenteditable="true" spellcheck="false">© 2023–2026 魔法少女莉比醬 / 莉比Ribi. All Rights Reserved. ٩(*' ' *)✨</p>
       <p data-editable-field="footerHint" class="footer-line footer-line-2" contenteditable="true" spellcheck="false">Made with Strawberry Magic 🍓 • 點擊右下角「✨ 排版與內容編輯模式」可移動卡片、刪除小區塊與編輯文字</p>
@@ -2695,7 +2760,7 @@ const CUSTOM_SITE_CONFIG = {
     "particles": [
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Magical.webp?raw=true",
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Star.png?raw=true",
-      "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Heart.png?raw=true",
+      "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/dango.png?raw=true",
       "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/Heart.png?raw=true"
     ],
     "floatMascot": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/lishi-white2.png?raw=true",
@@ -7681,6 +7746,125 @@ const CUSTOM_SITE_CONFIG = {
       btn.querySelector('.intro-toggle-text').textContent = open ? '收合' : '展開更多介紹';
       if (open && typeof fitIntroText === 'function') fitIntroText();
     });
+  })();
+  </script>
+  <script id="hdr-autohide-js">
+  // 頂部導覽列：在最上面時照原本樣子；往下滑會收起來，往上滑就從上方滑出一條，回到最上面再恢復原樣
+  (function () {
+    const hdr = document.getElementById('site-header');
+    const spacer = document.getElementById('hdr-spacer');
+    if (!hdr || !spacer) return;
+    let lastY = window.scrollY, floating = false, shown = false, raf = 0, natH = hdr.offsetHeight;
+    const editing = () => document.body.classList.contains('edit-mode-active') || window.innerWidth < 640;   // 手機不用這個功能
+    const menuOpen = () => hdr.classList.contains('nav-open');
+    function setFloat(on) {
+      if (on === floating) return;
+      floating = on;
+      if (on) {
+        natH = hdr.offsetHeight;
+        spacer.style.height = natH + 'px';
+        hdr.classList.add('hdr-float', 'no-anim');          // 先瞬間放到畫面外面（看不到）
+        void hdr.offsetWidth;
+        hdr.classList.remove('no-anim');
+      } else {
+        hdr.classList.remove('hdr-float', 'hdr-show', 'no-anim');
+        shown = false;
+      }
+      document.body.classList.toggle('hdr-floating', on);
+    }
+    function setShow(on) {
+      if (on === shown) return;
+      shown = on;
+      hdr.classList.toggle('hdr-show', on);
+    }
+    function update() {
+      raf = 0;
+      const y = Math.max(0, window.scrollY);
+      const dy = y - lastY;
+      if (editing()) { setFloat(false); lastY = y; return; }
+      if (!floating) {
+        if (y > natH + 40) setFloat(true);                  // 原本的導覽列已經滑出畫面 → 改成浮動模式（先藏著）
+      } else if (y <= 2 || (!shown && y <= natH)) {
+        setFloat(false);                                     // 回到最上面 → 恢復原樣
+      }
+      if (floating) {
+        if (menuOpen()) setShow(true);
+        else if (dy > 6) setShow(false);                     // 往下滑 → 收起來
+        else if (dy < -6) setShow(true);                     // 往上滑 → 滑出來
+      }
+      if (Math.abs(dy) > 6 || y <= 2) lastY = y;
+    }
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', () => { if (!floating) natH = hdr.offsetHeight; schedule(); });
+    // 點選單連結跳到某個區塊時，順便把導覽列收起來，不擋到標題
+    hdr.addEventListener('click', e => { if (e.target.closest('#nav-menu a[href^="#"]') && floating) setTimeout(() => setShow(false), 50); });
+    update();
+  })();
+  </script>
+  <script id="scroll-progress-js">
+  // 選單標出目前看到的區塊（電腦／平板：粉紅字＋小愛心）＋手機版可愛進度條
+  // 省效能：區塊位置只在載入、視窗大小改變、內容高度改變時量一次；滑動時只比對數字，不會逼瀏覽器重排版面
+  (function () {
+    const menu = document.getElementById('nav-menu');
+    const mp = document.getElementById('m-progress');
+    const mpFill = mp && mp.querySelector('.mp-fill'), mpTip = mp && mp.querySelector('.mp-tip'), mpLabel = mp && mp.querySelector('.mp-label');
+    const phoneMQ = window.matchMedia('(max-width: 639px)');
+    let raf = 0, talkTimer = 0, lastY = window.scrollY, curLink = null;
+    let marks = [], maxScroll = 1, viewH = window.innerHeight, trackW = 0, labelW = 60;
+    function measure() {
+      viewH = window.innerHeight;
+      maxScroll = Math.max(1, document.documentElement.scrollHeight - viewH);
+      marks = [];
+      if (menu) menu.querySelectorAll('a[href^="#"]').forEach(a => {
+        const sec = document.querySelector(a.getAttribute('href'));
+        if (!sec || a.style.display === 'none' || !sec.getClientRects().length) return;
+        marks.push({ a, top: sec.getBoundingClientRect().top + window.scrollY });
+      });
+      marks.sort((x, y) => x.top - y.top);
+      if (mp && phoneMQ.matches) trackW = mp.clientWidth;
+      schedule();
+    }
+    function update() {
+      raf = 0;
+      const y = window.scrollY;
+      const ratio = Math.min(1, Math.max(0, y / maxScroll));
+      // 目前區塊
+      let cur = null;
+      const line = y + viewH * 0.35;
+      for (const m of marks) { if (m.top <= line) cur = m.a; else break; }
+      if (y >= maxScroll - 4 && marks.length) cur = marks[marks.length - 1].a;   // 滑到最底 → 最後一項
+      if (cur !== curLink) {
+        if (curLink) curLink.classList.remove('is-current');
+        if (cur) cur.classList.add('is-current');
+        curLink = cur;
+        if (mpLabel) { mpLabel.textContent = cur ? cur.textContent.trim() : '魔法少女莉比醬'; labelW = 0; }
+      }
+      // 📱 手機：可愛進度條
+      if (mp && phoneMQ.matches) {
+        mpFill.style.transform = 'scaleX(' + ratio + ')';
+        const x = ratio * trackW;
+        mpTip.style.transform = 'translateX(' + x.toFixed(1) + 'px)';
+        if (Math.abs(y - lastY) > 2) {
+          lastY = y;
+          if (!mp.classList.contains('is-talk')) mp.classList.add('is-talk');
+          clearTimeout(talkTimer);
+          talkTimer = setTimeout(() => mp.classList.remove('is-talk'), 1200);
+        }
+        if (!labelW) labelW = mpLabel.offsetWidth || 60;   // 名字換了才量一次寬度
+        const shift = Math.min(Math.max(0, labelW / 2 - x - 4), labelW / 2) - Math.min(Math.max(0, x + labelW / 2 - trackW - 4), labelW / 2);
+        mpLabel.style.marginLeft = shift.toFixed(1) + 'px';
+      }
+    }
+    function schedule() { if (!raf) raf = requestAnimationFrame(update); }
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', measure);
+    window.addEventListener('load', measure);
+    if ('ResizeObserver' in window) {   // 內容高度變了（圖片載入、展開自我介紹…）才重新量
+      let t = 0; new ResizeObserver(() => { clearTimeout(t); t = setTimeout(measure, 150); }).observe(document.body);
+    }
+    if (menu) new MutationObserver(measure).observe(menu, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+    measure();
   })();
   </script>
 </body></html>
