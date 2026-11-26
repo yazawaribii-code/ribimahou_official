@@ -649,7 +649,7 @@
 </style>
 <style id="cw-css">
     /* ===== 🎀 合作實績（筆記本翻頁輪播；正在合作中的顯示 NOW ♡） ===== */
-    body:not(.edit-mode-active) #block-collab.cw-none { display: none !important; }
+    body:not(.edit-mode-active) #block-collab.cw-none .msb-collab { display: none !important; }   /* 沒有合作實績時只藏筆記本，莉程碑照常顯示 */
     #blocks-container > .cw-area { max-width: 42rem; margin-left: auto; margin-right: auto; padding: 0 .5rem; }   /* 上下間距跟其他區塊一樣 */
     body.edit-mode-active #blocks-container > .cw-area { padding-top: 5rem; }   /* 編輯模式：留位置給上方的積木控制列，不擋到標題 */
     .cw-headrow { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: .5rem; margin-bottom: 1.1rem; }
@@ -767,31 +767,29 @@
     .tagrow .modular-block [data-move-block] { display: none; }               /* 合作實績跟著 Hashtags 一起移動 */
     body.edit-mode-active .tagrow > #block-collab { padding-top: 3.25rem; }
     /* 合作實績的標題兩格都空白時，不留標題列的空位（不然筆記本上方會多出一段空白，間距看起來不一致） */
-    body:not(.edit-mode-active) .tagrow .cw-headrow:not(:has(.cw-eb:not(:empty))):not(:has(.cw-tt:not(:empty))) { display: none; }
+    body:not(.edit-mode-active) #block-collab .cw-headrow:not(:has(.cw-eb:not(:empty))):not(:has(.cw-tt:not(:empty))) { display: none; }
     /* 筆記本後面疊的紙張陰影會往下凸 6px，補回來讓「筆記本 → 下一個區塊」的距離跟其他區塊一樣 */
     .tagrow > #block-collab { padding-bottom: 6px; }
     @media (min-width: 1024px) {
-      .tagrow { grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr); gap: 2.5rem; }
       .tagrow > .tagrow-tags { order: 0; }
       .tagrow > #block-collab { max-width: none; margin: 0; padding: 0; }
     }
     /* 合作實績沒有內容／被隱藏時，Hashtags 自己置中 */
     body:not(.edit-mode-active) .tagrow:has(> #block-collab.cw-none),
     body:not(.edit-mode-active) .tagrow:has(> #block-collab.block-hidden-in-edit) { grid-template-columns: minmax(0, 1fr); }
-    body:not(.edit-mode-active) .tagrow:has(> #block-collab.cw-none) > .tagrow-tags,
-    body:not(.edit-mode-active) .tagrow:has(> #block-collab.block-hidden-in-edit) > .tagrow-tags { width: 100%; max-width: 34rem; margin: 0 auto; }
 
-    .tagrow-tags { width: 100%; max-width: 34rem; margin: 0 auto; padding: 1.75rem 1.5rem 1.6rem; border-radius: 28px; text-align: center; }
-    @media (min-width: 1024px) { .tagrow-tags { max-width: none; padding: 2.1rem 2rem 2rem; } }
-    .tag-eyebrow { font-size: .72rem; font-weight: 900; letter-spacing: .22em; color: #E85A7F; text-transform: uppercase; }
-    .tag-title { margin-top: .35rem; display: flex; align-items: center; justify-content: center; gap: .55rem;
-      font-size: 1.6rem; line-height: 1.2; font-weight: 900; color: #5A3E46; }
+    /* Hashtags：跟其他區塊一樣的整排卡片；標題靠左，標籤在電腦版並排 */
+    .tagrow-tags { width: 100%; margin: 0; padding: 1.5rem; text-align: left; }
+    @media (min-width: 640px) { .tagrow-tags { padding: 2rem; } }
+    .tag-eyebrow { font-size: .75rem; line-height: 1rem; font-weight: 900; letter-spacing: .1em; color: #E85A7F; text-transform: uppercase; }
+    .tag-title { display: flex; align-items: center; justify-content: flex-start; gap: .5rem;
+      font-size: 1.5rem; line-height: 2rem; font-weight: 900; color: #5A3E46; }
     .tag-title-deco { color: #FF8FB1; font-size: 1.05rem; }
     .tag-hint { margin-top: .4rem; font-size: .75rem; font-weight: 700; color: #A9838F; }
     body:not(.edit-mode-active) .tag-hint:empty::before { content: '點一下就能複製標籤 ✨'; }
-    @media (min-width: 640px) { .tag-title { font-size: 1.85rem; } }
+    @media (min-width: 640px) { .tag-title { font-size: 1.875rem; line-height: 2.25rem; } }
 
-    #hashtags-container.tag-list { display: flex; flex-direction: column; gap: .7rem; margin-top: 1.25rem; overflow: visible; padding: 0; }
+    #hashtags-container.tag-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr)); gap: .75rem; margin-top: 1.25rem; overflow: visible; padding: 0; }
     .tag-pill { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;
       min-height: 3rem; padding: .7rem 1.25rem; border-radius: 999px; cursor: pointer; text-align: center;
       background: rgba(255, 255, 255, .95); border: 1.5px solid #F7BFD0; color: #5A3E46;
@@ -804,6 +802,25 @@
     body:not(.edit-mode-active) .tag-pill-cat:empty { display: none; }
     body:not(.edit-mode-active) .tag-pill-line:has(.tag-pill-cat:empty) .tag-pill-sep { display: none; }
     .tag-pill-desc { display: none; }
+    /* 電腦／平板並排時：標籤在上、分類在下，每顆排法一致 */
+    @media (min-width: 640px) {
+      .tag-pill-line { flex-direction: column; align-items: center; gap: .05rem; }
+      .tag-pill-sep { display: none !important; }
+    }
+    /* 純文字：沒有外框，只用細直線隔開，像雜誌目錄 */
+    #hashtags-container.tag-list { gap: 0; margin-top: 1.1rem; }
+    #hashtags-container .tag-pill { min-height: 0; padding: .6rem .75rem; border: 0; border-radius: 0; background: transparent; }
+    #hashtags-container .tag-pill + .tag-pill { border-left: 1.5px solid #FFD6E0; }
+    #hashtags-container .tag-pill-tag { font-size: 1.08rem; color: #E85A7F; }
+    #hashtags-container .tag-pill::after { border-radius: 10px; inset: 0; }
+    @media (hover: hover) { #hashtags-container .tag-pill:hover { background: #FFF0F4; border-color: #FFD6E0; transform: none; box-shadow: none; border-radius: 10px; } }
+    @media (max-width: 639px) {
+      #hashtags-container.tag-list { gap: 0; }
+      #hashtags-container .tag-pill { padding: .8rem .25rem; }
+      #hashtags-container .tag-pill + .tag-pill { border-left: 0; border-top: 1.5px solid #FFE5EC; }
+      #hashtags-container .tag-pill-line { justify-content: flex-start; }
+      #hashtags-container .tag-pill { align-items: flex-start; }
+    }
     .tag-pill.is-featured { border-color: #E85A7F; }
     .tag-pill.is-featured .tag-pill-tag { color: #E85A7F; }
     @media (hover: hover) {
@@ -822,18 +839,31 @@
     body.edit-mode-active .tag-pill-desc { display: block; margin-top: .35rem; font-size: .75rem; color: #8A6A73; white-space: pre-line; }
     @media (max-width: 639px) {
       .tagrow { gap: 1.5rem; }
-      .tagrow-tags { padding: 1.5rem 1.1rem 1.25rem; border-radius: 24px; }
-      .tag-title { font-size: 1.45rem; }
-      #hashtags-container.tag-list { gap: .6rem; margin-top: 1.05rem; }
+      #hashtags-container.tag-list { grid-template-columns: minmax(0, 1fr); gap: .6rem; margin-top: 1.05rem; }
       .tag-pill { min-height: 2.9rem; padding: .65rem 1rem; }
       .tag-pill-tag { font-size: .95rem; }
       .tag-pill-cat { font-size: .82rem; }
     }
-    .cw-more { display: flex; justify-content: center; margin-top: 1.1rem; }
-    .cw-more a { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.4rem; border-radius: 999px;
+    /* ===== ♡ 莉程碑區塊（合作實績筆記本＋最新莉程碑） ===== */
+    .msb-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.75rem; align-items: center; }
+    .msb-collab .cw-frame { max-width: 34rem; }
+    .msb-latest { width: 100%; max-width: 34rem; margin: 0 auto; }
+    .msb-latest-head { font-size: .8rem; font-weight: 900; letter-spacing: .12em; color: #E85A7F; margin-bottom: .2rem; }
+    .msb-latest .ms-list { margin: 0; }
+    .msb-latest .ms-item { margin: .5rem 0; }
+    .msb-latest .ms-item::before { background: #fff; border-radius: 999px; }
+    .msb-latest .ms-state { padding: 1.5rem 1rem; }
+    .msb-more { display: flex; justify-content: center; margin-top: 1rem; }
+    .msb-more a { display: inline-flex; align-items: center; gap: .45rem; padding: .6rem 1.4rem; border-radius: 999px;
       background: rgba(255,255,255,.95); border: 1.5px solid #F7BFD0; color: #E85A7F; font-weight: 900; font-size: .92rem;
       letter-spacing: .04em; text-decoration: none; transition: background-color .2s, border-color .2s, transform .2s, box-shadow .2s; }
-    .cw-more a:hover { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgba(232,90,127,.55); }
+    .msb-more a:hover { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-2px); box-shadow: 0 6px 14px -8px rgba(232,90,127,.55); }
+    @media (min-width: 1024px) {
+      .msb-grid { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 2.5rem; }
+      .msb-collab .cw-frame { max-width: none; }
+      .msb-latest { max-width: none; }
+    }
+    body:not(.edit-mode-active) #block-collab.cw-none .msb-grid { grid-template-columns: minmax(0, 1fr); }
   </style>
 </head>
 <body class="min-h-screen relative selection:bg-sakura selection:text-white">
@@ -974,6 +1004,7 @@
         <a href="#block-sheet" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">關於莉比醬</a>
         <a href="#block-schedule" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">本週行程</a>
         <a href="#block-videos" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">主打影片</a>
+        <a href="#block-collab" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">莉程碑</a>
         <a href="#contact" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">合作詢問</a>
       </div>
     </nav>
@@ -1413,43 +1444,15 @@
           </div>
         </div>
       </div>
-    </section><section id="block-hashtags" class="modular-block" data-block-id="hashtags" data-block-name="合作實績＋Hashtags">
+    </section><section id="block-hashtags" class="modular-block" data-block-id="hashtags" data-block-name="Hashtags">
       <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
-        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：合作實績＋Hashtags</span>
+        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：Hashtags</span>
         <button type="button" data-move-block="hashtags" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
         <button type="button" data-move-block="hashtags" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
         <button type="button" data-toggle-block="hashtags" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
       </div>
 
-      <!-- 電腦版：左＝合作實績筆記本、右＝Hashtags 直式清單；手機版：Hashtags 在上、筆記本在下 -->
       <div class="tagrow">
-      <!-- 🎀 合作實績：放在 Hashtags 左邊（跟 Hashtags 一起移動；👁️ 可單獨隱藏） -->
-      <section id="block-collab" class="modular-block cw-area cw-none" data-block-id="collab" data-block-name="合作實績">
-        <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
-          <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：合作實績</span>
-          <button type="button" data-cw-open="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">🎀 編輯</button>
-          <button type="button" data-move-block="collab" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
-          <button type="button" data-move-block="collab" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
-          <button type="button" data-toggle-block="collab" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
-        </div>
-        <div class="cw-headrow">
-          <div class="cw-heading">
-            <span class="cw-eb" data-editable-field="adsEyebrow">♡ COLLABORATIONS</span>
-            <span class="cw-tt" data-editable-field="adsTitle">合作實績</span>
-          </div>
-          <button type="button" data-cw-open="1" class="cw-edit-btn">🎀 編輯合作實績</button>
-        </div>
-        <div class="cw-frame" role="region" aria-roledescription="carousel" aria-label="合作實績">
-          <div id="cw-viewport" class="cw-viewport">
-            <span class="cw-rings" aria-hidden="true"></span>
-            <div class="cw-window"><div id="cw-track" class="cw-track"></div></div>
-            <button id="cw-prev" type="button" class="cw-arrow cw-prev" aria-label="上一則">‹</button>
-            <button id="cw-next" type="button" class="cw-arrow cw-next" aria-label="下一則">›</button>
-          </div>
-          <div id="cw-dots" class="cw-dots"></div>
-        </div>
-        <div class="cw-more"><a href="#block-hashtags" data-ms-open="1">♡ 更多莉程碑 →</a></div>
-      </section>
 
         <!-- Hashtags：直式膠囊清單，點整顆就能複製（不顯示複製圖示） -->
         <div class="tagrow-tags kawaii-card shadow-kawaii">
@@ -1787,6 +1790,49 @@
           </div>
         </div>
       </div>
+    </section><section id="block-collab" class="modular-block cw-none" data-block-id="collab" data-block-name="莉程碑＋合作實績">
+      <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
+        <span class="bg-white/20 px-2 py-0.5 rounded-full">積木：莉程碑＋合作實績</span>
+        <button type="button" data-cw-open="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">🎀 編輯合作實績</button>
+        <button type="button" data-move-block="collab" data-dir="-1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬆️ 上移</button>
+        <button type="button" data-move-block="collab" data-dir="1" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">⬇️ 下移</button>
+        <button type="button" data-toggle-block="collab" class="hover:bg-white/25 px-2 py-1 rounded-full transition cursor-pointer">👁️ 顯示/隱藏</button>
+      </div>
+
+      <!-- ♡ 莉程碑：左＝合作實績筆記本、右＝最新莉程碑（手機版上下堆疊）；資料來自 milestones.csv -->
+      <div class="kawaii-card p-6 sm:p-8 shadow-kawaii space-y-6">
+        <div>
+          <div data-editable-field="milestonesEyebrow" class="text-xs font-black tracking-widest text-sakura-deep uppercase" contenteditable="true" spellcheck="false">MILESTONES &amp; COLLABORATIONS</div>
+          <h2 class="text-2xl sm:text-3xl font-black text-cocoa flex items-center gap-2">
+            <span data-editable-field="milestonesTitle" contenteditable="true" spellcheck="false">莉程碑</span>
+          </h2>
+        </div>
+        <div class="msb-grid">
+          <div class="msb-collab">
+            <div class="cw-headrow">
+              <div class="cw-heading">
+                <span class="cw-eb" data-editable-field="adsEyebrow">♡ COLLABORATIONS</span>
+                <span class="cw-tt" data-editable-field="adsTitle">合作實績</span>
+              </div>
+              <button type="button" data-cw-open="1" class="cw-edit-btn">🎀 編輯合作實績</button>
+            </div>
+            <div class="cw-frame" role="region" aria-roledescription="carousel" aria-label="合作實績">
+              <div id="cw-viewport" class="cw-viewport">
+                <span class="cw-rings" aria-hidden="true"></span>
+                <div class="cw-window"><div id="cw-track" class="cw-track"></div></div>
+                <button id="cw-prev" type="button" class="cw-arrow cw-prev" aria-label="上一則">‹</button>
+                <button id="cw-next" type="button" class="cw-arrow cw-next" aria-label="下一則">›</button>
+              </div>
+              <div id="cw-dots" class="cw-dots"></div>
+            </div>
+          </div>
+          <div class="msb-latest">
+            <div class="msb-latest-head"><span data-editable-field="milestonesLatestTitle" contenteditable="true" spellcheck="false">♡ 最新莉程碑</span></div>
+            <div id="ms-latest" class="msb-latest-body"><div class="ms-state">✦ 莉程碑載入中… ✦</div></div>
+            <div class="msb-more"><a href="#block-collab" data-ms-open="1"><span data-editable-field="milestonesMoreBtn">♡ 看全部莉程碑</span> →</a></div>
+          </div>
+        </div>
+      </div>
     </section>
 
 
@@ -2059,7 +2105,7 @@
         { id: 'hashtags', visible: true },
         { id: 'schedule', visible: true },
         { id: 'videos', visible: true },
-        { id: 'collab', visible: true }   // 🎀 合作實績（沒有內容時一般訪客看不到）
+        { id: 'collab', visible: true }   // ♡ 莉程碑＋合作實績（沒有合作實績時只藏筆記本）
       ],
       deletedItemIds: [],
       extraProfiles: [],                        // 🎀「關於莉比醬」左右切換的其他角色小檔案
@@ -2313,11 +2359,11 @@ const CUSTOM_SITE_CONFIG = {
       "visible": true
     },
     {
-      "id": "collab",
+      "id": "videos",
       "visible": true
     },
     {
-      "id": "videos",
+      "id": "collab",
       "visible": true
     }
   ],
@@ -2418,7 +2464,7 @@ const CUSTOM_SITE_CONFIG = {
     "schedule": 100,
     "sheet": 40,
     "channels": 50,
-    "hashtags": 55,
+    "hashtags": 0,
     "profile": 100,
     "collab": 100
   },
@@ -2737,6 +2783,7 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "schedules": {
     "this": {
+      "range": "11/23 – 11/29 2026",
       "days": [
         {
           "id": "csv-this-1",
@@ -2808,8 +2855,7 @@ const CUSTOM_SITE_CONFIG = {
           "highlight": true,
           "isRest": false
         }
-      ],
-      "range": "11/23 – 11/29 2026"
+      ]
     },
     "next": {
       "range": "11/30 – 12/06 <span class=\"text-sm font-bold opacity-90\">2026</span>",
@@ -4027,6 +4073,7 @@ const CUSTOM_SITE_CONFIG = {
 
     function toggleEditMode() {
       isEditMode = !isEditMode;
+      syncNavOrder();
       const body = document.body;
       const toolbar = document.getElementById('edit-toolbar');
       const btnText = document.getElementById('edit-btn-text');
@@ -4091,6 +4138,22 @@ const CUSTOM_SITE_CONFIG = {
         if (blockEl.parentElement === container) container.appendChild(blockEl);   // 合作實績放在 Hashtags 裡面，不單獨搬動
         if (item.visible) blockEl.classList.remove('block-hidden-in-edit');
         else blockEl.classList.add('block-hidden-in-edit');
+      });
+      syncNavOrder();
+    }
+
+    // 上方選單跟著區塊順序排列；隱藏的區塊，一般訪客也看不到它的選單連結（「合作詢問」固定在最後）
+    function syncNavOrder() {
+      const menu = document.getElementById('nav-menu');
+      const container = document.getElementById('blocks-container');
+      if (!menu || !container) return;
+      const last = menu.querySelector('a[href="#contact"]');
+      container.querySelectorAll(':scope > .modular-block').forEach(block => {
+        const link = menu.querySelector(`a[href="#${block.id}"]`);
+        if (!link) return;
+        menu.insertBefore(link, last || null);
+        const item = siteConfig.layout.find(x => x.id === block.dataset.blockId);
+        link.style.display = (item && !item.visible && !isEditMode) ? 'none' : '';
       });
     }
 
@@ -7051,6 +7114,7 @@ const CUSTOM_SITE_CONFIG = {
     const MILESTONES_SHEET_URL = '';
     const BIG_WORDS = ['周年', '週年', 'COVER', '更名', '出道', '生日'];
     const NEWEST_FIRST = true;   // true ＝ 最新的在最上面；false ＝ 從最早的開始
+    const LATEST_COUNT = 4;      // 莉程碑區塊右邊顯示幾個「最新莉程碑」
     const PAGE_SIZE = 8;         // 每一頁放幾個莉程碑（超過就會出現 1 2 3 … 的頁數）
 
     const modal = document.getElementById('ms-modal');
@@ -7157,7 +7221,17 @@ const CUSTOM_SITE_CONFIG = {
     }
 
     // 一開始先用「上次記住的」或「內建的」莉程碑，按下按鈕就能馬上顯示
-    function useText(t) { const items = csvToMilestones(t); cache = items; cacheText = t; return items; }
+    function useText(t) { const items = csvToMilestones(t); cache = items; cacheText = t; renderLatest(); return items; }
+    // 莉程碑區塊右邊的「最新莉程碑」
+    function renderLatest(msg) {
+      const box = document.getElementById('ms-latest');
+      if (!box) return;
+      if (msg) { box.innerHTML = `<div class="ms-state">${msg}</div>`; return; }
+      if (!cache || !cache.length) return;
+      const latest = (NEWEST_FIRST ? cache : cache.slice().reverse()).slice(0, LATEST_COUNT);
+      box.innerHTML = '<ol class="ms-list">' + latest.map(it =>
+        `<li class="ms-item${it.big ? ' is-big' : ''}"><span class="ms-date">${esc(it.date)}</span><span class="ms-text">${esc(it.text)}</span></li>`).join('') + '</ol>';
+    }
     (function initCache() {
       let saved = '';
       try { saved = localStorage.getItem(STORE_KEY) || ''; } catch (e) {}
@@ -7185,7 +7259,10 @@ const CUSTOM_SITE_CONFIG = {
       return fresh;
     }
     // 網頁載入完、閒下來時先偷偷讀好；滑鼠移到按鈕上也會先讀
-    function prefetch() { fetchFresh().catch(() => {}); }
+    function prefetch() {
+      if (location.protocol === 'file:' && !cache) { renderLatest('本機預覽時，請按左下角<br>「🏁 選擇莉程碑 CSV」♡'); return; }
+      fetchFresh().catch(() => { if (!cache) renderLatest('莉程碑暫時載入不了 🥺'); });
+    }
     window.addEventListener('load', () => {
       const go = () => setTimeout(prefetch, 800);
       if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 }); else go();
