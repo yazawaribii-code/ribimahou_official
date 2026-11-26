@@ -2362,7 +2362,8 @@ const CUSTOM_SITE_CONFIG = {
     },
     {
       "id": "xp-mwx1fpu3",
-      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/2026HBD.webp?raw=true",
+      "image": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/2026HBD_s.webp?raw=true",
+      "imageLarge": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/portfolio/Ribi/2026HBD.webp?raw=true",
       "chibi": "",
       "chibiSize": 120,
       "eyebrow": "2026 BIRTHDAY SPECIAL",
@@ -2720,6 +2721,7 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "schedules": {
     "this": {
+      "range": "11/23 – 11/29 2026",
       "days": [
         {
           "id": "csv-this-1",
@@ -2791,8 +2793,7 @@ const CUSTOM_SITE_CONFIG = {
           "highlight": true,
           "isRest": false
         }
-      ],
-      "range": "11/23 – 11/29 2026"
+      ]
     },
     "next": {
       "range": "11/30 – 12/06 <span class=\"text-sm font-bold opacity-90\">2026</span>",
@@ -5900,6 +5901,12 @@ const CUSTOM_SITE_CONFIG = {
             if (!img || !img.src) return;
             const lbImg = document.getElementById('lightbox-img');
             lbImg.src = img.src;
+            // 有設定 imageLarge（高解析大圖）：先顯示頁面上的圖，大圖下載完再換上去
+            if (p.imageLarge) {
+              const big = new Image(), want = optimizeImageUrl(p.imageLarge);
+              big.onload = () => { if (lbImg.src === img.src) lbImg.src = want; };
+              big.src = want;
+            }
             lbImg.alt = lightboxTitle(p) + ' 放大預覽';
             document.getElementById('lightbox-title').textContent = lightboxTitle(p);
             const lbBadge = document.querySelector('#lightbox-panel > .inline-block');
@@ -5953,6 +5960,17 @@ const CUSTOM_SITE_CONFIG = {
         xpBuilt = true;
         return true;
       }
+
+      // 網頁載完後，趁空檔先把其他角色頁的圖片下載好，切換時就能馬上顯示
+      function preloadXpImages() {
+        profiles().forEach(p => [p.image, p.chibi].forEach(u => {
+          if (u) { const im = new Image(); im.decoding = 'async'; im.src = optimizeImageUrl(u); }
+        }));
+      }
+      window.addEventListener('load', () => {
+        const run = () => preloadXpImages();
+        if ('requestIdleCallback' in window) requestIdleCallback(run, { timeout: 3000 }); else setTimeout(run, 1500);
+      });
 
       function imgTag(url, cls, alt) {
         if (!url) return '';
@@ -6159,6 +6177,7 @@ const CUSTOM_SITE_CONFIG = {
         if (next === null) return;
         const clean = safeImageUrl(next);
         if (clean === null) { showToast('⚠️ 圖片網址需以 https:// 開頭，或使用相對路徑'); return; }
+        if (key === 'image' && clean !== p.image) delete p.imageLarge;   // 換了三視圖，舊的高解析大圖就不再對應
         p[key] = clean;
         persistConfig(false);
         render();
