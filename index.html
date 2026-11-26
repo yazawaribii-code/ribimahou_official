@@ -1448,7 +1448,7 @@
           </div>
           <div id="cw-dots" class="cw-dots"></div>
         </div>
-        <div class="cw-more"><a href="https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pubhtml" target="_blank" rel="noopener noreferrer" data-ms-open="1">♡ 更多莉程碑 →</a></div>
+        <div class="cw-more"><a href="#block-hashtags" data-ms-open="1">♡ 更多莉程碑 →</a></div>
       </section>
 
         <!-- Hashtags：直式膠囊清單，點整顆就能複製（不顯示複製圖示） -->
@@ -7039,16 +7039,16 @@ const CUSTOM_SITE_CONFIG = {
     // =========================================================================
     // ★ 莉程碑 CSV 讀取（MILESTONES_CSV_URL） ★
     // 按下「更多莉程碑」時才去讀 CSV，所以試算表更新後，網站不用重新匯出 HTML！
-    //  - Google 試算表：檔案 → 共用 → 發布到網路 → 選「逗號分隔值 (.csv)」→ 貼上網址
-    //  - 放在 GitHub 同一個資料夾：'./milestones.csv'
+    //  - 放在 GitHub 同一個資料夾：'./milestones.csv'（目前用這個）
+    //  - 也可以用 Google 試算表：檔案 → 共用 → 發布到網路 → 選「逗號分隔值 (.csv)」→ 貼上網址
     // CSV 兩種寫法都可以：
     //  ① 一格寫完：「2024/3/31 正式更名為『魔法少女莉比醬』」（沒有日期的列，例如標題，會自動跳過）
     //  ② 分欄（第一列標題，中英文都可以）：日期(date) 內容(text) 重點(highlight，可省略)
     //     重點填 1／是／true ＝ 用 ★ 標示；沒有「重點」欄時，含 BIG_WORDS 的會自動標示
     // =========================================================================
-    const MILESTONES_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pub?output=csv';
+    const MILESTONES_CSV_URL = './milestones.csv';
     // 莉程碑載入失敗時，提示訊息裡「直接看試算表」的連結（留空 '' ＝ 不顯示）
-    const MILESTONES_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pubhtml';
+    const MILESTONES_SHEET_URL = '';
     const BIG_WORDS = ['周年', '週年', 'COVER', '更名', '出道', '生日'];
     const NEWEST_FIRST = true;   // true ＝ 最新的在最上面；false ＝ 從最早的開始
     const PAGE_SIZE = 8;         // 每一頁放幾個莉程碑（超過就會出現 1 2 3 … 的頁數）
@@ -7058,7 +7058,8 @@ const CUSTOM_SITE_CONFIG = {
     const sub = document.getElementById('ms-sub');
     const pager = document.getElementById('ms-pager');
     let list = [], page = 1;
-    let cache = null, loading = null, lastFocus = null;
+    const STORE_KEY = 'ms-csv-cache-v1';   // 瀏覽器記住上次讀到的試算表，下次打開更快
+    let cache = null, cacheText = '', fresh = null, pinned = false, lastFocus = null;
 
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
     const toast = m => (typeof showToast === 'function' ? showToast(m) : console.log(m));
@@ -7155,18 +7156,41 @@ const CUSTOM_SITE_CONFIG = {
         (MILESTONES_SHEET_URL ? `<br><a href="${esc(MILESTONES_SHEET_URL)}" target="_blank" rel="noopener noreferrer">點這裡直接看試算表 ↗</a>` : '') + '</div>';
     }
 
-    function load() {
-      if (cache) return Promise.resolve(cache);
-      if (loading) return loading;
-      if (!MILESTONES_CSV_URL) return Promise.reject(new Error('沒有設定 MILESTONES_CSV_URL'));
-      body.innerHTML = '<div class="ms-state">✦ 莉程碑載入中… ✦</div>'; pager.innerHTML = '';
+    // 一開始先用「上次記住的」或「內建的」莉程碑，按下按鈕就能馬上顯示
+    function useText(t) { const items = csvToMilestones(t); cache = items; cacheText = t; return items; }
+    (function initCache() {
+      let saved = '';
+      try { saved = localStorage.getItem(STORE_KEY) || ''; } catch (e) {}
+      if (saved) { try { useText(saved); } catch (e) {} }
+    })();
+
+    // 背景讀試算表最新版本；有變動才更新畫面（停在原本那一頁）
+    function fetchFresh() {
+      if (fresh || pinned || !MILESTONES_CSV_URL || location.protocol === 'file:') return fresh || (cache ? Promise.resolve(cache) : Promise.reject(new Error('沒有可讀的 CSV')));
       const url = MILESTONES_CSV_URL + (MILESTONES_CSV_URL.includes('?') ? '&' : '?') + '_t=' + Date.now();
-      loading = fetch(url, { cache: 'no-store' })
+      fresh = fetch(url, { cache: 'no-store' })
         .then(r => { if (!r.ok) throw new Error('HTTP ' + r.status); return r.text(); })
-        .then(t => (cache = csvToMilestones(t)))
-        .finally(() => { loading = null; });
-      return loading;
+        .then(t => {
+          if (pinned || t === cacheText) return cache;
+          useText(t);
+          try { localStorage.setItem(STORE_KEY, t); } catch (e) {}
+          if (modal.classList.contains('is-open')) {
+            const keep = page; list = cache; page = keep;
+            sub.textContent = `一起走過的 ${cache.length} 個莉程碑 ♡`;
+            renderPage();
+          }
+          return cache;
+        })
+        .catch(err => { console.warn('[莉程碑 CSV] 讀取失敗，先顯示內建的莉程碑：', err); fresh = null; throw err; });
+      return fresh;
     }
+    // 網頁載入完、閒下來時先偷偷讀好；滑鼠移到按鈕上也會先讀
+    function prefetch() { fetchFresh().catch(() => {}); }
+    window.addEventListener('load', () => {
+      const go = () => setTimeout(prefetch, 800);
+      if ('requestIdleCallback' in window) requestIdleCallback(go, { timeout: 3000 }); else go();
+    });
+    document.addEventListener('pointerover', e => { if (e.target.closest && e.target.closest('[data-ms-open]')) prefetch(); }, { passive: true });
 
     function open() {
       lastFocus = document.activeElement;
@@ -7174,7 +7198,14 @@ const CUSTOM_SITE_CONFIG = {
       modal.setAttribute('aria-hidden', 'false');
       document.body.classList.add('ms-lock');
       modal.querySelector('.ms-close').focus();
-      load().then(render).catch(err => { console.warn('[莉程碑 CSV] 讀取失敗：', err); renderError(); });
+      if (cache && cache.length) {
+        render(cache);
+        prefetch();
+      } else {
+        body.innerHTML = '<div class="ms-state">✦ 莉程碑載入中… ✦</div>'; pager.innerHTML = '';
+        if (location.protocol === 'file:' && !pinned) { pager.innerHTML = ''; body.innerHTML = '<div class="ms-state">本機預覽時，請按左下角<br>「🏁 選擇莉程碑 CSV」選檔案 ♡</div>'; return; }
+        fetchFresh().then(render).catch(renderError);
+      }
     }
     function close() {
       modal.classList.remove('is-open');
@@ -7209,7 +7240,7 @@ const CUSTOM_SITE_CONFIG = {
         const reader = new FileReader();
         reader.onload = () => {
           try {
-            cache = csvToMilestones(String(reader.result));
+            const t = String(reader.result); csvToMilestones(t); pinned = true; useText(t);
             toast('🏁 已讀取「' + file.name + '」的 ' + cache.length + ' 個莉程碑！');
             open();
           } catch (err) { toast('⚠️ 莉程碑 CSV 讀取失敗：' + err.message); }
