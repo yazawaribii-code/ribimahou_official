@@ -8159,7 +8159,7 @@ const CUSTOM_SITE_CONFIG = {
       if (html === text) { status('目前的內容跟網站上一模一樣，不用發布喔 ✨', 'ok'); return; }
       status('發布中…（檔案比較大，請稍等幾秒）');
       const stamp = new Date().toLocaleString('zh-TW', { hour12: false });
-      await putFile(SITE_REPO, SITE_REPO.path, bytesToBase64(new TextEncoder().encode(html)), '官網更新（?edit 一鍵發布）' + stamp, sha);
+      await putFile(SITE_REPO, SITE_REPO.path, bytesToBase64(new TextEncoder().encode(html)), 'Update ' + SITE_REPO.path, sha);
       status('發布成功 🎉 大約 1～2 分鐘後，所有人都會看到新版官網！<br><small>（看起來還是舊的話，重新整理一下就好）</small>', 'ok');
       if (typeof showToast === 'function') showToast('🚀 已發布到網站！');
     } catch (e) {
@@ -8217,7 +8217,7 @@ const CUSTOM_SITE_CONFIG = {
       const name = makeFileName(file.name, ext);
       const path = IMAGE_REPO.folder + '/' + name;
       status('上傳中…（' + Math.round(blob.size / 1024) + 'KB）');
-      await putFile(IMAGE_REPO, path, bytesToBase64(new Uint8Array(await blob.arrayBuffer())), '官網圖片：' + name + '（?edit 上傳）');
+      await putFile(IMAGE_REPO, path, bytesToBase64(new Uint8Array(await blob.arrayBuffer())), 'Add files via upload');
       const url = 'https://raw.githubusercontent.com/' + IMAGE_REPO.owner + '/' + IMAGE_REPO.repo + '/' + IMAGE_REPO.branch + '/' + encPath(path);
       lastUploadedUrl = url;
       addRecent(url, URL.createObjectURL(blob));
@@ -8310,7 +8310,7 @@ const CUSTOM_SITE_CONFIG = {
         try {
           status('上傳' + conf.name + ' CSV 中…');
           const stamp = new Date().toLocaleString('zh-TW', { hour12: false });
-          await putFile(SITE_REPO, conf.path, bytesToBase64(buf), '更新' + conf.name + ' CSV（?edit 上傳）' + stamp, sha);
+          await putFile(SITE_REPO, conf.path, bytesToBase64(buf), 'Update ' + conf.path, sha);
           confirmBox.innerHTML = '';
           status('✅ ' + conf.name + ' CSV 已更新（共 ' + newN + ' 筆）！大約 1～2 分鐘後大家就會看到新內容 🎉', 'ok');
           if (typeof showToast === 'function') showToast('📅 ' + conf.name + ' CSV 已上傳！');
