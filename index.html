@@ -151,8 +151,10 @@
       background: linear-gradient(90deg, #fff 0%, rgba(255, 166, 198, .95) 17%, rgba(255, 172, 202, .48) 52%, rgba(255, 172, 202, 0) 100%);
       filter: drop-shadow(0 0 3.5px rgba(255, 140, 182, .55));
       transform-origin: left center; opacity: 0;
-      animation: meteorFall var(--dur, 9s) linear var(--delay, 0s) infinite;
     }
+    /* 劃過一次花的時間：改 --speed（預設 1 秒）；多久出現一次在檔案最下面每顆流星的 --dur */
+    #bg-meteors { --speed: 1s; }
+    #bg-meteors i.is-fly { animation: meteorFall var(--speed) linear forwards; }
     #bg-meteors i::before {
       content: ''; position: absolute; left: -2px; top: 50%; width: 5.5px; height: 5.5px; border-radius: 50%;
       background: #fff; transform: translateY(-50%);
@@ -160,9 +162,8 @@
     }
     @keyframes meteorFall {
       0%   { opacity: 0; transform: rotate(-28deg) translateX(0); }
-      1.5% { opacity: .92; }
-      7%   { opacity: .92; }
-      10%  { opacity: 0; transform: rotate(-28deg) translateX(-55vmax); }
+      15%  { opacity: .92; }
+      70%  { opacity: .92; }
       100% { opacity: 0; transform: rotate(-28deg) translateX(-55vmax); }
     }
     @media (prefers-reduced-motion: reduce) { #bg-meteors { display: none; } }
@@ -6753,9 +6754,23 @@ const CUSTOM_SITE_CONFIG = {
     fitAll();
   })();
 </script>
+<!-- 🌠 流星：--dur ＝ 多久出現一次（循環），--delay ＝ 打開網頁後第一次出現的時間；改 --dur 不會影響劃過的速度 -->
 <div id="bg-meteors" aria-hidden="true">
-  <i style="--x:58%;--y:-3%;--dur:10s;--delay:1.5s;--len:190px"></i>
-  <i style="--x:84%;--y:3%;--dur:11s;--delay:2.7s"></i>
-  <i style="--x:103%;--y:16%;--dur:12s;--delay:4.2s;--len:150px"></i>
+  <i style="--x:58%;--y:-3%;--dur:6s;--delay:1.5s;--len:190px"></i>
+  <i style="--x:84%;--y:3%;--dur:7s;--delay:2.7s"></i>
+  <i style="--x:103%;--y:16%;--dur:8s;--delay:4.2s;--len:150px"></i>
 </div>
+<script>
+  /* 流星計時：每顆照自己的 --dur 循環出現，每次劃過的時間固定（--speed） */
+  (function meteorTimer() {
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    document.querySelectorAll('#bg-meteors i').forEach(el => {
+      const cs = getComputedStyle(el);
+      const every = (parseFloat(cs.getPropertyValue('--dur')) || 10) * 1000;
+      const delay = (parseFloat(cs.getPropertyValue('--delay')) || 0) * 1000;
+      const fly = () => { el.classList.remove('is-fly'); void el.offsetWidth; el.classList.add('is-fly'); };
+      setTimeout(() => { fly(); setInterval(fly, every); }, delay);
+    });
+  })();
+</script>
 </body></html>
