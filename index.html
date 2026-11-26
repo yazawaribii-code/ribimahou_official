@@ -883,6 +883,40 @@
     }
     body:not(.edit-mode-active) #block-collab.cw-none .msb-grid { grid-template-columns: minmax(0, 1fr); }
   </style>
+<style id="side-icon-css">
+    /* 頻道卡片圖示：統一正方形（自己的圖片或原本的粉色方塊都一樣大，標題才會對齊） */
+    .sc-icon-wrap { position: relative; flex-shrink: 0; }
+    .sc-icon { width: 4rem; height: 4rem; }
+    @media (min-width: 640px) { .sc-icon { width: 4.5rem; height: 4.5rem; } }
+    .sc-icon-img { border-radius: 1rem; overflow: hidden; background: #FFE5EC; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+    .sc-icon-img img { width: 100%; height: 100%; object-fit: cover; display: block; user-select: none; -webkit-user-drag: none; }
+  </style>
+  <style id="social-grid-css">
+    /* 📱 手機／平板：各式連結＝沒有外框的文字連結（圖示＋文字，自然換行）；電腦版維持原樣，編輯模式維持膠囊方便修改 */
+    @media (max-width: 1023px) {
+      body:not(.edit-mode-active) #social-pills-container { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .6rem 1.4rem; margin-top: .9rem; padding: 0 .25rem; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item { background: transparent !important; border: 0 !important; box-shadow: none !important; border-radius: 0 !important; color: #5A3E46 !important; min-width: 0; transition: color .2s, transform .2s; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item:hover { color: #E85A7F !important; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item:active { transform: scale(.96); }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item { display: inline-flex; align-items: center; padding: .15rem .1rem !important; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item > a { display: inline-flex; align-items: center; gap: .35rem; font-size: .82rem; font-weight: 800; white-space: nowrap; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item i { font-size: .95rem; }
+    }
+    /* 📱 手機版：各式連結改成一排左右滑動＋粉色進度條（跟 TAG一覽 一樣） */
+    @media (max-width: 639px) {
+      body:not(.edit-mode-active) #social-pills-container {
+        flex-wrap: nowrap; justify-content: flex-start; gap: 0 1.5rem; overflow-x: auto; overscroll-behavior-x: contain;
+        scroll-snap-type: x proximity; scrollbar-width: none; padding: .2rem .5rem;
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 .75rem, #000 calc(100% - 1.75rem), transparent);
+                mask-image: linear-gradient(90deg, transparent 0, #000 .75rem, #000 calc(100% - 1.75rem), transparent);
+      }
+      body:not(.edit-mode-active) #social-pills-container::-webkit-scrollbar { display: none; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item { flex: 0 0 auto; scroll-snap-align: start; scroll-margin-left: .5rem; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item:last-child { margin-right: 1rem; }
+      body:not(.edit-mode-active) #social-pills-container > .subcard-item > a { font-size: .88rem; padding: .35rem 0; }
+      body:not(.edit-mode-active) #social-scrollbar { margin-top: .6rem; }
+    }
+  </style>
 </head>
 <body class="min-h-screen relative selection:bg-sakura selection:text-white">
 
@@ -1382,6 +1416,7 @@
           </a>
         </div>
       </div>
+        <div id="social-scrollbar" class="tag-scrollbar" aria-hidden="true"><span></span></div>
       </div>
     </section><section id="block-sheet" class="modular-block" data-block-id="sheet" data-block-name="角色設定＆三視圖">
       <div class="block-edit-controls absolute -top-4 right-4 z-30 bg-sakura-deep text-white px-3 py-1.5 rounded-full shadow-lg items-center gap-2 text-xs font-bold">
@@ -1713,7 +1748,7 @@
       </div>
 
       <div class="kawaii-card p-6 sm:p-8 shadow-kawaii space-y-6">
-        <div class="flex flex-wrap items-end justify-between gap-2">
+        <div class="flex flex-wrap items-end justify-between gap-2" data-fit-frame>
           <div>
             <div data-editable-field="videosEyebrow" class="text-xs font-black tracking-widest text-sakura-deep uppercase" contenteditable="true" spellcheck="false">FEATURED COVERS &amp; CLIPS</div>
             <h2 class="text-2xl sm:text-3xl font-black text-cocoa flex items-center gap-2">
@@ -1750,7 +1785,7 @@
             </div>
           </div>
 
-          <div class="lg:col-span-5 space-y-4">
+          <div class="lg:col-span-5 space-y-4" data-fit-frame>
             <h3 id="featured-side-title" class="text-xl sm:text-2xl font-black text-cocoa leading-snug">《ツインテール魔法少女》翻唱企劃</h3>
             <p id="featured-side-text" class="text-sm text-cocoa-light leading-relaxed">從曲繪插畫到歌聲都充滿粉嫩魔法能量！點擊下方精選影片卡片，可以隨時切換不同的主打翻唱作品預覽。</p>
             <div class="flex flex-wrap gap-2 pt-1">
@@ -2483,7 +2518,7 @@ const CUSTOM_SITE_CONFIG = {
     "schedule": 100,
     "sheet": 40,
     "channels": 50,
-    "hashtags": 0,
+    "hashtags": 40,
     "profile": 100,
     "collab": 0
   },
@@ -2652,7 +2687,8 @@ const CUSTOM_SITE_CONFIG = {
       "url": "https://www.youtube.com/@Ribi_Yazawa",
       "badgeText": "YOUTUBE",
       "iconClass": "fa-brands fa-youtube",
-      "gradientClass": "from-[#FF5E7E] to-[#E85A7F]"
+      "gradientClass": "from-[#FF5E7E] to-[#E85A7F]",
+      "iconImage": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/official/YT.png?raw=true"
     },
     {
       "id": "ch-youtube-copy-mwr9m2nqy",
@@ -2661,7 +2697,8 @@ const CUSTOM_SITE_CONFIG = {
       "url": "https://www.youtube.com/@ribiribiri_VOD",
       "badgeText": "YOUTUBE",
       "iconClass": "fa-brands fa-youtube",
-      "gradientClass": "from-[#FF5E7E] to-[#E85A7F]"
+      "gradientClass": "from-[#FF5E7E] to-[#E85A7F]",
+      "iconImage": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/official/YT.png?raw=true"
     },
     {
       "id": "ch-commission",
@@ -2670,7 +2707,8 @@ const CUSTOM_SITE_CONFIG = {
       "url": "https://illustration.ribimahou.com/",
       "badgeText": "ARTWORK",
       "iconClass": "fa-solid fa-palette",
-      "gradientClass": "from-[#FFB3C6] to-[#FF85A4]"
+      "gradientClass": "from-[#FFB3C6] to-[#FF85A4]",
+      "iconImage": "https://github.com/yazawaribii-code/RibiPortfolio/blob/main/official/other.png?raw=true"
     },
     {
       "id": "ch-goods",
@@ -2802,6 +2840,7 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "schedules": {
     "this": {
+      "range": "11/23 – 11/29 2026",
       "days": [
         {
           "id": "csv-this-1",
@@ -2873,8 +2912,7 @@ const CUSTOM_SITE_CONFIG = {
           "highlight": true,
           "isRest": false
         }
-      ],
-      "range": "11/23 – 11/29 2026"
+      ]
     },
     "next": {
       "range": "11/30 – 12/06 <span class=\"text-sm font-bold opacity-90\">2026</span>",
@@ -3680,7 +3718,13 @@ const CUSTOM_SITE_CONFIG = {
       let current = '';
       let label = '';
       let video = null;
-      if (key === 'video') {
+      let sideItem = null;
+      if (key === 'sideIcon') {
+        sideItem = siteConfig.sideChannels.find(c => c.id === videoId);
+        if (!sideItem) return;
+        current = sideItem.iconImage || '';
+        label = '頻道圖示（' + String(sideItem.title || '').trim() + '）— 建議用正方形圖片';
+      } else if (key === 'video') {
         video = siteConfig.videos.find(v => v.id === videoId);
         if (!video) return;
         current = video.thumb || '';
@@ -3700,14 +3744,16 @@ const CUSTOM_SITE_CONFIG = {
       const clean = safeImageUrl(next);
       if (clean === null) { showToast('⚠️ 圖片網址需以 https:// 開頭，或使用相對路徑'); return; }
 
-      if (video) video.thumb = clean;
+      if (sideItem) sideItem.iconImage = clean;
+      else if (video) video.thumb = clean;
       else { if (!siteConfig.images) siteConfig.images = {}; siteConfig.images[key] = clean; }
 
       persistConfig(false);
       applySiteImages();
       if (video) renderVideoCards();
+      if (sideItem) renderSideChannels();
 
-      if (!clean) { showToast('🖼️ 已還原為預設插圖'); return; }
+      if (!clean) { showToast(sideItem ? '🖼️ 已還原為原本的粉色圖示' : '🖼️ 已還原為預設插圖'); return; }
       showToast('🖼️ 已更新圖片（記得匯出才會讓所有訪客看到）');
       const probe = new Image();
       probe.onerror = () => showToast('⚠️ 這個網址載入失敗，目前先顯示預設插圖，請確認是圖片直連網址');
@@ -3722,7 +3768,7 @@ const CUSTOM_SITE_CONFIG = {
       e.stopPropagation();
       const editBtn = e.target.closest('[data-img-edit]');
       const adjBtn = e.target.closest('[data-img-adjust]');
-      if (editBtn) editSiteImage(editBtn.dataset.imgEdit, editBtn.dataset.videoId || null);
+      if (editBtn) editSiteImage(editBtn.dataset.imgEdit, editBtn.dataset.videoId || editBtn.dataset.itemId || null);
       else if (adjBtn) openImageAdjust(adjBtn.dataset.imgAdjust, adjBtn.dataset.videoId || null);
     }, true);
 
@@ -4370,6 +4416,18 @@ const CUSTOM_SITE_CONFIG = {
       `).join('');
     }
 
+    // 頻道卡片左邊的圖示：有設定 iconImage 就顯示自己的圖片，沒有就用原本的粉色漸層方塊
+    function sideIconHtml(item) {
+      const icon = safeImageUrl(item.iconImage || '') || '';
+      const box = icon
+        ? `<div class="sc-icon sc-icon-img"><img src="${escapeAttr(optimizeImageUrl(icon))}" data-orig="${escapeAttr(icon)}" alt="" decoding="async" draggable="false" onerror="if(this.dataset.orig&&this.getAttribute('src')!==this.dataset.orig){this.src=this.dataset.orig}else{this.onerror=null;this.style.visibility='hidden'}"></div>`
+        : `<div class="sc-icon rounded-2xl bg-gradient-to-br ${item.gradientClass} text-white flex flex-col items-center justify-center shadow-sm">
+                <i class="${item.iconClass} text-2xl"></i>
+                <span${editableAttr('sideChannels', item.id, 'badgeText')} class="text-[10px] font-black mt-0.5 tracking-wider">${escapeHtml(item.badgeText)}</span>
+              </div>`;
+      return `<div class="sc-icon-wrap">${box}<div class="img-edit-btn absolute left-0 top-full mt-1 z-40 items-center whitespace-nowrap"><button type="button" data-img-edit="sideIcon" data-item-id="${escapeAttr(item.id)}" title="換成自己的圖示（建議正方形圖片）" class="${IMG_BTN_CLASS}">🖼️ 換圖示</button></div></div>`;
+    }
+
     function renderSideChannels() {
       const container = document.getElementById('side-channel-cards-container');
       const items = siteConfig.sideChannels.filter(item => !isItemDeleted(item.id));
@@ -4378,10 +4436,7 @@ const CUSTOM_SITE_CONFIG = {
           ${createSubcardControlsHtml('sideChannels', item.id)}
           <a ${linkAttrs(item.url)} class="flex items-center justify-between gap-4 w-full">
             <div class="flex items-center gap-4">
-              <div class="w-16 h-16 sm:w-20 sm:h-16 rounded-2xl bg-gradient-to-br ${item.gradientClass} text-white flex flex-col items-center justify-center shrink-0 shadow-sm">
-                <i class="${item.iconClass} text-2xl"></i>
-                <span class="text-[10px] font-black mt-0.5 tracking-wider">${escapeHtml(item.badgeText)}</span>
-              </div>
+              ${sideIconHtml(item)}
               <div>
                 <h4${editableAttr('sideChannels', item.id, 'title')} class="font-black text-base sm:text-lg text-cocoa group-hover:text-sakura-deep transition">${escapeHtml(item.title)}</h4>
                 <p${editableAttr('sideChannels', item.id, 'desc')} class="text-xs sm:text-sm text-cocoa-light font-medium">${escapeHtml(item.desc)}</p>
@@ -7024,6 +7079,80 @@ const CUSTOM_SITE_CONFIG = {
     fitAll();
   })();
 </script>
+<script>
+  /* 📱 手機版：YouTube 主打影片區塊的文字「不自動換行」——每一行（自己按 Enter 的換行會保留）各自縮小字級塞進框框 */
+  (function fitVideoLines() {
+    const block = document.getElementById('block-videos');
+    if (!block) return;
+    const SEL = '[data-editable-field], [data-item-field], #featured-video-title, #featured-video-desc, #featured-side-title, #featured-side-text';
+    const FRAME = '[data-fit-frame], [data-video-card-id], .fv-text';
+    const MIN = 9;   // 最小字級（px），比這還塞不下才讓那一行自然換行
+    const isMobile = () => window.innerWidth < 640;
+    const isEdit = () => document.body.classList.contains('edit-mode-active');
+
+    function unwrap(el) {
+      if (el.querySelector(':scope > .fit-line')) el.textContent = el.textContent;   // 文字內容完全不變，只拿掉包裝
+    }
+    function limitFor(el, frame) {
+      const fcs = getComputedStyle(frame);
+      let lim = frame.getBoundingClientRect().right - parseFloat(fcs.paddingRight) - parseFloat(fcs.borderRightWidth) - 1;
+      for (let a = el; a && a !== frame; a = a.parentElement) {   // 按鈕這類有內距的外框，也要扣掉右邊內距
+        const cs = getComputedStyle(a);
+        lim -= parseFloat(cs.paddingRight) + parseFloat(cs.borderRightWidth);
+      }
+      return lim;
+    }
+    function fitOne(el) {
+      unwrap(el);
+      el.style.fontSize = '';
+      if (!isMobile() || isEdit() || el === document.activeElement) return;
+      const frame = el.closest(FRAME);
+      const text = el.textContent;
+      if (!frame || !text.trim() || el.children.length) return;   // 裡面有其他標籤的就不動
+      el.textContent = '';
+      text.split('\n').forEach((line, i) => {
+        if (i) el.appendChild(document.createTextNode('\n'));
+        if (!line.trim()) { el.appendChild(document.createTextNode(line)); return; }
+        const sp = document.createElement('span');
+        sp.className = 'fit-line';
+        sp.style.cssText = 'display:inline-block;white-space:nowrap;max-width:none';
+        sp.textContent = line;
+        el.appendChild(sp);
+      });
+      // 整段一起縮：找出最塞不下的那一行，所有行都用同一個字級
+      const lim = limitFor(el, frame);
+      const lines = el.querySelectorAll(':scope > .fit-line');
+      let ratio = 1;
+      lines.forEach(sp => {
+        const r = sp.getBoundingClientRect();
+        if (r.right > lim + 0.5 && r.width > 0) ratio = Math.min(ratio, (lim - r.left) / r.width);
+      });
+      if (ratio >= 1) return;
+      const base = parseFloat(getComputedStyle(el).fontSize);
+      const size = Math.floor(base * ratio * 10) / 10;
+      el.style.fontSize = Math.max(size, MIN) + 'px';   // 設在整段上，行距也會一起變小
+      if (size < MIN) lines.forEach(sp => { sp.style.whiteSpace = 'normal'; sp.style.display = 'inline'; });
+    }
+    let raf = 0;
+    function fitAll() {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        block.querySelectorAll(SEL).forEach(fitOne);
+        mo.takeRecords();   // 自己改的不算，避免無限循環
+      });
+    }
+    const mo = new MutationObserver(fitAll);
+    mo.observe(block, { childList: true, subtree: true, characterData: true });
+    new MutationObserver(() => { if (isEdit()) block.querySelectorAll(SEL).forEach(unwrap); fitAll(); })
+      .observe(document.body, { attributes: true, attributeFilter: ['class'] });   // 進出編輯模式
+    block.addEventListener('focusin', e => { if (e.target.matches && e.target.matches(SEL)) unwrap(e.target); });
+    let lastW = window.innerWidth;
+    window.addEventListener('resize', () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; fitAll(); });
+    window.addEventListener('load', fitAll);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+    fitAll();
+  })();
+</script>
 <!-- 🌠 流星：--dur ＝ 多久出現一次（循環），--delay ＝ 打開網頁後第一次出現的時間；改 --dur 不會影響劃過的速度 -->
 <div id="bg-meteors" aria-hidden="true">
   <i style="--x:58%;--y:-3%;--dur:6s;--delay:1.5s;--len:190px"></i>
@@ -7350,31 +7479,36 @@ const CUSTOM_SITE_CONFIG = {
   })();
   </script>
   <script id="tag-scrollbar-js">
-  // TAG一覽（手機版左右滑動）的粉色進度條：滑到哪裡，粉色條就跟到哪裡
+  // 手機版左右滑動列（TAG一覽、各式連結）的粉色進度條：滑到哪裡，粉色條就跟到哪裡
   (function () {
-    const list = document.getElementById('hashtags-container');
-    const bar = document.getElementById('tag-scrollbar');
-    if (!list || !bar) return;
-    const thumb = bar.firstElementChild;
-    let raf = 0;
-    function update() {
-      raf = 0;
-      const max = list.scrollWidth - list.clientWidth;
-      const on = max > 4 && getComputedStyle(list).overflowX !== 'visible';
-      bar.classList.toggle('is-on', on);
-      if (!on) return;
-      const ratio = Math.min(1, list.clientWidth / list.scrollWidth);
-      const pos = Math.min(1, Math.max(0, list.scrollLeft / max));
-      thumb.style.width = (ratio * 100) + '%';
-      thumb.style.transform = `translateX(${pos * (1 - ratio) / ratio * 100}%)`;
+    function attach(listId, barId) {
+      const list = document.getElementById(listId);
+      const bar = document.getElementById(barId);
+      if (!list || !bar) return;
+      const thumb = bar.firstElementChild;
+      let raf = 0;
+      function update() {
+        raf = 0;
+        const max = list.scrollWidth - list.clientWidth;
+        const on = max > 4 && getComputedStyle(list).overflowX !== 'visible';
+        bar.classList.toggle('is-on', on);
+        if (!on) return;
+        const ratio = Math.min(1, list.clientWidth / list.scrollWidth);
+        const pos = Math.min(1, Math.max(0, list.scrollLeft / max));
+        thumb.style.width = (ratio * 100) + '%';
+        thumb.style.transform = `translateX(${pos * (1 - ratio) / ratio * 100}%)`;
+      }
+      const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+      list.addEventListener('scroll', schedule, { passive: true });
+      window.addEventListener('resize', schedule);
+      if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(list);
+      new MutationObserver(schedule).observe(list, { childList: true });                                        // 內容重新產生時
+      new MutationObserver(schedule).observe(document.body, { attributes: true, attributeFilter: ['class'] });   // 進出編輯模式
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(schedule);
+      schedule();
     }
-    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
-    list.addEventListener('scroll', schedule, { passive: true });
-    window.addEventListener('resize', schedule);
-    if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(list);
-    new MutationObserver(schedule).observe(list, { childList: true });                       // 標籤重新產生時
-    new MutationObserver(schedule).observe(document.body, { attributes: true, attributeFilter: ['class'] });   // 進出編輯模式
-    schedule();
+    attach('hashtags-container', 'tag-scrollbar');
+    attach('social-pills-container', 'social-scrollbar');
   })();
   </script>
 </body></html>
