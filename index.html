@@ -692,6 +692,23 @@
     }
 
     /* 📺 行程標籤的平台圖示 */
+    /* 週表吉祥物：圖片滿版，白框文字疊在圖片下方 */
+    body:not(.edit-mode-active) #schedule-mascot-card [data-editable-field="scheduleMascotKaomoji"]:empty { display: none; }
+    #schedule-mascot-card [data-editable-field="scheduleMascotBubble"] { white-space: pre-line; }
+    @media (min-width: 640px) {
+      #schedule-mascot-card { display: block; width: 13rem; aspect-ratio: 1 / 1; }
+      #schedule-mascot-card .sch-mascot-caption {
+        position: absolute; left: .75rem; right: .75rem; bottom: 0; z-index: 10;
+        transform: translateY(50%);   /* 白框一半壓在圖片上、一半露在框外，像被夾住 */
+        display: flex; flex-direction: column; align-items: center; }
+      #schedule-mascot-card { overflow: visible; }
+      #schedule-mascot-card #img-schedule-mascot { border-radius: calc(1.5rem - 2px); }
+      #schedule-mascot-card [data-editable-field="scheduleMascotBubble"] { border: 2px solid rgba(255,255,255,.9); box-shadow: 0 4px 12px rgba(214,69,112,.22); }
+    }
+    @media (min-width: 768px) {   /* 電腦版：框跟著橫幅高度拉滿，圖片滿版 */
+      #schedule-mascot-card { align-self: stretch; aspect-ratio: auto; min-height: 200px; width: 14rem; }
+    }
+    @media (min-width: 1024px) { #schedule-mascot-card { width: 15rem; } }
     .sch-pf { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
     .sch-pf-icon { font-size: 13px; line-height: 1; }
     .sch-pf-text { margin-left: 1px; }
@@ -1709,10 +1726,14 @@
               </div>
             </div>
 
-            <div class="hidden sm:flex flex-col items-center justify-center bg-white/25 backdrop-blur-md border-2 border-white/60 rounded-3xl p-4 w-48 shrink-0 text-center animate-float overflow-hidden">
-              <img id="img-schedule-mascot" loading="lazy" decoding="async" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="莉比醬週表吉祥物" class="w-24 h-24 object-contain mb-2 drop-shadow">
-              <div data-editable-field="scheduleMascotBubble" class="text-xs font-black bg-white text-sakura-deep px-3 py-1 rounded-full shadow-sm" contenteditable="true" spellcheck="false">本週也請多指教！</div>
-              <div data-editable-field="scheduleMascotKaomoji" class="text-[11px] font-bold mt-1.5 text-white" contenteditable="true" spellcheck="false">٩(*' ' *)✨</div>
+            <div id="schedule-mascot-card" class="hidden relative bg-white/25 backdrop-blur-md border-2 border-white/60 rounded-3xl shrink-0 text-center animate-float overflow-hidden">
+              <!-- 圖片：整個框滿版 -->
+              <img id="img-schedule-mascot" loading="lazy" decoding="async" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="莉比醬週表吉祥物" class="absolute inset-0 w-full h-full object-cover">
+              <!-- 白框文字：疊在圖片下半部，不再擠到圖片底下 -->
+              <div class="sch-mascot-caption">
+                <div data-editable-field="scheduleMascotBubble" class="text-xs font-black leading-snug bg-white/95 text-sakura-deep px-3 py-1.5 rounded-2xl shadow-md" contenteditable="true" spellcheck="false">本週也請多指教！</div>
+                <div data-editable-field="scheduleMascotKaomoji" class="text-[11px] font-bold mt-1 text-white drop-shadow" contenteditable="true" spellcheck="false">٩(*' ' *)✨</div>
+              </div>
             </div>
           </div>
         </div>
