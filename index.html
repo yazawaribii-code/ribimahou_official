@@ -814,13 +814,30 @@
     #hashtags-container .tag-pill-tag { font-size: 1.08rem; color: #E85A7F; }
     #hashtags-container .tag-pill::after { border-radius: 10px; inset: 0; }
     @media (hover: hover) { #hashtags-container .tag-pill:hover { background: #FFF0F4; border-color: #FFD6E0; transform: none; box-shadow: none; border-radius: 10px; } }
+    /* 📱 手機版：TAG 改成一排左右滑動（編輯模式維持直式，方便修改） */
     @media (max-width: 639px) {
-      #hashtags-container.tag-list { gap: 0; }
-      #hashtags-container .tag-pill { padding: .8rem .25rem; }
-      #hashtags-container .tag-pill + .tag-pill { border-left: 0; border-top: 1.5px solid #FFE5EC; }
-      #hashtags-container .tag-pill-line { justify-content: flex-start; }
-      #hashtags-container .tag-pill { align-items: flex-start; }
+      body:not(.edit-mode-active) #hashtags-container.tag-list {
+        display: flex; gap: 0; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+        scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        margin-left: -1.5rem; margin-right: -1.5rem; padding: 0 1.5rem;   /* 滑動範圍延伸到卡片邊緣 */
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 2rem), transparent);
+                mask-image: linear-gradient(90deg, transparent 0, #000 1.25rem, #000 calc(100% - 2rem), transparent);
+      }
+      body:not(.edit-mode-active) #hashtags-container.tag-list::-webkit-scrollbar { display: none; }
+      body:not(.edit-mode-active) #hashtags-container .tag-pill { flex: 0 0 auto; min-width: 7.5rem; max-width: 12rem; padding: .55rem 1rem; scroll-snap-align: start; scroll-margin-left: 1.5rem; }
+      body:not(.edit-mode-active) #hashtags-container .tag-pill:last-child { margin-right: 1.5rem; }
+      body:not(.edit-mode-active) #hashtags-container .tag-pill-line { flex-direction: column; align-items: center; gap: .05rem; }
+      body:not(.edit-mode-active) #hashtags-container .tag-pill-sep { display: none !important; }
+      body:not(.edit-mode-active) #hashtags-container .tag-pill-tag { font-size: 1rem; white-space: nowrap; }
+      body:not(.edit-mode-active) #hashtags-container .tag-pill-cat { white-space: nowrap; }
+      body:not(.edit-mode-active) .tag-hint:empty::before { content: '左右滑動，點一下就能複製標籤 ✨'; }
+      /* 編輯模式：直式清單 */
+      body.edit-mode-active #hashtags-container .tag-pill + .tag-pill { border-left: 0; }
+      /* 粉色滑動進度條 */
+      body:not(.edit-mode-active) .tag-scrollbar.is-on { display: block; }
     }
+    .tag-scrollbar { display: none; position: relative; height: 4px; margin-top: .9rem; border-radius: 999px; background: rgba(255, 255, 255, .7); overflow: hidden; }
+    .tag-scrollbar > span { position: absolute; top: 0; bottom: 0; left: 0; width: 30%; border-radius: inherit; background: #FFA8BE; transition: width .2s; }
     .tag-pill.is-featured { border-color: #E85A7F; }
     .tag-pill.is-featured .tag-pill-tag { color: #E85A7F; }
     @media (hover: hover) {
@@ -1461,6 +1478,7 @@
           <h2 class="tag-title"><span data-editable-field="hashtagsTitle">TAG一覽</span></h2>
           <p data-editable-field="hashtagsHint" class="tag-hint"></p>
           <div id="hashtags-container" class="tag-list" role="list"></div>
+          <div id="tag-scrollbar" class="tag-scrollbar" aria-hidden="true"><span></span></div>
         </div>
       </div>
     </section><section id="block-schedule" class="modular-block" data-block-id="schedule" data-block-name="本週魔法行程週表">
@@ -7329,6 +7347,34 @@ const CUSTOM_SITE_CONFIG = {
       const add = () => { document.body.appendChild(input); document.body.appendChild(btn); };
       if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', add); else add();
     })();
+  })();
+  </script>
+  <script id="tag-scrollbar-js">
+  // TAG一覽（手機版左右滑動）的粉色進度條：滑到哪裡，粉色條就跟到哪裡
+  (function () {
+    const list = document.getElementById('hashtags-container');
+    const bar = document.getElementById('tag-scrollbar');
+    if (!list || !bar) return;
+    const thumb = bar.firstElementChild;
+    let raf = 0;
+    function update() {
+      raf = 0;
+      const max = list.scrollWidth - list.clientWidth;
+      const on = max > 4 && getComputedStyle(list).overflowX !== 'visible';
+      bar.classList.toggle('is-on', on);
+      if (!on) return;
+      const ratio = Math.min(1, list.clientWidth / list.scrollWidth);
+      const pos = Math.min(1, Math.max(0, list.scrollLeft / max));
+      thumb.style.width = (ratio * 100) + '%';
+      thumb.style.transform = `translateX(${pos * (1 - ratio) / ratio * 100}%)`;
+    }
+    const schedule = () => { if (!raf) raf = requestAnimationFrame(update); };
+    list.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    if ('ResizeObserver' in window) new ResizeObserver(schedule).observe(list);
+    new MutationObserver(schedule).observe(list, { childList: true });                       // 標籤重新產生時
+    new MutationObserver(schedule).observe(document.body, { attributes: true, attributeFilter: ['class'] });   // 進出編輯模式
+    schedule();
   })();
   </script>
 </body></html>
