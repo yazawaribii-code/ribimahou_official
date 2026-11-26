@@ -2367,7 +2367,7 @@ const CUSTOM_SITE_CONFIG = {
       "chibiSize": 120,
       "eyebrow": "2026 BIRTHDAY SPECIAL",
       "title": "莉息蛋糕大家族",
-      "caption": "2026生日特企🎂\n感謝參加活動的莉息們！",
+      "caption": "2026生日特企🎂- 感謝參加活動的莉息們！",
       "heading": "",
       "body": "",
       "lightboxTitle": "2026莉息蛋糕大家族",
@@ -2720,7 +2720,6 @@ const CUSTOM_SITE_CONFIG = {
   ],
   "schedules": {
     "this": {
-      "range": "11/23 – 11/29 2026",
       "days": [
         {
           "id": "csv-this-1",
@@ -2787,12 +2786,13 @@ const CUSTOM_SITE_CONFIG = {
           "day": "週日",
           "date": "11/29",
           "tag": "圖奇/YT",
-          "title": "2千追台詞回紀念",
+          "title": "2千追紀念台詞回",
           "time": "21:00",
           "highlight": true,
           "isRest": false
         }
-      ]
+      ],
+      "range": "11/23 – 11/29 2026"
     },
     "next": {
       "range": "11/30 – 12/06 <span class=\"text-sm font-bold opacity-90\">2026</span>",
@@ -6701,6 +6701,38 @@ const CUSTOM_SITE_CONFIG = {
   window.addEventListener('scroll',hide,{passive:true});
   document.addEventListener('mousedown',hide);
 })();
+</script>
+<script>
+  /* 手機版：三視圖底下的說明文字自動縮小，盡量排成一行，避免換行不漂亮 */
+  (function fitSheetCaptions() {
+    const SEL = '[data-editable-field="sheetCaptionLeft"], [data-xp-field="caption"]';
+    const MIN = 11;   // 最小字級（px），再小就讓它自然換行
+    function fitOne(el) {
+      el.style.fontSize = ''; el.style.whiteSpace = '';
+      if (window.innerWidth >= 640 || document.body.classList.contains('edit-mode-active')) return;
+      const box = el.parentElement; if (!box || !el.textContent.trim()) return;
+      const cs = getComputedStyle(box);
+      const avail = box.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight) - 1;
+      if (avail <= 0) return;
+      el.style.whiteSpace = 'nowrap';
+      const w = el.scrollWidth;
+      if (w <= avail) return;
+      const base = parseFloat(getComputedStyle(el).fontSize);
+      const size = Math.floor(base * avail / w * 10) / 10;
+      if (size >= MIN) el.style.fontSize = size + 'px';
+      else { el.style.fontSize = MIN + 'px'; el.style.whiteSpace = ''; }
+    }
+    let raf = 0;
+    function fitAll() { cancelAnimationFrame(raf); raf = requestAnimationFrame(() => document.querySelectorAll(SEL).forEach(fitOne)); }
+    window.addEventListener('resize', fitAll);
+    window.addEventListener('load', fitAll);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fitAll);
+    const mo = new MutationObserver(fitAll);
+    mo.observe(document.body, { attributes: true, attributeFilter: ['class'] });   // 進出編輯模式
+    const sheet = document.getElementById('block-sheet');
+    if (sheet) mo.observe(sheet, { childList: true, subtree: true, characterData: true });   // 切換角色頁、文字更新
+    fitAll();
+  })();
 </script>
 <div id="bg-meteors" aria-hidden="true">
   <i style="--x:58%;--y:-3%;--dur:10s;--delay:1.5s;--len:190px"></i>
