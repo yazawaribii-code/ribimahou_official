@@ -7914,4 +7914,289 @@ const CUSTOM_SITE_CONFIG = {
     fit();
   })();
   </script>
+
+<!-- ===== ?edit 雲端發布＋圖片上傳（直接存到 GitHub，不用再下載、手動上傳） ===== -->
+<style id="gh-publish-css">
+  #ghp-modal { position: fixed; inset: 0; z-index: 99990; display: none; align-items: center; justify-content: center; background: rgba(74, 59, 61, 0.45); padding: 1rem; }
+  #ghp-modal.open { display: flex; }
+  #ghp-box { width: min(460px, 100%); max-height: 90vh; overflow-y: auto; background: #fff9fb; border: 3px solid #fff; outline: 2px dashed #ffb3c8; outline-offset: -10px; border-radius: 24px; box-shadow: 7px 7px 0 #ffd3e0; padding: 1.4rem 1.4rem 1.2rem; font-family: inherit; color: #4a3b3d; }
+  #ghp-box h3 { margin: 0 0 0.8rem; font-size: 1.15rem; font-weight: 900; color: #ff6f98; display: flex; justify-content: space-between; align-items: center; }
+  #ghp-box h4 { margin: 1rem 0 0.4rem; font-size: 0.95rem; font-weight: 800; }
+  #ghp-close { background: none; border: none; font-size: 1.6rem; line-height: 1; color: #ff8fae; cursor: pointer; }
+  .ghp-tip { font-size: 0.8rem; color: #9c8689; line-height: 1.6; margin: 0.2rem 0 0.5rem; }
+  .ghp-input { width: 100%; border: 2px solid #ffe3ec; border-radius: 12px; padding: 0.5rem 0.7rem; font-size: 0.9rem; background: #fff; color: #4a3b3d; font-family: inherit; }
+  .ghp-input:focus { outline: none; border-color: #ff8fae; }
+  .ghp-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  .ghp-btn { border: none; border-radius: 30px; padding: 0.55rem 1.1rem; font-weight: 800; font-size: 0.88rem; cursor: pointer; background: #ff8fae; color: #fff; box-shadow: 3px 3px 0 #ffd3e0; font-family: inherit; }
+  .ghp-btn.ghost { background: #fff; color: #ff8fae; border: 2px solid #ff8fae; box-shadow: none; }
+  .ghp-btn.big { width: 100%; padding: 0.8rem; font-size: 1rem; margin-top: 0.6rem; }
+  .ghp-btn:disabled { opacity: 0.45; cursor: default; }
+  #ghp-status { display: none; margin: 0.6rem 0 0.2rem; padding: 0.6rem 0.8rem; border-radius: 12px; font-size: 0.85rem; background: #fff; border: 2px dashed #ffc6d6; line-height: 1.5; }
+  #ghp-status.show { display: block; }
+  #ghp-status.ok { border-color: #8fd6ae; background: #effaf3; }
+  #ghp-status.warn { border-color: #f4c56a; background: #fff8e6; }
+  #ghp-status.err { border-color: #ff8080; background: #fff0f0; }
+  #ghp-drop { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; padding: 1.2rem 1rem; border: 3px dashed #ffb3c8; border-radius: 18px; background: #fff; color: #ff8fae; cursor: pointer; text-align: center; font-weight: 800; }
+  #ghp-drop small { color: #9c8689; font-weight: 500; }
+  #ghp-drop.over { background: #ffe3ec; }
+  .ghp-recent { display: flex; align-items: center; gap: 0.6rem; background: #fff; border: 2px solid #ffe3ec; border-radius: 14px; padding: 0.4rem; margin-top: 0.45rem; }
+  .ghp-recent img { width: 46px; height: 46px; object-fit: cover; border-radius: 10px; flex-shrink: 0; }
+  .ghp-recent span { flex: 1; min-width: 0; font-size: 0.75rem; color: #9c8689; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .ghp-recent button { flex-shrink: 0; padding: 0.35rem 0.8rem; font-size: 0.78rem; }
+  #ghp-token-box { display: none; }
+  #ghp-token-box.open { display: block; }
+  #ghp-token-link { background: none; border: none; color: #ff8fae; font-size: 0.8rem; text-decoration: underline; cursor: pointer; padding: 0; font-family: inherit; }
+</style>
+<script id="gh-publish-js">
+(function () {
+  if (typeof CAN_EDIT === 'undefined' || !CAN_EDIT) return;
+
+  // ★ 官網放在哪裡（如果之後搬家，改這裡就好）
+  const SITE_REPO  = { owner: 'yazawaribii-code', repo: 'ribimahou_official', branch: 'main', path: 'index.html' };
+  // ★ 上傳的圖片要存在哪裡
+  const IMAGE_REPO = { owner: 'yazawaribii-code', repo: 'RibiPortfolio', branch: 'main', folder: 'official' };
+  const TOKEN_KEY = 'ribiOfficialGhToken';
+
+  // ---- 金鑰 ----
+  const cleanToken = raw => (raw || '').replace(/[\s​-‍⁠﻿　]+/g, '');
+  const tokenProblem = t => {
+    if (!t) return '請先貼上金鑰';
+    if (/[^\x21-\x7E]/.test(t)) return '金鑰裡混到中文或特殊符號了，請只複製 github_pat_ 開頭的那一串英數字';
+    if (!/^(github_pat_|ghp_)[A-Za-z0-9_]+$/.test(t)) return '金鑰格式不太對，應該是 github_pat_ 開頭、只有英文數字和底線的一長串';
+    return '';
+  };
+  let token = '';
+  try { token = cleanToken(localStorage.getItem(TOKEN_KEY)); } catch (e) {}
+  if (tokenProblem(token)) token = '';
+
+  // ---- GitHub 小工具 ----
+  const api = r => 'https://api.github.com/repos/' + r.owner + '/' + r.repo;
+  const encPath = p => p.split('/').map(encodeURIComponent).join('/');
+  const headers = () => ({ 'Authorization': 'Bearer ' + token, 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' });
+  function bytesToBase64(bytes) {
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function friendlyError(status, where) {
+    if (status === 401) return '金鑰無效或已過期，請按下方「設定金鑰」重新貼上';
+    if (status === 403 || status === 404) return '金鑰沒有 ' + where + ' 的寫入權限：請確認金鑰有勾選 ' + where + '，而且 Contents 是 Read and write';
+    if (status === 409) return 'GitHub 上的檔案剛好被別的地方改過了，請再按一次';
+    if (status === 422) return '檔案太大或格式不對，GitHub 不接受（' + status + '）';
+    return 'GitHub 回應錯誤（' + status + '）';
+  }
+  async function putFile(repo, path, base64, message, sha) {
+    const body = { message, content: base64, branch: repo.branch };
+    if (sha) body.sha = sha;
+    const r = await fetch(api(repo) + '/contents/' + encPath(path), { method: 'PUT', headers: headers(), body: JSON.stringify(body) });
+    if (!r.ok) throw new Error(friendlyError(r.status, repo.repo));
+    return r.json();
+  }
+
+  // ---- 介面 ----
+  const modal = document.createElement('div');
+  modal.id = 'ghp-modal';
+  modal.innerHTML =
+    '<div id="ghp-box" role="dialog" aria-label="雲端發布">' +
+      '<h3><span>✦ 雲端發布</span><button id="ghp-close" aria-label="關閉">×</button></h3>' +
+      '<div id="ghp-status"></div>' +
+      '<h4>🚀 發布到網站</h4>' +
+      '<p class="ghp-tip">把目前的排版、文字、公告、圖片等所有修改，直接存到 GitHub。大約 1～2 分鐘後，所有人都會看到新版官網。</p>' +
+      '<button class="ghp-btn big" id="ghp-publish">發布到網站 ✦</button>' +
+      '<h4>🖼️ 上傳圖片</h4>' +
+      '<p class="ghp-tip">上傳後網址會自動複製；接著去點要換的圖的「換圖」，網址也會<b>自動帶入</b>，按確定就好。</p>' +
+      '<label id="ghp-drop"><input type="file" accept="image/*" hidden id="ghp-file">把圖片拖進來<small>或點這裡選圖片・會自動轉 webp、縮到 2000px（GIF 保持原樣）</small></label>' +
+      '<div id="ghp-recent-list"></div>' +
+      '<div class="ghp-row" style="margin-top:1rem"><button id="ghp-token-link">🔑 設定金鑰</button></div>' +
+      '<div id="ghp-token-box">' +
+        '<p class="ghp-tip">貼上官網用的 GitHub 金鑰（github_pat_ 開頭，需要勾選 ' + SITE_REPO.repo + ' 和 ' + IMAGE_REPO.repo + '，Contents 設為 Read and write）。金鑰只會存在這台裝置的瀏覽器。</p>' +
+        '<input type="password" class="ghp-input" id="ghp-token" placeholder="github_pat_xxxxxxxx">' +
+        '<div class="ghp-row"><button class="ghp-btn" id="ghp-token-save">儲存並測試</button><button class="ghp-btn ghost" id="ghp-token-clear">清除金鑰</button></div>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(modal);
+  const $ = id => document.getElementById(id);
+  const statusEl = $('ghp-status');
+  function status(msg, type) { statusEl.innerHTML = msg || ''; statusEl.className = msg ? 'show ' + (type || '') : ''; }
+  function openModal(showToken) {
+    modal.classList.add('open');
+    if (showToken || !token) {
+      $('ghp-token-box').classList.add('open');
+      if (!token) status('第一次使用，請先在下面貼上金鑰喔～', 'warn');
+    }
+  }
+  $('ghp-close').onclick = () => modal.classList.remove('open');
+  modal.addEventListener('click', e => { if (e.target === modal) modal.classList.remove('open'); });
+  $('ghp-token-link').onclick = () => $('ghp-token-box').classList.toggle('open');
+
+  // 工具列加上兩個按鈕（放在「匯出完整設定碼」前面）
+  const exportBtn = document.getElementById('btn-export-layout');
+  if (exportBtn) {
+    const mk = (html, fn) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = exportBtn.className;
+      b.innerHTML = html;
+      b.addEventListener('click', fn);
+      exportBtn.parentNode.insertBefore(b, exportBtn);
+      return b;
+    };
+    mk('🖼️ 上傳圖片', () => openModal(false));
+    const pub = mk('🚀 發布到網站', () => openModal(false));
+    pub.className = exportBtn.className.replace('bg-white/20', 'bg-white/35');
+  }
+
+  // ---- 金鑰設定 ----
+  $('ghp-token').value = token;
+  $('ghp-token-save').onclick = async () => {
+    const t = cleanToken($('ghp-token').value);
+    $('ghp-token').value = t;
+    const problem = tokenProblem(t);
+    if (problem) { status(problem, 'err'); return; }
+    token = t;
+    try { localStorage.setItem(TOKEN_KEY, token); } catch (e) {}
+    status('測試連線中…');
+    try {
+      for (const repo of [SITE_REPO, IMAGE_REPO]) {
+        const r = await fetch(api(repo), { headers: headers() });
+        if (r.status === 401) throw new Error('金鑰無效，請重新複製一次');
+        if (!r.ok) throw new Error('金鑰沒有勾選 ' + repo.repo + '，請回 GitHub 把它加進金鑰的 Repository access');
+        const j = await r.json();
+        if (!j.permissions || !j.permissions.push) throw new Error(repo.repo + ' 只有讀取權限，請把 Contents 改成 Read and write');
+      }
+      status('連線成功！官網和圖片倉庫都可以寫入了 🎉', 'ok');
+      $('ghp-token-box').classList.remove('open');
+    } catch (e) { status(e.message, 'err'); }
+  };
+  $('ghp-token-clear').onclick = () => {
+    token = ''; $('ghp-token').value = '';
+    try { localStorage.removeItem(TOKEN_KEY); } catch (e) {}
+    status('已清除這台裝置上的金鑰', 'ok');
+  };
+  const needToken = () => {
+    if (token) return false;
+    $('ghp-token-box').classList.add('open');
+    status('請先設定金鑰', 'warn');
+    return true;
+  };
+
+  // ---- 發布到網站 ----
+  async function readSiteFile() {
+    const r = await fetch(api(SITE_REPO) + '/contents/' + encPath(SITE_REPO.path) + '?ref=' + SITE_REPO.branch, { headers: headers(), cache: 'no-store' });
+    if (r.status === 404) throw new Error('在 ' + SITE_REPO.repo + ' 裡找不到 ' + SITE_REPO.path + '，或金鑰沒有勾選這個倉庫');
+    if (!r.ok) throw new Error(friendlyError(r.status, SITE_REPO.repo));
+    const j = await r.json();
+    let text;
+    if (j.content) {
+      const bytes = Uint8Array.from(atob(j.content.replace(/\n/g, '')), c => c.charCodeAt(0));
+      text = new TextDecoder().decode(bytes);
+    } else {
+      // 檔案超過 1MB 時 GitHub 不會直接附內容，改用原始檔格式讀取
+      const raw = await fetch(api(SITE_REPO) + '/contents/' + encPath(SITE_REPO.path) + '?ref=' + SITE_REPO.branch,
+        { headers: Object.assign(headers(), { 'Accept': 'application/vnd.github.raw' }), cache: 'no-store' });
+      if (!raw.ok) throw new Error(friendlyError(raw.status, SITE_REPO.repo));
+      text = await raw.text();
+    }
+    return { sha: j.sha, text };
+  }
+
+  $('ghp-publish').onclick = async () => {
+    if (needToken()) return;
+    const btn = $('ghp-publish');
+    btn.disabled = true;
+    try {
+      persistConfig(false);                  // 先把畫面上的修改存好
+      status('讀取 GitHub 上最新的官網檔案…');
+      const { sha, text } = await readSiteFile();
+      let html;
+      try { html = injectConfigIntoHtml(text); }
+      catch (e) { throw new Error('GitHub 上的 ' + SITE_REPO.path + ' 裡找不到 CUSTOM_SITE_CONFIG，請確認檔案是官網的 index.html'); }
+      if (html === text) { status('目前的內容跟網站上一模一樣，不用發布喔 ✨', 'ok'); return; }
+      status('發布中…（檔案比較大，請稍等幾秒）');
+      const stamp = new Date().toLocaleString('zh-TW', { hour12: false });
+      await putFile(SITE_REPO, SITE_REPO.path, bytesToBase64(new TextEncoder().encode(html)), '官網更新（?edit 一鍵發布）' + stamp, sha);
+      status('發布成功 🎉 大約 1～2 分鐘後，所有人都會看到新版官網！<br><small>（看起來還是舊的話，重新整理一下就好）</small>', 'ok');
+      if (typeof showToast === 'function') showToast('🚀 已發布到網站！');
+    } catch (e) {
+      status(e.message, 'err');
+    } finally {
+      btn.disabled = false;
+    }
+  };
+
+  // ---- 上傳圖片 ----
+  let lastUploadedUrl = '';
+  async function prepareImage(file) {
+    const ext = (file.name.split('.').pop() || 'png').toLowerCase();
+    if (file.type === 'image/gif' || file.type === 'image/svg+xml') return { blob: file, ext };
+    try {
+      const bmp = await createImageBitmap(file);
+      const scale = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+      const c = document.createElement('canvas');
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise(res => c.toBlob(res, 'image/webp', 0.88));
+      if (!blob || blob.type !== 'image/webp') return { blob: file, ext };
+      if (ext === 'webp' && blob.size >= file.size) return { blob: file, ext };
+      return { blob, ext: 'webp' };
+    } catch (e) { return { blob: file, ext }; }
+  }
+  function makeFileName(original, ext) {
+    const base = original.replace(/\.[^.]+$/, '').replace(/[^A-Za-z0-9_-]+/g, '').slice(0, 30) || 'img';
+    const t = new Date();
+    const p2 = n => String(n).padStart(2, '0');
+    return base + '-' + t.getFullYear() + p2(t.getMonth() + 1) + p2(t.getDate()) + '-' + p2(t.getHours()) + p2(t.getMinutes()) + p2(t.getSeconds()) + '.' + ext;
+  }
+  async function copy(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) { return false; }
+  }
+  function addRecent(url, previewUrl) {
+    const row = document.createElement('div');
+    row.className = 'ghp-recent';
+    row.innerHTML = '<img alt=""><span></span><button class="ghp-btn">複製網址</button>';
+    row.querySelector('img').src = previewUrl;
+    row.querySelector('span').textContent = url.split('/').pop();
+    row.querySelector('button').onclick = async () => {
+      lastUploadedUrl = url;
+      status((await copy(url)) ? '已複製網址 📋 現在去點「換圖」，網址會自動帶入' : '網址：' + url, 'ok');
+    };
+    $('ghp-recent-list').prepend(row);
+  }
+  async function uploadFile(file) {
+    if (needToken()) return;
+    if (!file || !file.type.startsWith('image/')) { status('請選擇圖片檔喔', 'warn'); return; }
+    try {
+      status('處理圖片中…');
+      const { blob, ext } = await prepareImage(file);
+      const name = makeFileName(file.name, ext);
+      const path = IMAGE_REPO.folder + '/' + name;
+      status('上傳中…（' + Math.round(blob.size / 1024) + 'KB）');
+      await putFile(IMAGE_REPO, path, bytesToBase64(new Uint8Array(await blob.arrayBuffer())), '官網圖片：' + name + '（?edit 上傳）');
+      const url = 'https://raw.githubusercontent.com/' + IMAGE_REPO.owner + '/' + IMAGE_REPO.repo + '/' + IMAGE_REPO.branch + '/' + encPath(path);
+      lastUploadedUrl = url;
+      addRecent(url, URL.createObjectURL(blob));
+      const copied = await copy(url);
+      status('上傳成功 🎉 ' + (copied ? '網址已複製！' : '') + '<br>接著關掉這個視窗，點要換的圖的「換圖」，網址會自動帶入，按確定就好～<br><small>換好之後記得按「🚀 發布到網站」</small>', 'ok');
+    } catch (e) { status(e.message, 'err'); }
+  }
+  const drop = $('ghp-drop');
+  $('ghp-file').onchange = e => { uploadFile(e.target.files[0]); e.target.value = ''; };
+  ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', e => uploadFile(e.dataTransfer.files[0]));
+
+  // 「換圖」時，自動把剛上傳的圖片網址帶進輸入框
+  const nativePrompt = window.prompt.bind(window);
+  window.prompt = function (message, defaultValue) {
+    if (lastUploadedUrl && /圖片網址/.test(String(message || ''))) {
+      const url = lastUploadedUrl;
+      lastUploadedUrl = '';      // 用一次就好，避免下一次換圖又帶入同一張
+      return nativePrompt(message, url);
+    }
+    return nativePrompt(message, defaultValue);
+  };
+})();
+</script>
+
 </body></html>
