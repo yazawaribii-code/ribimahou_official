@@ -9,6 +9,17 @@
   </style>
   <!-- 防閃爍：在 JS 套用你的設定前先隱藏頁面，套用完成後才顯示 -->
   <style id="preload-hide">body{visibility:hidden}</style>
+  <!-- 主打頻道卡片上的毛玻璃小標籤（離線中／直播中、每週六固定無莉日）：橫幅圖片載入完成前先隱藏，避免手機上出現灰色方塊 -->
+  <style id="glass-pill-css">
+    #live-status, [data-editable-field="mainStreamScheduleNote"] {
+      clip-path: inset(0 round 999px);          /* 毛玻璃一定照圓角裁切，不會變成方形 */
+      transform: translateZ(0);
+      opacity: 0; transition: opacity .45s ease;
+    }
+    html.glass-ready #live-status, html.glass-ready [data-editable-field="mainStreamScheduleNote"],
+    body.edit-mode-active #live-status, body.edit-mode-active [data-editable-field="mainStreamScheduleNote"] { opacity: 1; }
+  </style>
+  <noscript><style>#live-status,[data-editable-field="mainStreamScheduleNote"]{opacity:1!important}</style></noscript>
   <noscript><style>body{visibility:visible !important}</style></noscript>
 
   <!-- ✨ 魔法棒載入動畫 -->
@@ -7509,6 +7520,26 @@ const CUSTOM_SITE_CONFIG = {
     }
     attach('hashtags-container', 'tag-scrollbar');
     attach('social-pills-container', 'social-scrollbar');
+  })();
+  </script>
+  <script id="glass-pill-js">
+  // 橫幅圖片真的畫出來之後（或沒有設定橫幅／載入失敗），才讓毛玻璃小標籤淡入
+  (function () {
+    const root = document.documentElement;
+    const img = document.getElementById('img-main-channel-banner');
+    let done = false;
+    const show = () => { if (done) return; done = true; requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('glass-ready'))); };
+    if (!img) { show(); return; }
+    const realLoaded = () => img.complete && img.naturalWidth > 1 && !img.classList.contains('hidden');
+    const check = () => {
+      if (realLoaded()) { (img.decode ? img.decode().catch(() => {}) : Promise.resolve()).then(show); return; }
+      if (img.classList.contains('hidden') && document.readyState === 'complete') show();   // 沒有設定橫幅圖片
+    };
+    img.addEventListener('load', check);
+    img.addEventListener('error', () => setTimeout(check, 50));
+    window.addEventListener('load', () => setTimeout(check, 50));
+    check();
+    setTimeout(show, 6000);   // 網路很慢時，最多等 6 秒就顯示
   })();
   </script>
 </body></html>
