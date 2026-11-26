@@ -6993,8 +6993,9 @@ const CUSTOM_SITE_CONFIG = {
     .ms-item.is-big .ms-text { color: #C8436A; }
     .ms-state { text-align: center; padding: 2.5rem 1rem; font-size: .9rem; font-weight: 700; color: #A9838F; }
     .ms-state a, .ms-foot a { color: #E85A7F; font-weight: 900; }
-    .ms-pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .3rem; padding: .7rem .8rem 0; }
+    .ms-pager { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: .3rem; padding: .8rem .8rem 1rem; border-top: 1.5px dashed #FFE0EA; }
     .ms-pager:empty { display: none; }
+    .ms-body:has(+ .ms-pager:empty) { padding-bottom: 1.6rem; }
     .ms-pg { min-width: 2.1rem; height: 2.1rem; padding: 0 .45rem; border-radius: 999px; border: 1.5px solid #F7BFD0; background: #fff;
       color: #C8436A; font: inherit; font-size: .85rem; font-weight: 900; cursor: pointer; transition: background-color .2s, border-color .2s, transform .2s; }
     .ms-pg:hover:not(:disabled):not([aria-current="page"]) { background: #FFF0F4; border-color: #FF8FB1; transform: translateY(-1px); }
@@ -7030,7 +7031,6 @@ const CUSTOM_SITE_CONFIG = {
         </div>
         <div id="ms-body" class="ms-body"></div>
         <nav id="ms-pager" class="ms-pager" aria-label="莉程碑頁數"></nav>
-        <div class="ms-foot"><a id="ms-sheet-link" href="#" target="_blank" rel="noopener noreferrer">在試算表查看 ↗</a></div>
       </div>
     </div>
   </div>
@@ -7047,7 +7047,7 @@ const CUSTOM_SITE_CONFIG = {
     //     重點填 1／是／true ＝ 用 ★ 標示；沒有「重點」欄時，含 BIG_WORDS 的會自動標示
     // =========================================================================
     const MILESTONES_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pub?output=csv';
-    // 「在試算表查看」連到的網址（留空 '' ＝ 不顯示這個連結）
+    // 莉程碑載入失敗時，提示訊息裡「直接看試算表」的連結（留空 '' ＝ 不顯示）
     const MILESTONES_SHEET_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRdHKqlepTukAA5i4PNikgF_HkgfifhhxspqacGaqkJ6Rdv0iR89qqYyaL8bRfRXW-gaxILgI1t_ydw/pubhtml';
     const BIG_WORDS = ['周年', '週年', 'COVER', '更名', '出道', '生日'];
     const NEWEST_FIRST = true;   // true ＝ 最新的在最上面；false ＝ 從最早的開始
@@ -7058,8 +7058,6 @@ const CUSTOM_SITE_CONFIG = {
     const sub = document.getElementById('ms-sub');
     const pager = document.getElementById('ms-pager');
     let list = [], page = 1;
-    const sheetLink = document.getElementById('ms-sheet-link');
-    if (MILESTONES_SHEET_URL) sheetLink.href = MILESTONES_SHEET_URL; else sheetLink.parentNode.style.display = 'none';
     let cache = null, loading = null, lastFocus = null;
 
     const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
