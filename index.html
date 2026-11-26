@@ -559,8 +559,9 @@
     #nav-menu a.is-current::after { transform: translateX(-50%) scale(1); }
     @media (max-width: 639px) { #nav-menu a::after { display: none; } }
 
-    /* 🖥️ 電腦版：點選單「主打影片」時，停的位置再往下一點，主打影片和下面的影片卡片能看到更多 */
-    @media (min-width: 1024px) { #block-videos { scroll-margin-top: 20px; } }
+    /* 點選單「主打影片」時，停的位置再往下一點，主打影片和下面的影片卡片能看到更多（電腦／平板／手機都一樣） */
+    #blocks-container #block-videos { scroll-margin-top: 20px; }
+    @media (max-width: 639px) { #blocks-container #block-videos { scroll-margin-top: 36px; } }   /* 手機：留位置給最上面的愛心進度條 */
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
