@@ -559,6 +559,8 @@
     #nav-menu a.is-current::after { transform: translateX(-50%) scale(1); }
     @media (max-width: 639px) { #nav-menu a::after { display: none; } }
 
+    /* 🖥️ 電腦版：點選單「主打影片」時，停的位置再往下一點，主打影片和下面的影片卡片能看到更多 */
+    @media (min-width: 1024px) { #block-videos { scroll-margin-top: 20px; } }
     /* 「角色設定＆三視圖」Q版立繪：上下浮動＋魔法少女星星粒子 */
     @keyframes chibiBob {
       0%, 100% { transform: translateY(0); }
@@ -7790,7 +7792,7 @@ const CUSTOM_SITE_CONFIG = {
       if (floating) {
         if (menuOpen()) setShow(true);
         else if (dy > 6) setShow(false);                     // 往下滑 → 收起來
-        else if (dy < -6) setShow(true);                     // 往上滑 → 滑出來
+        else if (dy < -6 && performance.now() > quietUntil) setShow(true);   // 往上滑 → 滑出來
       }
       if (Math.abs(dy) > 6 || y <= 2) lastY = y;
     }
@@ -7798,7 +7800,12 @@ const CUSTOM_SITE_CONFIG = {
     window.addEventListener('scroll', schedule, { passive: true });
     window.addEventListener('resize', () => { if (!floating) natH = hdr.offsetHeight; schedule(); });
     // 點選單連結跳到某個區塊時，順便把導覽列收起來，不擋到標題
-    hdr.addEventListener('click', e => { if (e.target.closest('#nav-menu a[href^="#"]') && floating) setTimeout(() => setShow(false), 50); });
+    let quietUntil = 0;   // 點選單跳區塊的那一小段平滑捲動中，不要讓導覽列冒出來擋住標題
+    hdr.addEventListener('click', e => {
+      if (!e.target.closest('#nav-menu a[href^="#"]')) return;
+      quietUntil = performance.now() + 1200;
+      if (floating) setTimeout(() => setShow(false), 50);
+    });
     update();
   })();
   </script>
