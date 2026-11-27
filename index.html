@@ -60,6 +60,34 @@
     @media (prefers-reduced-motion:reduce){.ml-wave,.ml-glow,.ml-ring,.ml-text span{animation:none!important}.ml-ring{display:none}}
   </style>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- iPad 轉向修正：Safari 有時轉成橫式後，網頁還停在直式的寬度（右邊一片空白）。
+     轉向後把 viewport 設定輕輕改一下再改回來，逼 Safari 重新量一次畫面寬度。 -->
+<script>
+(function () {
+  var vp = document.querySelector('meta[name="viewport"]');
+  if (!vp) return;
+  var base = vp.getAttribute('content');
+  var t1 = 0, t2 = 0;
+  function nudge() {
+    vp.setAttribute('content', base + ', maximum-scale=1.0');
+    setTimeout(function () {
+      vp.setAttribute('content', base);
+      void document.documentElement.offsetWidth;            // 讓瀏覽器重算版面
+      window.dispatchEvent(new Event('resize'));           // 通知網站其他程式「寬度變了」
+    }, 60);
+  }
+  function onRotate() {
+    clearTimeout(t1); clearTimeout(t2);
+    t1 = setTimeout(nudge, 250);                            // 轉完先推一次
+    t2 = setTimeout(function () {                          // 0.9 秒後再檢查一次，寬度還是不對就再推
+      if (Math.abs(document.documentElement.clientWidth - window.innerWidth) > 2 ||
+          (window.visualViewport && Math.abs(visualViewport.width * visualViewport.scale - window.innerWidth) > 2)) nudge();
+    }, 900);
+  }
+  window.addEventListener('orientationchange', onRotate);
+  if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', onRotate);
+})();
+</script>
   <title>魔法少女莉比醬｜Official Website</title>
   <meta name="description" content="台灣個人勢 VTuber 魔法少女莉比醬（繪師筆名：莉比Ribi，粉絲名：莉息）官方網站。包含個人檔案、橫式角色三視圖、直播週表、翻唱影片與專屬 Hashtags。">
 
