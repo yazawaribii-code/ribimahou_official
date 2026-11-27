@@ -1108,7 +1108,7 @@
       transform: rotate(4deg); border-radius: 2px; transform-origin: 0% 50%; }
     /* 🎀 翻開封面：紙膠帶從右端掀起、往上撕開飛走；翻回封面再輕輕貼回來 */
     .msb-collab .cw-frame.tape-off::before { animation: cwTapePeel .75s cubic-bezier(.5,0,.4,1) forwards; }
-    .msb-collab .cw-frame.tape-back::before { animation: cwTapeStick .55s cubic-bezier(.2,.8,.3,1.2) both; }
+    .msb-collab .cw-frame.tape-back::before { animation: cwTapeStick .55s cubic-bezier(.2,.8,.3,1.2) .8s both;   /* 等最後一頁翻完（.8s）才貼回來 */ }
     @keyframes cwTapePeel {
       0%   { transform: rotate(4deg); opacity: 1; filter: drop-shadow(0 0 0 rgba(232,90,127,0)); }
       35%  { transform: rotate(-12deg) skewX(-6deg) scaleY(.92); opacity: 1; filter: drop-shadow(0 4px 3px rgba(232,90,127,.3)); }
