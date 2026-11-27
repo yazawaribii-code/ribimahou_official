@@ -88,44 +88,6 @@
   if (screen.orientation && screen.orientation.addEventListener) screen.orientation.addEventListener('change', onRotate);
 })();
 </script>
-<!-- 🔍 iPad 轉向偵錯面板：只有網址後面加 ?debug 才會出現，一般訪客完全看不到
-     也可以加上測試開關：&noblur（關毛玻璃）、&nofx（關漂浮物／流星／吉祥物）、&noclip（關左右裁切） -->
-<script>
-(function () {
-  var q = location.search;
-  if (!/[?&]debug\b/.test(q)) return;
-  var css = '';
-  if (/[?&]noblur\b/.test(q)) css += '*{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}';
-  if (/[?&]nofx\b/.test(q))   css += '#magic-particles-container,#bg-meteors,#float-mascot{display:none!important}*{will-change:auto!important}';
-  if (/[?&]noclip\b/.test(q)) css += 'html,body{overflow-x:visible!important}';
-  if (css) { var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st); }
-  var n = { resize: 0, orient: 0, frames: 0 };
-  window.addEventListener('resize', function () { n.resize++; });
-  window.addEventListener('orientationchange', function () { n.orient++; });
-  (function tick() { n.frames++; requestAnimationFrame(tick); })();
-  function boot() {
-    var box = document.createElement('div');
-    box.style.cssText = 'position:fixed;left:8px;top:8px;z-index:2147483647;background:rgba(0,0,0,.78);color:#fff;font:12px/1.45 monospace;padding:8px 10px;border-radius:10px;pointer-events:none;white-space:pre';
-    document.body.appendChild(box);
-    setInterval(function () {
-      var vv = window.visualViewport, de = document.documentElement;
-      var o = (screen.orientation && screen.orientation.type) || ('orientation=' + window.orientation);
-      box.textContent =
-        '方向  ' + o + '\n' +
-        'innerWidth   ' + window.innerWidth + ' x ' + window.innerHeight + '\n' +
-        'clientWidth  ' + de.clientWidth + '\n' +
-        'body 寬      ' + Math.round(document.body.getBoundingClientRect().width) + '\n' +
-        'visualVP     ' + (vv ? Math.round(vv.width) + ' x ' + Math.round(vv.height) + ' @' + vv.scale.toFixed(2) : '無') + '\n' +
-        'screen       ' + screen.width + ' x ' + screen.height + '\n' +
-        '橫式媒體查詢 ' + matchMedia('(orientation: landscape)').matches + '\n' +
-        'resize ' + n.resize + '  轉向 ' + n.orient + '\n' +
-        '心跳 ' + n.frames + '  ' + new Date().toLocaleTimeString() + '\n' +
-        '開關 ' + (css ? q.replace(/^\?/, '') : '無');
-    }, 250);
-  }
-  if (document.body) boot(); else document.addEventListener('DOMContentLoaded', boot);
-})();
-</script>
   <title>魔法少女莉比醬｜Official Website</title>
   <meta name="description" content="台灣個人勢 VTuber 魔法少女莉比醬（繪師筆名：莉比Ribi，粉絲名：莉息）官方網站。包含個人檔案、橫式角色三視圖、直播週表、翻唱影片與專屬 Hashtags。">
 
