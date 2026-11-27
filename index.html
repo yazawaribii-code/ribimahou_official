@@ -1105,7 +1105,24 @@
     .msb-collab .cw-frame { position: relative; }
     .msb-collab .cw-frame::before { content: ''; position: absolute; top: -10px; right: 18%; width: 90px; height: 24px; z-index: 6; pointer-events: none;
       background: repeating-linear-gradient(45deg, rgba(255,179,203,.75) 0 6px, rgba(255,214,224,.75) 6px 12px);
-      transform: rotate(4deg); border-radius: 2px; }
+      transform: rotate(4deg); border-radius: 2px; transform-origin: 0% 50%; }
+    /* 🎀 翻開封面：紙膠帶從右端掀起、往上撕開飛走；翻回封面再輕輕貼回來 */
+    .msb-collab .cw-frame.tape-off::before { animation: cwTapePeel .75s cubic-bezier(.5,0,.4,1) forwards; }
+    .msb-collab .cw-frame.tape-back::before { animation: cwTapeStick .55s cubic-bezier(.2,.8,.3,1.2) both; }
+    @keyframes cwTapePeel {
+      0%   { transform: rotate(4deg); opacity: 1; filter: drop-shadow(0 0 0 rgba(232,90,127,0)); }
+      35%  { transform: rotate(-12deg) skewX(-6deg) scaleY(.92); opacity: 1; filter: drop-shadow(0 4px 3px rgba(232,90,127,.3)); }
+      100% { transform: translate(14px, -46px) rotate(-22deg) scale(.92); opacity: 0; filter: drop-shadow(0 8px 6px rgba(232,90,127,0)); }
+    }
+    @keyframes cwTapeStick {
+      0%   { transform: translate(8px, -30px) rotate(-14deg); opacity: 0; }
+      70%  { transform: translate(0, 1px) rotate(5deg); opacity: 1; }
+      100% { transform: rotate(4deg); opacity: 1; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .msb-collab .cw-frame.tape-off::before { animation: none; opacity: 0; }
+      .msb-collab .cw-frame.tape-back::before { animation: none; }
+    }
     /* 主要按鈕改實心粉 */
     .msb-more a { background: #FF8FB1; border-color: #FF8FB1; color: #fff; }
     .msb-more a:hover { background: #E85A7F; border-color: #E85A7F; color: #fff; }
@@ -5461,6 +5478,14 @@ const CUSTOM_SITE_CONFIG = {
       const to = ((i % n) + n) % n;
       if (dir === undefined) dir = i < from ? -1 : 1;
       document.querySelectorAll('#cw-dots .cw-dot').forEach((d, k) => d.setAttribute('aria-current', k === to ? 'true' : 'false'));
+      // 🎀 紙膠帶：離開封面就往上撕開，回到封面再貼回去
+      const tapeFrame = document.querySelector('#block-collab .cw-frame');
+      if (tapeFrame) {
+        const offCover = !slides[to].classList.contains('cw-cover');
+        const wasOff = tapeFrame.classList.contains('tape-off');
+        if (offCover && !wasOff) { tapeFrame.classList.remove('tape-back'); tapeFrame.classList.add('tape-off'); }
+        else if (!offCover && wasOff) { tapeFrame.classList.remove('tape-off'); tapeFrame.classList.add('tape-back'); }
+      }
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (to === from || !animate || reduce || n < 2) { adsState.idx = to; settleAdSlides(); return; }
       const cur = slides[from], nxt = slides[to];
