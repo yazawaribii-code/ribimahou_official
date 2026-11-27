@@ -1091,6 +1091,24 @@
       .msb-latest { max-width: none; }
     }
     body:not(.edit-mode-active) #block-collab.cw-none .msb-grid { grid-template-columns: minmax(0, 1fr); }
+    /* ===== ♡ 莉程碑：減少白色、分出主次 ===== */
+    /* 非最新的莉程碑：半透明粉玻璃 */
+    .msb-latest .ms-item:not(.is-big) { background: rgba(255,240,245,.45); border-color: rgba(255,201,218,.6);
+      -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+    .msb-latest .ms-item::before { background: transparent; }
+    /* 日期變成小膠囊 */
+    .msb-latest .ms-date { background: #FFE0EA; padding: .05rem .5rem; border-radius: 999px; }
+    /* 筆記本：奶油紙＋粉色疊紙＋紙膠帶 */
+    .msb-collab .cw-viewport { background: #FFFBF7;
+      box-shadow: 3px 3px 0 -1px #FFF0F4, 3px 3px 0 1px #FFD6E0, 6px 6px 0 -1px #FFE5EC, 6px 6px 0 1px #FFC9DA; }
+    .msb-collab .cw-slide { background-color: #FFFBF7; }
+    .msb-collab .cw-frame { position: relative; }
+    .msb-collab .cw-frame::before { content: ''; position: absolute; top: -10px; right: 18%; width: 90px; height: 24px; z-index: 6; pointer-events: none;
+      background: repeating-linear-gradient(45deg, rgba(255,179,203,.75) 0 6px, rgba(255,214,224,.75) 6px 12px);
+      transform: rotate(4deg); border-radius: 2px; }
+    /* 主要按鈕改實心粉 */
+    .msb-more a { background: #FF8FB1; border-color: #FF8FB1; color: #fff; }
+    .msb-more a:hover { background: #E85A7F; border-color: #E85A7F; color: #fff; }
   </style>
 <style id="side-icon-css">
     /* 頻道卡片圖示：統一正方形（自己的圖片或原本的粉色方塊都一樣大，標題才會對齊） */
