@@ -8401,4 +8401,74 @@ const CUSTOM_SITE_CONFIG = {
 })();
 </script>
 
+<!-- 📱 iPad／平板：導覽列「要點兩下才有反應」修正
+     1) 觸控裝置不套用導覽列的 hover 變色＋底線（iPad 會把第一下當成「滑鼠移過去」吃掉）
+     2) 手指一放開就直接捲到該區塊，不用等瀏覽器的點擊；捲動改成自己控制，不會被導覽列切換浮動模式打斷 -->
+<style>
+  @media (hover: none) {
+    #nav-menu a:hover:not(.is-current) { color: rgb(90 62 70); text-decoration-line: none; }
+    #nav-menu a { transition: none; -webkit-tap-highlight-color: transparent; }
+  }
+</style>
+<script>
+(function navTapFix() {
+  var menu = document.getElementById('nav-menu');
+  if (!menu) return;
+  var root = document.documentElement;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var anim = 0, handledUntil = 0, down = null;
+
+  // 算出瀏覽器原本會停的位置（含 scroll-margin-top 的設定），量完馬上捲回來，畫面不會閃
+  function targetY(el) {
+    var y0 = window.scrollY;
+    el.scrollIntoView({ block: 'start' });
+    var y = window.scrollY;
+    window.scrollTo(0, y0);
+    return y;
+  }
+  function goTo(href) {
+    var el = href && href.length > 1 && document.querySelector(href);
+    if (!el) return false;
+    cancelAnimationFrame(anim);
+    var prev = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';                    // 暫時關掉 CSS 平滑捲動，改由下面的動畫控制
+    var from = window.scrollY, to = targetY(el);
+    var dur = reduce ? 0 : Math.min(900, 350 + Math.abs(to - from) * 0.15), t0 = performance.now();
+    function step(now) {
+      var p = dur ? Math.min(1, (now - t0) / dur) : 1;
+      var e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;   // 慢 → 快 → 慢
+      window.scrollTo(0, from + (to - from) * e);
+      if (p < 1) { anim = requestAnimationFrame(step); return; }
+      to = targetY(el); window.scrollTo(0, to);           // 最後再對準一次（途中版面有變也不怕）
+      root.style.scrollBehavior = prev;
+    }
+    anim = requestAnimationFrame(step);
+    try { history.replaceState(null, '', href); } catch (e) {}
+    return true;
+  }
+  const wide = () => window.innerWidth >= 640;            // 手機版（☰ 選單）維持原本的做法
+
+  // 觸控：手指放開的瞬間就處理（輕點才算，滑動不算）
+  menu.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse') return;
+    down = { x: e.clientX, y: e.clientY, t: performance.now() };
+  });
+  menu.addEventListener('pointerup', function (e) {
+    var d = down; down = null;
+    if (!d || e.pointerType === 'mouse' || !wide()) return;
+    if (Math.abs(e.clientX - d.x) > 10 || Math.abs(e.clientY - d.y) > 10 || performance.now() - d.t > 700) return;
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (a && goTo(a.getAttribute('href'))) handledUntil = performance.now() + 800;
+  });
+  menu.addEventListener('pointercancel', function () { down = null; });
+  // 滑鼠點擊（或手指已經處理過的那一下）
+  menu.addEventListener('click', function (e) {
+    var a = e.target.closest && e.target.closest('a[href^="#"]');
+    if (!a || !wide()) return;
+    e.preventDefault();                                     // 不 stopPropagation：導覽列收起來的功能照常運作
+    if (performance.now() < handledUntil) return;          // 手指剛剛已經捲過了，不要重複
+    goTo(a.getAttribute('href'));
+  });
+})();
+</script>
 </body></html>
