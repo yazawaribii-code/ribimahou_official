@@ -1161,6 +1161,69 @@
       body:not(.edit-mode-active) #social-scrollbar { margin-top: .6rem; }
     }
   </style>
+  <!-- 導覽列最後的「繪圖委託」小膠囊按鈕（連到繪圖網站，另開新分頁） -->
+  <style>
+    #site-header #nav-menu .nav-sep { width: 1.5px; height: 1.1rem; background: #FFC9D8; border-radius: 2px; margin: 0 .3rem 0 .2rem; flex-shrink: 0; }
+    #site-header #nav-menu a.nav-art {
+      display: inline-flex; align-items: center; gap: .35rem; flex-shrink: 0;
+      padding: .36rem .85rem; border-radius: 999px; white-space: nowrap; text-decoration: none;
+      background: #FFF0F4; color: #E85A7F; border: 1.5px solid #FFC9D8;
+      transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease;
+    }
+    #site-header #nav-menu a.nav-art::after { display: none; }          /* 不要「目前區塊」的小愛心 */
+    #site-header #nav-menu a.nav-art i { font-size: .85em; }
+    #site-header #nav-menu a.nav-art .nav-art-arrow { font-size: .8em; opacity: .75; }
+    @media (hover: hover) and (pointer: fine) {
+      #site-header #nav-menu a.nav-art:hover { background: #FF8FB1; color: #fff; border-color: #FF8FB1; transform: translateY(-1px); }
+    }
+    @media (hover: none) {
+      #site-header #nav-menu a.nav-art:hover { color: #E85A7F; }       /* 平板點完不要黏著變色 */
+      #site-header #nav-menu a.nav-art.low:hover { color: #FF85A4; }
+    }
+    /* 小平板（選單比較擠）：拿掉 ↗、縮小一點間距 */
+    @media (min-width: 640px) and (max-width: 767px) {
+      #site-header #nav-menu a.nav-art { padding: .36rem .45rem; }
+      #site-header #nav-menu a.nav-art .nav-art-arrow { display: none; }
+    }
+    /* 手機 ☰ 選單：放在最下面，上面一條淡淡的分隔線 */
+    @media (max-width: 639px) {
+      #site-header.nav-open #nav-menu .nav-sep { width: auto; height: 1.5px; margin: .3rem .7rem .4rem; }
+      #site-header.nav-open #nav-menu a.nav-art { justify-content: flex-start; padding: .65rem 1rem; border-radius: .9rem; font-size: .9rem; }
+      #site-header.nav-open #nav-menu a.nav-art .nav-art-arrow { margin-left: auto; }
+    }
+  </style>
+  <!-- 導覽列：「合作」改成粉紅實心按鈕（最顯眼），「繪圖委託」改成低調的外部連結 -->
+  <style>
+    #site-header #nav-menu a.nav-cta {
+      display: inline-flex; align-items: center; gap: .4rem; flex-shrink: 0;
+      margin-left: .35rem; padding: .45rem 1.1rem; border-radius: 999px; white-space: nowrap;
+      background: #FF7FA6; color: #fff; text-decoration: none; letter-spacing: .03em;
+      transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
+    }
+    #site-header #nav-menu a.nav-cta::after { display: none; }
+    #site-header #nav-menu a.nav-cta.is-current, #site-header #nav-menu a.nav-cta:hover { color: #fff; text-decoration: none; }
+    #site-header #nav-menu a.nav-cta i { font-size: .85em; }
+    /* 繪圖委託：吸網站本來就有的粉色（跟首頁「閃亮登場囉～～」同一個粉），移上去變成標題「莉比醬」的粉 */
+    #site-header #nav-menu a.nav-art.low {
+      border: none; padding: .36rem .55rem; color: #FF85A4;
+      /* 滑鼠移上去時的底線：用一整條（文字和 ↗ 下面連在一起，不會斷成兩段） */
+      background: linear-gradient(#FFA8BE, #FFA8BE) no-repeat;
+      background-origin: content-box; background-position: 0 calc(100% + 5px); background-size: 0 2px;
+      transition: color .2s ease;
+    }
+    #site-header #nav-menu a.nav-art.low .nav-art-arrow { color: #FFB3C6; opacity: 1; }
+    @media (hover: hover) and (pointer: fine) {
+      #site-header #nav-menu a.nav-art.low:hover { background-color: transparent; background-size: 100% 2px; color: #E85A7F; transform: none; text-decoration: none; }
+      #site-header #nav-menu a.nav-cta:hover { background: #F2668F; }
+    }
+    @media (max-width: 639px) {
+      #site-header.nav-open #nav-menu a.nav-cta { justify-content: center; margin: .35rem .2rem .1rem; padding: .65rem 1rem; }
+      #site-header.nav-open #nav-menu a.nav-art.low { padding: .65rem 1rem; }
+    }
+    /* B：柔柔的光暈陰影、比較正式 */
+    #site-header #nav-menu a.nav-cta { box-shadow: 0 4px 12px -2px rgba(255,127,166,.45); }
+    @media (hover: hover) and (pointer: fine) { #site-header #nav-menu a.nav-cta:hover { transform: translateY(-1px); } }
+  </style>
 </head>
 <body class="min-h-screen relative selection:bg-sakura selection:text-white">
 
@@ -1298,12 +1361,15 @@
       <button id="nav-toggle" type="button" aria-label="開啟選單" aria-expanded="false" aria-controls="nav-menu" class="sm:hidden w-10 h-10 -mr-1 flex items-center justify-center text-2xl leading-none text-cocoa hover:text-sakura-deep cursor-pointer select-none">☰</button>
 
       <div id="nav-menu" class="flex items-center justify-between sm:justify-end w-full sm:w-auto gap-0 sm:gap-2 text-xs sm:text-sm font-bold">
+        <!-- 繪圖委託網站（另開新分頁）：網址改這裡就好 -->
+        <a href="https://illustration.ribimahou.com/" target="_blank" rel="noopener" class="nav-art low" aria-label="繪圖委託（另開新分頁）" title="繪圖委託"><span class="nav-art-text">繪圖委託</span><span class="nav-art-arrow" aria-hidden="true">↗</span></a>
+        <span class="nav-sep" aria-hidden="true"></span>
         <a href="#block-channels" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">魔法傳送門</a>
         <a href="#block-sheet" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">關於莉比醬</a>
         <a href="#block-schedule" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">本週行程</a>
         <a href="#block-videos" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">主打影片</a>
         <a href="#block-collab" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">莉程碑</a>
-        <a href="#contact" class="px-1 sm:px-3 py-1.5 whitespace-nowrap text-cocoa hover:text-sakura-deep underline-offset-[6px] decoration-2 decoration-sakura hover:underline transition">合作詢問</a>
+        <a href="#contact" class="nav-cta">合作洽詢</a>
       </div>
     </nav>
   </header>
